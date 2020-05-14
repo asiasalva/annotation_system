@@ -44,6 +44,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GUI\MainWindow.py" />
+    <Compile Include="GUI\WindowPaint.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GUI\__init__.py">
       <SubType>Code</SubType>
     </Compile>
