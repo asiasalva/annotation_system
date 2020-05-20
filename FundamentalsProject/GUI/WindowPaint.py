@@ -5,7 +5,7 @@ from PyQt5 import QtGui
 import sys
 
 
-class WindowPaint(QWidget):
+class WindowPaint(QMainWindow):
 	def setupUi(self, MainWindow):
 	
 
@@ -28,7 +28,7 @@ class WindowPaint(QWidget):
 
 		self.drawing = False
 		self.brushSize = 15
-		self.brushColor = Qt.black
+		self.brushColor = Qt.red
 		self.lastPoint = QPoint()
 
 		#mainMenu = self.menuBar()
@@ -123,7 +123,7 @@ class WindowPaint(QWidget):
 
 	def paintEvent(self, event):
 		canvasPainter  = QPainter(self)
-		canvasPainter.drawImage(self.rect(),self.image, self.image.rect() )
+		canvasPainter.drawImage(self.rect(), self.image, self.image.rect() )
 
 
 

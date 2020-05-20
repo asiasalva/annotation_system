@@ -42,16 +42,18 @@ class VideoPlayer(QWidget):
 		self.windowPaint = WindowPaint.WindowPaint()
 		self.windowPaint.setupUi(MainWindow)
 
-		#self.layout = QStackedLayout()
-		#self.layout.addWidget(self.videoWidget)
-		#self.layout.addWidget(self.windowPaint)
-		##self.layout.addWidget(self.x)
-		#self.layout.setStackingMode(QStackedLayout.StackAll)#StackOne)
+		self.layout = QStackedLayout()
+		self.layout.addWidget(self.x)
+		self.layout.addWidget(self.windowPaint)
+		self.layout.addWidget(self.videoWidget)
+		
+		self.layout.setStackingMode(QStackedLayout.StackAll)#StackOne)
 		##self.layout.setCurrentIndex(0)
 
 		#self.windowPaint.image.fill(Qt.red)
 		#self.background = QLabel(self)
 		#self.background.setPixmap(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\12.jpg"))
+		#self.layout.addWidget(self.background)
 
 		#self.layout = QGridLayout()
 		
@@ -65,8 +67,8 @@ class VideoPlayer(QWidget):
 
 		### Widget container
 		container = QVBoxLayout(self)
-		container.addWidget(self.videoWidget)
-		#container.addLayout(self.layout)
+		#container.addWidget(self.videoWidget)
+		container.addLayout(self.layout)
 		container.addWidget(self.positionSlider)
 
 
@@ -89,8 +91,8 @@ class VideoPlayer(QWidget):
 	# Change slider position as video go forward/backward
 	def positionChanged(self, position):
 		self.positionSlider.setValue(position)
-		if position > self.time/2:
-			self.layout.setCurrentIndex(1)
+		#if position > self.time/2:
+		#	self.layout.setCurrentIndex(1)
 
 	# Change slider moving speed
 	def durationChanged(self, duration):
