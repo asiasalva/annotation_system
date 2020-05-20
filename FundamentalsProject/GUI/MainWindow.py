@@ -10,6 +10,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import GUI
 from GUI import (VideoPlayerControlBar, VideoPlayer, AnnotationsTable, AnnotationsProperties, AnnotationsList)
+from GUI import VideoPlayerOpenCV
 
 
 class Ui_MainWindow(object):
@@ -102,7 +103,8 @@ class Ui_MainWindow(object):
 		### Custom widgets - "Video side"
 
 		# Add VideoPlayer widget
-		self.videoPlayer = VideoPlayer.VideoPlayer()
+		###self.videoPlayer = VideoPlayer.VideoPlayer()
+		self.videoPlayer = VideoPlayerOpenCV.VideoPlayerOpenCV()
 		self.videoPlayer.setupUi(self)
 
 		# Add VideoPlayerControlBar widget
@@ -149,6 +151,7 @@ class Ui_MainWindow(object):
 
 		#self.videoPlayerControlBar.provaControlBar(123)
 		#self.annotationsProperties.prova(12)
+		self.videoPlayer.start()
 
 
 
