@@ -1,12 +1,9 @@
-import sys
-
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray
-from PyQt5.QtGui import QColor, QCursor, QPainterPath, QBrush
+from PyQt5.QtGui import QColor, QCursor
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
 
-import GUI
 from GUI import Mode
 
 class Annotation(QWidget):
@@ -19,7 +16,7 @@ class Annotation(QWidget):
 	outFocus = pyqtSignal(bool)
 	newGeometry = pyqtSignal(QRect)
 
-	def __init__(self, parent, p, cWidget, isArrow = False): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
+	def __init__(self, parent, p, cWidget, isArrow): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
 		super().__init__(parent=parent)
 
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
@@ -98,8 +95,10 @@ class Annotation(QWidget):
 
 	def keyPressEvent(self, e: QtGui.QKeyEvent):
 		if not self.m_isEditing: return
+		# Remove annotation
 		if e.key() == QtCore.Qt.Key_Delete:
 			self.deleteLater()
+			self.parentWidget().removeAnnotation(self)
 		# Moving container with arrows
 		if QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
 			newPos = QPoint(self.x(), self.y())
@@ -183,6 +182,8 @@ class Annotation(QWidget):
 
 	def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseReleaseEvent(self, e)
+		# Save new annotation's position
+		self.annotationPosition = self.pos()
 
 	def mouseMoveEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseMoveEvent(self, e)

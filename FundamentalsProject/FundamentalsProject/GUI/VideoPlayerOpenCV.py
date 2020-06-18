@@ -1,17 +1,11 @@
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import (QVBoxLayout, QWidget , QSlider, QLabel)
+import cv2
 
+from PyQt5.QtWidgets import QVBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
-from PyQt5.QtMultimediaWidgets import QVideoWidget
 from PyQt5.QtCore import Qt, QUrl, QTimer
-from PyQt5 import QtGui
 from PyQt5.QtGui import QPixmap, QImage
 
-
-import GUI
 from GUI import WindowPaint
-from PyQt5.QtWidgets import QStackedLayout, QGridLayout
-import cv2 
 
 
 class VideoPlayerOpenCV(QWidget):

@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit
-from PyQt5.QtCore import QPoint, Qt
+from PyQt5.QtCore import QPoint
 from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Annotation
@@ -31,5 +31,9 @@ class AnnotationsContainer(QWidget):
 			)
 		elif(annotationType == 3):	# BREAKPOINT
 			print("Creating BREAKPOINT")
+
+
+	def removeAnnotation(self, annotationToRemove):
+		self.mw.listOfAnnotations.remove(annotationToRemove)
 
 

@@ -31,6 +31,9 @@
     <Compile Include="GUI\Annotation.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GUI\AnnotationDrawing.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="GUI\AnnotationsContainer.py">
       <SubType>Code</SubType>
     </Compile>
@@ -44,9 +47,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GUI\Mode.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="GUI\VideoPlayer.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GUI\VideoPlayerControlBar.py">

@@ -1,6 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import (QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QHeaderView)
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QLabel
 
 class AnnotationsTable(QWidget):
 
@@ -15,15 +13,15 @@ class AnnotationsTable(QWidget):
 		self.table.setHorizontalHeaderLabels(("Frame", "Sec", "Type"))
 		
 		header = self.table.horizontalHeader()       
-		header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
-		header.setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
-		header.setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
+		header.setSectionResizeMode(0, QHeaderView.Stretch)
+		header.setSectionResizeMode(1, QHeaderView.Stretch)
+		header.setSectionResizeMode(2, QHeaderView.Stretch)
 
 
 
 		### Widget container
 		container = QVBoxLayout(self)
-		container.addWidget(QtWidgets.QLabel("Annotations"))
+		container.addWidget(QLabel("Annotations"))
 		container.addWidget(self.table)
 
 

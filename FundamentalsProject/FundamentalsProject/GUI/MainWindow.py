@@ -1,16 +1,6 @@
-# -*- coding: utf-8 -*-
+from PyQt5 import QtCore, QtWidgets
 
-# Form implementation generated from reading ui file 'MainWindow.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
-
-from PyQt5 import QtCore, QtGui, QtWidgets
-import GUI
-from GUI import (VideoPlayerControlBar, VideoPlayer, AnnotationsTable, AnnotationsProperties, AnnotationsList)
-from GUI import VideoPlayerOpenCV
+from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
 from GUI import Annotation, WindowPaint, AnnotationsContainer
 
 
@@ -106,7 +96,6 @@ class Ui_MainWindow(object):
 		### Custom widgets - "Video side"
 
 		# Add VideoPlayer widget
-		###self.videoPlayer = VideoPlayer.VideoPlayer()
 		self.videoPlayer = VideoPlayerOpenCV.VideoPlayerOpenCV()
 		self.videoPlayer.setupUi(self)
 
@@ -162,6 +151,7 @@ class Ui_MainWindow(object):
 
 		if(command == 0):					# First setup
 			self.listOfAnnotations = list()
+			self.listOfDrawing = list()
 			
 
 
@@ -188,6 +178,12 @@ class Ui_MainWindow(object):
 			self.videoPlayer.forward()
 		elif(command == 7):
 			self.videoPlayer.nextBreakpoint()
+
+
+		#for item in self.listOfAnnotations:
+		#	print(item.getPosition())
+		#for item in self.listOfDrawing:
+		#	print(item.drawingType)
 
 
 

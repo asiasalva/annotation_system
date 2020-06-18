@@ -1,12 +1,18 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMenu, QMenuBar, QAction, QFileDialog, QWidget
-from PyQt5.QtGui import QIcon, QImage, QPainter, QPen, QBrush, QColor
-from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 from PyQt5 import QtGui
-import sys
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtGui import QImage, QPainter, QPen, QBrush, QColor
+from PyQt5.QtCore import Qt, QPoint, QRect, QSize
+
+from GUI import AnnotationDrawing
 
 
-class WindowPaint(QMainWindow):
+class WindowPaint(QWidget):
 	def setupUi(self, MainWindow):
+
+		self.mw = MainWindow
+
+
+
 
 		self.image = QImage(self.size(), QImage.Format_ARGB32)
 		self.image.fill(QtGui.qRgba(0,0,0,0));
@@ -16,10 +22,16 @@ class WindowPaint(QMainWindow):
 		self.brushColor = Qt.red
 		self.lastPoint = QPoint()
 
+		self.painterPen = QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+
 		self.clear = False
-		self.clearSize = 15
+		self.rubberSize = 15
 
 		self.trackMouse = False
+
+
+
+		
 
 
 		''' Per provare la GOMMA, togli il commento da questo pezzo
@@ -99,19 +111,24 @@ class WindowPaint(QMainWindow):
 		if(event.buttons() & Qt.LeftButton) & self.drawing:
 			if ((0 <= event.x() <= self.width()) and (0 <= event.y() <= self.height())):
 				painter = QPainter(self.image)
-				painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+				painter.setPen(self.painterPen)
 
 				currentPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
 
 				if self.clear:
-					r = QRect(QPoint(), self.clearSize*QSize())
+					r = QRect(QPoint(), self.rubberSize*QSize())
 					r.moveCenter(currentPoint)
 					painter.save()
 					painter.setCompositionMode(QPainter.CompositionMode_Clear)
 					painter.eraseRect(r)
 					painter.restore()
+
+					# dType = 0 -> LINE, 1 -> RUBBER
+					self.createAnnotation(1, None, None, None, self.rubberSize, currentPoint)
 				else:
 					painter.drawLine(self.lastPoint, currentPoint)
+					# dType = 0 -> LINE, 1 -> RUBBER
+					self.createAnnotation(0, self.painterPen, self.lastPoint, currentPoint, None, None)
 
 
 				self.lastPoint = currentPoint
@@ -135,7 +152,7 @@ class WindowPaint(QMainWindow):
 	def changeColour(self):
 		self.clear = not self.clear
 		if self.clear:
-			pixmap = QtGui.QPixmap(QSize(1, 1)*self.clearSize)
+			pixmap = QtGui.QPixmap(QSize(1, 1)*self.rubberSize)
 			pixmap.fill(Qt.transparent)
 			painter = QtGui.QPainter(pixmap)
 			painter.setPen(QtGui.QPen(Qt.black, 2))
@@ -148,12 +165,45 @@ class WindowPaint(QMainWindow):
 
 
 
+
+
 	def setTrackingMouse(self, tracking):
 		self.trackMouse = tracking
 
 	def getTrackingMouse(self):
 		return self.trackMouse
 
+	def setPainterPen(self, pen):
+		self.painterPen = pen
+
+	def getPainterPen(self):
+		return self.painterPen
+
+	def setRubberSize(self, size):
+		self.rubberSize = size
+
+	def getRubberSize(self):
+		return self.rubberSize
+
+	
+	def createAnnotation(self, dType, pen, pStart, pEnd, rSize, rPoint):
+		self.mw.listOfDrawing.append(
+			AnnotationDrawing.AnnotationDrawing(dType, pen, pStart, pEnd, rSize, rPoint)
+		)
+
+
+
+
+
+
+	#LINE
+	#painterPen		QPen	
+	#pointStart		QPoint
+	#pointEnd		QPoint
+
+	#RUBBER
+	#rubberSize		int
+	#point			QPoint
 
 
 
