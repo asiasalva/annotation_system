@@ -18,14 +18,14 @@ class WindowPaint(QWidget):
 		self.image.fill(QtGui.qRgba(0,0,0,0));
 
 		self.drawing = False
-		self.brushSize = 15
+		self.brushSize = 1
 		self.brushColor = Qt.red
 		self.lastPoint = QPoint()
 
 		self.painterPen = QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
 
 		self.clear = False
-		self.rubberSize = 15
+		self.rubberSize = 1
 
 		self.trackMouse = False
 
@@ -190,6 +190,25 @@ class WindowPaint(QWidget):
 		self.mw.listOfDrawing.append(
 			AnnotationDrawing.AnnotationDrawing(dType, pen, pStart, pEnd, rSize, rPoint)
 		)
+
+	def drawAnnotations(self, listOfDrawings):
+		
+		painter = QPainter(self.image)
+		
+		for drawing in listOfDrawings:			
+
+			# drawingType = 0 -> LINE, 1 -> RUBBER
+			if drawing.drawingType:
+				r = QRect(QPoint(), drawing.rubberSize*QSize())
+				r.moveCenter(drawing.rubberPoint)
+				painter.save()
+				painter.setCompositionMode(QPainter.CompositionMode_Clear)
+				painter.eraseRect(r)
+				painter.restore()
+			else:
+				painter.setPen(drawing.painterPen)
+				painter.drawLine(drawing.pointStart, drawing.pointEnd)
+
 
 
 

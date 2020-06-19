@@ -16,8 +16,11 @@ class Annotation(QWidget):
 	outFocus = pyqtSignal(bool)
 	newGeometry = pyqtSignal(QRect)
 
-	def __init__(self, parent, p, cWidget, isArrow): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
+	def __init__(self, parent, p, cWidget, isArrow, MainWindow): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
 		super().__init__(parent=parent)
+
+		self.mw = MainWindow
+		self.childWidget = None
 
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
@@ -51,6 +54,9 @@ class Annotation(QWidget):
 			elif(isinstance(self.childWidget, QSvgWidget)):
 				self.setupSvgVariables(isArrow)
 
+
+			self.mw.setLastFocusAnnotation(self)
+
 	
 	def focusInEvent(self, a0: QtGui.QFocusEvent):
 		self.m_infocus = True
@@ -58,6 +64,9 @@ class Annotation(QWidget):
 		p.installEventFilter(self)
 		p.repaint()
 		self.inFocus.emit(True)
+
+		if self.childWidget is not None:
+			self.mw.setLastFocusAnnotation(self)
 
 	def focusOutEvent(self, a0: QtGui.QFocusEvent):
 		if not self.m_isEditing:
@@ -68,7 +77,7 @@ class Annotation(QWidget):
 
 	def paintEvent(self, e: QtGui.QPaintEvent):
 		painter = QtGui.QPainter(self)
-		color = (r, g, b, a) = (255, 0, 0, 16)
+		color = (r, g, b, a) = (255, 0, 0, 0)
 		painter.fillRect(e.rect(), QColor(r, g, b, a))
 
 		if self.m_infocus:
@@ -289,6 +298,13 @@ class Annotation(QWidget):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.textboxText = ""
 
+			'''
+			x = self.childWidget.palette()#QtGui.QPalette()
+			x.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QtCore.Qt.red);
+			self.childWidget.setPalette(x)
+			'''
+			
+
 	def mouseDoubleClickEvent(self, event):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
@@ -350,7 +366,7 @@ class Annotation(QWidget):
 			self.svgString_end = r',12,12)"/></svg>'
 
 			self.svgColor = "000000"			# Color of the SVG image (both LINE or ARROW)
-			self.svgExtraAttribute = "1"		# Extra attribute of the SVG image ('stroke-width' for LINE, 'fill-opacity' for ARROW
+			self.svgExtraAttribute = "1"		# Extra attribute of the SVG image ('stroke-width' for LINE, 'fill-opacity' for ARROW)
 			self.svgTransform = "0"				# Rotation of the SVG image
 
 

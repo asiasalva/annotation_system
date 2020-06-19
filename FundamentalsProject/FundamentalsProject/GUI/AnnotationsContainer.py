@@ -17,17 +17,17 @@ class AnnotationsContainer(QWidget):
 		if(annotationType == 0):	# LINE
 			print("Creating LINE")
 			self.mw.listOfAnnotations.append(
-				Annotation.Annotation(self, QPoint(10,10), QSvgWidget(), False)
+				Annotation.Annotation(self, QPoint(10,10), QSvgWidget(), False, self.mw)
 			)
 		elif(annotationType == 1):	# ARROW
 			print("Creating ARROW")
 			self.mw.listOfAnnotations.append(
-				Annotation.Annotation(self, QPoint(10,10), QSvgWidget(), True)
+				Annotation.Annotation(self, QPoint(10,10), QSvgWidget(), True, self.mw)
 			)
 		elif(annotationType == 2):	# TEXTBOX
 			print("Creating TEXTBOX")
 			self.mw.listOfAnnotations.append(
-				Annotation.Annotation(self, QPoint(10,10), QPlainTextEdit(), False)
+				Annotation.Annotation(self, QPoint(10,10), QPlainTextEdit(), False, self.mw)
 			)
 		elif(annotationType == 3):	# BREAKPOINT
 			print("Creating BREAKPOINT")

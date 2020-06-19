@@ -1,8 +1,7 @@
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer
-
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing
 
 class Ui_MainWindow(object):
 
@@ -152,6 +151,51 @@ class Ui_MainWindow(object):
 		if(command == 0):					# First setup
 			self.listOfAnnotations = list()
 			self.listOfDrawing = list()
+			self.lastFocusAnnotation = None
+			#self.lastFocusAnnotationIndex = -1
+
+
+			'''
+			# Prova di "windowPaint.drawAnnotations"
+			self.listOfDrawing.append(
+			AnnotationDrawing.AnnotationDrawing(0, QtGui.QPen(QtCore.Qt.black, 25, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin), QtCore.QPoint(10,10), QtCore.QPoint(10,50), None, None)
+			)
+			self.listOfDrawing.append(
+			AnnotationDrawing.AnnotationDrawing(1, None, None, None, 5, QtCore.QPoint(10,25))
+			)
+
+			self.windowPaint.drawAnnotations(self.listOfDrawing)
+			'''
+
+	'''
+	def setLastFocusAnnotationIndex(self, lastFocusAnnotation):
+		self.lastFocusAnnotationIndex = self.listOfAnnotations.index(lastFocusAnnotation)
+		print("index = " + str(self.lastFocusAnnotationIndex))
+
+		#print(self.listOfAnnotations[self.lastFocusAnnotationIndex].childWidget.__class__.__name__)
+		#print(self.listOfAnnotations[self.lastFocusAnnotationIndex].svgTransform)
+		#self.listOfAnnotations[self.lastFocusAnnotationIndex].setSvgTransform("30")
+
+		self.lastFocusAnnotation = lastFocusAnnotation
+
+		print(self.lastFocusAnnotation.textboxText)
+		print(self.listOfAnnotations[self.lastFocusAnnotationIndex].textboxText)
+		self.lastFocusAnnotation.setTextboxText("ciao ciao")
+	'''
+
+	def setLastFocusAnnotation(self, lastFocusAnnotation):
+		self.lastFocusAnnotation = lastFocusAnnotation
+
+		print("Widget on focus")
+		#print(self.lastFocusAnnotation.childWidget.__class__.__name__)
+		print(self.lastFocusAnnotation.childWidget.__class__)
+		#print(QtWidgets.QPlainTextEdit)
+		#print(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit))
+		#print(isinstance(None, QtWidgets.QPlainTextEdit))
+
+		self.annotationsProperties.setProperties(self.lastFocusAnnotation)
+		
+
 			
 
 
@@ -199,6 +243,10 @@ class Ui_MainWindow(object):
 		# 4 -> drawing
 
 		if(command == 4):
+
+			self.lastFocusAnnotation = None
+			self.annotationsProperties.setProperties(self.lastFocusAnnotation)
+
 			if self.windowPaint.getTrackingMouse():
 				self.annotationsList.changeDrawButtonText(False)
 				self.windowPaint.setTrackingMouse(False)
