@@ -1,17 +1,7 @@
-# -*- coding: utf-8 -*-
+from PyQt5 import QtCore, QtWidgets, QtGui
 
-# Form implementation generated from reading ui file 'MainWindow.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
-
-from PyQt5 import QtCore, QtGui, QtWidgets
-import GUI
-from GUI import (VideoPlayerControlBar, VideoPlayer, AnnotationsTable, AnnotationsProperties, AnnotationsList)
-from GUI import VideoPlayerOpenCV
-
+from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing
 
 class Ui_MainWindow(object):
 
@@ -95,15 +85,16 @@ class Ui_MainWindow(object):
 		QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
 
+		### Custom widgets - Annotations
 
-
-
+		self.windowPaint = WindowPaint.WindowPaint()
+		self.windowPaint.setupUi(self)
+		self.annotationsContainer = AnnotationsContainer.AnnotationsContainer(self)
 
 
 		### Custom widgets - "Video side"
 
 		# Add VideoPlayer widget
-		###self.videoPlayer = VideoPlayer.VideoPlayer()
 		self.videoPlayer = VideoPlayerOpenCV.VideoPlayerOpenCV()
 		self.videoPlayer.setupUi(self)
 
@@ -114,7 +105,6 @@ class Ui_MainWindow(object):
 		# Put "video side" components inside vertical container previously defined
 		self.vboxVideo.addWidget(self.videoPlayer)
 		self.vboxVideo.addWidget(self.videoPlayerControlBar)
-
 
 
 
@@ -132,29 +122,11 @@ class Ui_MainWindow(object):
 		self.annotationsTable = AnnotationsTable.AnnotationsTable()
 		self.annotationsTable.setupUi(self)
 
-		
-
 		# Put "annotations side" components inside splitter container previously defined
 		self.splitterAnnotation.addWidget(self.annotationsList)
 		self.splitterAnnotation.addWidget(self.annotationsProperties)
-		self.splitterAnnotation.addWidget(self.annotationsTable)		
+		self.splitterAnnotation.addWidget(self.annotationsTable)
 		
-
-
-
-
-
-
-
-
-
-
-		#self.videoPlayerControlBar.provaControlBar(123)
-		#self.annotationsProperties.prova(12)
-		self.videoPlayer.start()
-
-
-
 
 
 	def retranslateUi(self, MainWindow):
@@ -173,5 +145,88 @@ class Ui_MainWindow(object):
 
 
 
-	#def prova(doNotCareYouNeedThisArgumentToMakeFuncionWork, text):
-	#	print("MainWindow -> " + text)
+	def setupAnnotations(self, command, fileName = ""):
+		print("setupAnnotations")
+
+		if(command == 0):					# First setup
+			self.listOfAnnotations = list()
+			self.listOfDrawing = list()
+
+
+			'''
+			# Prova di "windowPaint.drawAnnotations"
+			self.listOfDrawing.append(
+			AnnotationDrawing.AnnotationDrawing(0, QtGui.QPen(QtCore.Qt.black, 25, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin), QtCore.QPoint(10,10), QtCore.QPoint(10,50), None, None)
+			)
+			self.listOfDrawing.append(
+			AnnotationDrawing.AnnotationDrawing(1, None, None, None, 5, QtCore.QPoint(10,25))
+			)
+
+			self.windowPaint.drawAnnotations(self.listOfDrawing)
+			'''
+
+			
+
+
+
+
+	### ACTIONS: VideoPlayerControlBar -> VideoPlayerOpenCV
+
+	def controlBarCommand(self, command):
+		print("controlBarCommand -> " + str(command))
+
+		if(command == 0):
+			self.videoPlayer.play()
+		elif(command == 1):
+			self.videoPlayer.pause()
+		elif(command == 2):
+			self.videoPlayer.stop()
+		elif(command == 3):
+			self.videoPlayer.backward()
+		elif(command == 4):
+			self.videoPlayer.decreaseSpeed()
+		elif(command == 5):
+			self.videoPlayer.increaseSpeed()
+		elif(command == 6):
+			self.videoPlayer.forward()
+		elif(command == 7):
+			self.videoPlayer.nextBreakpoint()
+
+
+		#for item in self.listOfAnnotations:
+		#	print(item.getPosition())
+		#for item in self.listOfDrawing:
+		#	print(item.drawingType)
+
+
+
+	### ACTIONS: AnnotationsList -> ???
+
+	def annotationsListCommand(self, command):
+		print("annotationsListCommand -> " + str(command))
+
+		# 0 -> line
+		# 1 -> arrow
+		# 2 -> textbox
+		# 3 -> breakpoint
+		# 4 -> drawing
+
+		if(command == 4):
+			if self.windowPaint.getTrackingMouse():
+				self.annotationsList.changeDrawButtonText(False)
+				self.windowPaint.setTrackingMouse(False)
+				self.videoPlayer.setLayoutWidget(2)
+			else:
+				self.annotationsList.changeDrawButtonText(True)
+				self.windowPaint.setTrackingMouse(True)
+				self.videoPlayer.setLayoutWidget(1)
+			### TO DO -> properties
+		else:
+			self.annotationsList.changeDrawButtonText(False)
+			self.windowPaint.setTrackingMouse(False)
+			self.videoPlayer.setLayoutWidget(2)
+			### TO DO
+
+			self.annotationsContainer.createAnnotation(command)
+
+	
