@@ -167,36 +167,77 @@ class Ui_MainWindow(object):
 			self.windowPaint.drawAnnotations(self.listOfDrawing)
 			'''
 
-	'''
-	def setLastFocusAnnotationIndex(self, lastFocusAnnotation):
-		self.lastFocusAnnotationIndex = self.listOfAnnotations.index(lastFocusAnnotation)
-		print("index = " + str(self.lastFocusAnnotationIndex))
-
-		#print(self.listOfAnnotations[self.lastFocusAnnotationIndex].childWidget.__class__.__name__)
-		#print(self.listOfAnnotations[self.lastFocusAnnotationIndex].svgTransform)
-		#self.listOfAnnotations[self.lastFocusAnnotationIndex].setSvgTransform("30")
-
-		self.lastFocusAnnotation = lastFocusAnnotation
-
-		print(self.lastFocusAnnotation.textboxText)
-		print(self.listOfAnnotations[self.lastFocusAnnotationIndex].textboxText)
-		self.lastFocusAnnotation.setTextboxText("ciao ciao")
-	'''
 
 	def setLastFocusAnnotation(self, lastFocusAnnotation):
 		self.lastFocusAnnotation = lastFocusAnnotation
 
-		print("Widget on focus")
+		#print("Widget on focus")
 		#print(self.lastFocusAnnotation.childWidget.__class__.__name__)
-		print(self.lastFocusAnnotation.childWidget.__class__)
+		#print(self.lastFocusAnnotation.childWidget.__class__)
 		#print(QtWidgets.QPlainTextEdit)
 		#print(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit))
+		#print(isinstance(self.lastFocusAnnotation.childWidget.__class__, QtWidgets.QPlainTextEdit))
+		#print(self.lastFocusAnnotation.childWidget.__class__ is QtWidgets.QPlainTextEdit)
 		#print(isinstance(None, QtWidgets.QPlainTextEdit))
 
-		self.annotationsProperties.setProperties(self.lastFocusAnnotation)
+		self.windowPaint.setRubber(False)
+
+
+		if(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__, 
+				False, 
+				None, 
+				None, 
+				None
+			)
+		elif self.lastFocusAnnotation.isArrow:
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__, 
+				self.lastFocusAnnotation.isArrow, 
+				self.lastFocusAnnotation.svgColor, 
+				int(float(self.lastFocusAnnotation.svgExtraAttribute)*100), 
+				int(self.lastFocusAnnotation.svgTransform)
+			)
+		else:
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__, 
+				self.lastFocusAnnotation.isArrow, 
+				self.lastFocusAnnotation.svgColor, 
+				int(self.lastFocusAnnotation.svgExtraAttribute), 
+				int(self.lastFocusAnnotation.svgTransform)
+			)
 		
 
-			
+	def setNewAnnotationProperties(self, colorString, value1, value2):
+		
+		# DRAWING
+		if self.lastFocusAnnotation is None:
+			# RUBBER
+			if colorString is None:
+				self.windowPaint.setRubber(True)
+				self.windowPaint.setRubberSize(value2)
+			# DRAW
+			else:
+				self.windowPaint.setPainterPen(QtGui.QPen(QtGui.QColor(colorString), value1, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+				self.windowPaint.setRubber(False)
+				self.windowPaint.setRubberSize(value2)
+		# TEXTBOX
+		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
+			print("textbox...per ora niente proprieta'")
+		# ARROW
+		elif self.lastFocusAnnotation.isArrow:
+			self.lastFocusAnnotation.setSvgColor(colorString)
+			self.lastFocusAnnotation.setSvgExtraAttribute(str(value1/100))
+			self.lastFocusAnnotation.setSvgTransform(str(value2))
+		# LINE
+		else:
+			self.lastFocusAnnotation.setSvgColor(colorString)
+			self.lastFocusAnnotation.setSvgExtraAttribute(str(value1))
+			self.lastFocusAnnotation.setSvgTransform(str(value2))
+
+
+
 
 
 
@@ -224,12 +265,6 @@ class Ui_MainWindow(object):
 			self.videoPlayer.nextBreakpoint()
 
 
-		#for item in self.listOfAnnotations:
-		#	print(item.getPosition())
-		#for item in self.listOfDrawing:
-		#	print(item.drawingType)
-
-
 
 	### ACTIONS: AnnotationsList -> ???
 
@@ -245,22 +280,27 @@ class Ui_MainWindow(object):
 		if(command == 4):
 
 			self.lastFocusAnnotation = None
-			self.annotationsProperties.setProperties(self.lastFocusAnnotation)
+			self.annotationsProperties.setProperties(
+				None, 
+				False, 
+				self.windowPaint.getPainterPen().color().name(),
+				self.windowPaint.getPainterPen().width(),
+				self.windowPaint.getRubberSize()
+			)
 
 			if self.windowPaint.getTrackingMouse():
 				self.annotationsList.changeDrawButtonText(False)
 				self.windowPaint.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(2)
+				self.windowPaint.setRubber(False)
 			else:
 				self.annotationsList.changeDrawButtonText(True)
 				self.windowPaint.setTrackingMouse(True)
 				self.videoPlayer.setLayoutWidget(1)
-			### TO DO -> properties
 		else:
 			self.annotationsList.changeDrawButtonText(False)
 			self.windowPaint.setTrackingMouse(False)
 			self.videoPlayer.setLayoutWidget(2)
-			### TO DO
 
 			self.annotationsContainer.createAnnotation(command)
 

@@ -149,8 +149,8 @@ class WindowPaint(QWidget):
 		canvasPainter.drawImage(self.rect(), self.image, self.image.rect() )
 
 
-	def changeColour(self):
-		self.clear = not self.clear
+	def setRubber(self, active):
+		self.clear = active
 		if self.clear:
 			pixmap = QtGui.QPixmap(QSize(1, 1)*self.rubberSize)
 			pixmap.fill(Qt.transparent)

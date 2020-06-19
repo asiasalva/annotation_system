@@ -11,6 +11,9 @@ class AnnotationsProperties(QWidget):
 
 	def setupUi(self, MainWindow):
 
+		self.mw = MainWindow
+
+
 		### Widgets simulating a list view
 		self.formLayout = QFormLayout()
 		self.frame = QFrame()
@@ -46,9 +49,12 @@ class AnnotationsProperties(QWidget):
 		self.comboboxColor = QComboBox()
 
 		self.setStandardColors(self.comboboxColor)
-		self.comboboxColor.activated.connect(self.getSelectedColor)
+		#self.comboboxColor.activated.connect(self.getSelectedColor)
+		self.comboboxColor.activated.connect(self.changeProperties)
+		self.spinboxValue1.valueChanged.connect(self.changeProperties)
+		self.spinboxValue2.valueChanged.connect(self.changeProperties)
 
-		self.setProperties(None)
+		#self.setProperties(None, False, "#000000", 1, 10)
 
 		self.formLayout.addRow(self.lblColor, self.comboboxColor)
 		self.formLayout.addRow(self.lblValue1, self.spinboxValue1)
@@ -94,53 +100,75 @@ class AnnotationsProperties(QWidget):
 
 
 
-	def setProperties(self, annotation):
+	def setProperties(self, annotationClass, isArrow, colorString, value1, value2):
 		print("Choosing properties")
 
-		if annotation is None:
+		self.spinboxValue1.blockSignals(True)
+		self.spinboxValue2.blockSignals(True)
+
+		if annotationClass is None:
 			# DRAWING
 			self.lblColor.setText("Brush color:")
 			self.lblValue1.setText("Brush size:")
 			self.lblValue2.setText("Rubber size:")
 			self.spinboxValue1.setRange(1, 100)
-			self.spinboxValue1.setValue(1)
+			self.spinboxValue1.setValue(value1)
 			self.spinboxValue2.setRange(1, 100)
-			self.spinboxValue2.setValue(10)
+			self.spinboxValue2.setValue(value2)
 
-			if(self.comboboxColor.itemData(0) != 0):
+			if(self.comboboxColor.itemData(0) is not None):
 				self.insertRubber(self.comboboxColor, 0)
+
+			self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 		else:
 			# Annotation -> remove rubber from colors
-			if(self.comboboxColor.itemData(0) == 0):
+			if(self.comboboxColor.itemData(0) is None):
 				self.removeRubber(self.comboboxColor, 0)
 
 			#if(isinstance(annotation.childWidget, QtWidgets.QPlainTextEdit)):
 				# TEXTBOX
 				# ???
 
-			if(isinstance(annotation.childWidget, QSvgWidget)):
+			if annotationClass is QSvgWidget:
 				# SVG
-				if annotation.isArrow:
+				if isArrow:
 					# ARROW
 					self.lblColor.setText("Arrow color:")
 					self.lblValue1.setText("Arrow opacity:")
 					self.lblValue2.setText("Arrow rotation:")
 					self.spinboxValue1.setRange(0, 100)
-					self.spinboxValue1.setValue(100)
+					self.spinboxValue1.setValue(value1)
 					self.spinboxValue2.setRange(0, 360)
-					self.spinboxValue2.setValue(0)
+					self.spinboxValue2.setValue(value2)
+					self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 				else:
 					# LINE
 					self.lblColor.setText("Line color:")
 					self.lblValue1.setText("Line width:")
 					self.lblValue2.setText("Line rotation:")
 					self.spinboxValue1.setRange(1, 25)
-					self.spinboxValue1.setValue(1)
+					self.spinboxValue1.setValue(value1)
 					self.spinboxValue2.setRange(0, 360)
-					self.spinboxValue2.setValue(0)
+					self.spinboxValue2.setValue(value2)
+					self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
+
+
+		
+		self.spinboxValue1.blockSignals(False)
+		self.spinboxValue2.blockSignals(False)
 
 
 
+	def changeProperties(self):
+		selectedColor = self.comboboxColor.currentData()
+		selectedValue1 = self.spinboxValue1.value()
+		selectedValue2 = self.spinboxValue2.value()
+
+
+		self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2)
+
+
+		
 
 
 
@@ -148,37 +176,39 @@ class AnnotationsProperties(QWidget):
 		print(self.comboboxColor.currentData())
 
 	def insertRubber(self, combobox, index):
-		combobox.insertItem(index, QIcon(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\rubber.svg").scaled(12,12)), "Rubber", 0)
+		combobox.insertItem(index, QIcon(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\rubber.svg").scaled(12,12)), "Rubber", None)
 
 	def removeRubber(self, combobox, index):
 		combobox.removeItem(index)
 	
-	def insertColor(self, combobox, color, name):
+	def insertColor(self, combobox, brushColor, name):
 		pix = QPixmap(12, 12)
 		painter = QPainter(pix)
 
 		painter.setPen(Qt.gray)
-		painter.setBrush(QBrush(color))
+		painter.setBrush(brushColor)
 		painter.drawRect(0, 0, 12, 12)
+
 		painter.end()
 
-		combobox.addItem(QIcon(pix), name, color)
+		combobox.addItem(QIcon(pix), name, brushColor.color().name())
+
 
 	def setStandardColors(self, combobox):
-		self.insertColor(combobox, Qt.black, "Black")					# 2
-		self.insertColor(combobox, Qt.white, "White")					# 3
-		self.insertColor(combobox, Qt.red, "Red")						# 7
-		self.insertColor(combobox, Qt.darkRed, "Dark red")				# 13
-		self.insertColor(combobox, Qt.green, "Green")					# 8
-		self.insertColor(combobox, Qt.darkGreen, "Dark green")			# 14
-		self.insertColor(combobox, Qt.blue, "Blue")						# 9
-		self.insertColor(combobox, Qt.darkBlue, "Dark blue")			# 15
-		self.insertColor(combobox, Qt.cyan, "Cyan")						# 10
-		self.insertColor(combobox, Qt.darkCyan, "Dark cyan")			# 16
-		self.insertColor(combobox, Qt.magenta, "Magenta")				# 11
-		self.insertColor(combobox, Qt.darkMagenta, "Dark magenta")		# 17
-		self.insertColor(combobox, Qt.yellow, "Yellow")					# 12
-		self.insertColor(combobox, Qt.darkYellow, "Dark yellow")		# 18
-		self.insertColor(combobox, Qt.gray, "Gray")						# 5
-		self.insertColor(combobox, Qt.darkGray, "Dark gray")			# 4
-		self.insertColor(combobox, Qt.lightGray, "Light gray")			# 6
+		self.insertColor(combobox, QBrush(Qt.black), "Black")					# 2		#000000
+		self.insertColor(combobox, QBrush(Qt.white), "White")					# 3		#ffffff
+		self.insertColor(combobox, QBrush(Qt.red), "Red")						# 7		#ff0000
+		self.insertColor(combobox, QBrush(Qt.darkRed), "Dark red")				# 13	#800000
+		self.insertColor(combobox, QBrush(Qt.green), "Green")					# 8		#00ff00
+		self.insertColor(combobox, QBrush(Qt.darkGreen), "Dark green")			# 14	#008000
+		self.insertColor(combobox, QBrush(Qt.blue), "Blue")						# 9		#0000ff
+		self.insertColor(combobox, QBrush(Qt.darkBlue), "Dark blue")			# 15	#000080
+		self.insertColor(combobox, QBrush(Qt.cyan), "Cyan")						# 10	#00ffff
+		self.insertColor(combobox, QBrush(Qt.darkCyan), "Dark cyan")			# 16	#008080
+		self.insertColor(combobox, QBrush(Qt.magenta), "Magenta")				# 11	#ff00ff
+		self.insertColor(combobox, QBrush(Qt.darkMagenta), "Dark magenta")		# 17	#800080
+		self.insertColor(combobox, QBrush(Qt.yellow), "Yellow")					# 12	#ffff00
+		self.insertColor(combobox, QBrush(Qt.darkYellow), "Dark yellow")		# 18	#808000
+		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
+		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
+		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0

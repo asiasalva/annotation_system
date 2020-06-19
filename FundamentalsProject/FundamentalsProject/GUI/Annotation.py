@@ -365,7 +365,7 @@ class Annotation(QWidget):
 
 			self.svgString_end = r',12,12)"/></svg>'
 
-			self.svgColor = "000000"			# Color of the SVG image (both LINE or ARROW)
+			self.svgColor = "#000000"			# Color of the SVG image (both LINE or ARROW)
 			self.svgExtraAttribute = "1"		# Extra attribute of the SVG image ('stroke-width' for LINE, 'fill-opacity' for ARROW)
 			self.svgTransform = "0"				# Rotation of the SVG image
 
@@ -374,7 +374,7 @@ class Annotation(QWidget):
 			self.showSVG()
 
 
-	def setSvgFill(self, newColor):
+	def setSvgColor(self, newColor):
 		if(isinstance(self.childWidget, QSvgWidget)):
 			self.svgColor = newColor
 			self.showSVG()
@@ -409,14 +409,14 @@ class Annotation(QWidget):
 			if self.isArrow:
 				qba.append(
 					 self.svgString_start +  
-					 ' fill="#' + self.svgColor + 
+					 ' fill="' + self.svgColor + 
 					 '" fill-opacity="' + self.svgExtraAttribute +
 					 '" transform="rotate(' + self.svgTransform + 
 					 self.svgString_end)
 			else:
 				qba.append(
 					 self.svgString_start +  
-					 ' stroke="#' + self.svgColor + 
+					 ' stroke="' + self.svgColor + 
 					 '" stroke-width="' + self.svgExtraAttribute +
 					 '" transform="rotate(' + self.svgTransform + 
 					 self.svgString_end)
