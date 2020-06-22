@@ -194,9 +194,9 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				False, 
-				None, 
-				0,#None, 
-				0,#None,
+				self.lastFocusAnnotation.getTextboxFontColor(), 
+				self.lastFocusAnnotation.getTextboxFontSize(),
+				self.lastFocusAnnotation.getTextboxBackgroundOpacity(),
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
@@ -237,7 +237,9 @@ class Ui_MainWindow(object):
 				self.windowPaint.setRubberSize(value2)
 		# TEXTBOX
 		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
-			#print("textbox...per ora niente proprieta'")
+			self.lastFocusAnnotation.setTextboxFontColor(colorString)
+			self.lastFocusAnnotation.setTextboxFontSize(value1)
+			self.lastFocusAnnotation.setTextboxBackgroundOpacity(value2)
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 		# ARROW

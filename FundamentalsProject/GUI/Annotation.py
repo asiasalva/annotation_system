@@ -321,13 +321,21 @@ class Annotation(QWidget):
 	def setupTextboxVariables(self):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.textboxText = ""
-
-			'''
-			x = self.childWidget.palette()#QtGui.QPalette()
-			x.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QtCore.Qt.red);
-			self.childWidget.setPalette(x)
-			'''
+			self.textboxBackgroundOpacity = 100
+			self.textboxFontColor = "#000000"
+			self.textboxFontSize = 10
+			self.setTextboxPalette()
 			
+
+	def setTextboxPalette(self):
+		textboxPalette = self.childWidget.palette()
+		self.childWidget.setFont(QtGui.QFont(self.childWidget.font().rawName(), self.textboxFontSize))
+		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Text, QColor(self.textboxFontColor))
+		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QColor(255, 255, 255, (int(self.textboxBackgroundOpacity*2.55))))
+		self.childWidget.setPalette(textboxPalette)
+
+		self.setTextboxText(self.getTextboxText())
+
 
 	def mouseDoubleClickEvent(self, event):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
@@ -343,18 +351,46 @@ class Annotation(QWidget):
 
 		return super().eventFilter(obj, event)
 
+	def updateTextboxText(self):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			self.textboxText = self.childWidget.toPlainText()
 
 	def setTextboxText(self, newText):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.textboxText = newText
 			self.childWidget.setPlainText(self.textboxText)
 
+	def setTextboxBackgroundOpacity(self, newOpacity):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			self.textboxBackgroundOpacity = newOpacity
+			self.setTextboxPalette()
+
+	def setTextboxFontColor(self, newColor):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			self.textboxFontColor = newColor
+			self.setTextboxPalette()
+
+	def setTextboxFontSize(self, newSize):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			self.textboxFontSize = newSize
+			self.setTextboxPalette()
+
 	def getTextboxText(self):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			return self.textboxText
 
-	def updateTextboxText(self):
-		self.textboxText = self.childWidget.toPlainText()
+	def getTextboxBackgroundOpacity(self):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			return self.textboxBackgroundOpacity
+
+	def getTextboxFontColor(self):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			return self.textboxFontColor
+
+	def getTextboxFontSize(self):
+		if(isinstance(self.childWidget, QPlainTextEdit)):
+			return self.textboxFontSize
+	
 
 	#endregion
 

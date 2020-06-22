@@ -141,14 +141,12 @@ class AnnotationsProperties(QWidget):
 
 			if annotationClass is QPlainTextEdit:
 				# TEXTBOX
-				# ???
-				# Per ora nascondo le proprieta'
-				self.lblColor.setHidden(True)
-				self.lblValue1.setHidden(True)
-				self.lblValue2.setHidden(True)
-				self.spinboxValue1.setHidden(True)
-				self.spinboxValue2.setHidden(True)
-				self.comboboxColor.setHidden(True)
+				self.lblColor.setText("Text color:")
+				self.lblValue1.setText("Text size:")
+				self.lblValue2.setText("Background opacity:")
+				self.spinboxValue1.setRange(1, 100)
+				self.spinboxValue2.setRange(0, 100)
+				self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 
 			if annotationClass is QSvgWidget:
 				# SVG
@@ -199,11 +197,6 @@ class AnnotationsProperties(QWidget):
 		self.spinboxSecEnd.setRange(0, duration)
 
 		
-
-
-
-	def getSelectedColor(self):
-		print(self.comboboxColor.currentData())
 
 	def insertRubber(self, combobox, index):
 		combobox.insertItem(index, QIcon(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\rubber.svg").scaled(12,12)), "Rubber", None)
