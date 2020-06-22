@@ -1,4 +1,5 @@
 import cv2
+#import pathlib
 
 from PyQt5.QtWidgets import QVBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
@@ -18,7 +19,8 @@ class VideoPlayerOpenCV(QWidget):
 
 
 		### Video path
-		fileName = "C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\video.mp4"
+		fileName = "C:\\Users\\Brugix\\source\\repos\\asiasalva\\annotation_system\\FundamentalsProject\\GUI\\video.mp4"
+		#fileName = str(pathlib.Path("video.mp4").parent.absolute()) + "\\video.mp4" # NOT WORKING -> prende il path del file di startup
 			
 
 		### OpenCV video capture
