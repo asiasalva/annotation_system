@@ -275,8 +275,21 @@ class Annotation(QWidget):
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
 		self.annotationPosition = self.pos()
+
+		# These two lines of code (which change annotation's size and put it back 
+		#	are used to prevent that Qt automatically adjust the widget's size 
+		#	to a useful default using adjustSize()
+		# For more information -> https://doc.qt.io/qt-5/qwidget.html#visible-prop
+		# "If its size or position has changed, Qt guarantees that a widget 
+		#	gets move and resize events just before it is shown. 
+		#	If the widget has not been resized yet, Qt will adjust the widget's size 
+		#	to a useful default using adjustSize()."
+		self.resize(self.width()+1, self.height()+1)
+		self.resize(self.width()-1, self.height()-1)
+
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
+
 
 	def setFrameRange(self, fStart, fEnd):
 		self.annotationFrameStart = fStart
