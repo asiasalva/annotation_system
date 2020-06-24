@@ -5,9 +5,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Mode
-from GUI import Annotation 
 
-class AnnotationBreak(QWidget):
+class Annotation(QWidget):
 
 	### TCONTAINER VARIABLES AND METHODS ###
 	#region
@@ -16,14 +15,12 @@ class AnnotationBreak(QWidget):
 	inFocus = pyqtSignal(bool)
 	outFocus = pyqtSignal(bool)
 	newGeometry = pyqtSignal(QRect)
-	isArrow = None  
 
 	def __init__(self, parent, p, cWidget, MainWindow, currentSecond): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
 		self.childWidget = None
-		self.setGeometry(300, 300, 350, 350)
 
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
@@ -34,14 +31,13 @@ class AnnotationBreak(QWidget):
 		self.move(p)
 
 		self.vLayout = QVBoxLayout(self)
-		self.setChildWidget(cWidget, currentSecond)
+		self.setChildWidget(cWidget, isArrow, currentSecond)
 
 		self.m_infocus = True
 		self.m_isEditing = True
 		self.installEventFilter(parent)
 
-
-	def setChildWidget(self, cWidget, currentSecond):
+	def setChildWidget(self, cWidget, isArrow, currentSecond):
 		if cWidget:
 			self.childWidget = cWidget
 			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)

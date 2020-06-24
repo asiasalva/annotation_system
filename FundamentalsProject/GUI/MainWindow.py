@@ -211,7 +211,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
-		else:
+		elif self.lastFocusAnnotation.isArrow == False:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				self.lastFocusAnnotation.isArrow, 
@@ -221,6 +221,10 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+		else:
+			self.lastFocusAnnotation.childWidget.__class__, 
+			self.lastFocusAnnotation.getSecStart(),
+			self.lastFocusAnnotation.getSecEnd()
 		
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):
@@ -377,3 +381,4 @@ class Ui_MainWindow(object):
 			self.videoPlayer.setLayoutWidget(2)
 
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
+			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(),self.videoPlayer.getCurrentFrameNumber())

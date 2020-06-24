@@ -116,10 +116,11 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue2.setValue(value2)
 		self.spinboxSecStart.setValue(secStart)
 		self.spinboxSecEnd.setValue(secEnd)
-
+		print('annotation class clicked:', annotationClass)
 
 		if annotationClass is None:
 			# DRAWING
+			print(annotationClass)
 			self.lblColor.setText("Brush color:")
 			self.lblValue1.setText("Brush size:")
 			self.lblValue2.setText("Rubber size:")
@@ -135,7 +136,7 @@ class AnnotationsProperties(QWidget):
 			self.spinboxSecStart.setHidden(True)
 			self.spinboxSecEnd.setHidden(True)
 		elif annotationClass is AnnotationBreak:
-			print('non so cosa metterci')
+			print('ma cosa devo metterci qui')
 		else:
 			# Annotation -> remove rubber from colors
 			if(self.comboboxColor.itemData(0) is None):
