@@ -280,6 +280,7 @@ class Ui_MainWindow(object):
 
 		if(command == 0):
 			self.videoPlayer.play()
+			self.videoPlayerControlBar.enableButtons(True)
 			self.annotationsList.setEnabled(False)
 			self.annotationsProperties.setEnabled(False)
 			self.annotationsContainer.setEnabled(False)
