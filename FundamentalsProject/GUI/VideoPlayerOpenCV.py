@@ -1,5 +1,5 @@
 import cv2
-#import pathlib
+import os
 
 from PyQt5.QtWidgets import QVBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
@@ -19,7 +19,9 @@ class VideoPlayerOpenCV(QWidget):
 
 
 		### Video path
-		fileName = "C:\\Users\\Brugix\\source\\repos\\asiasalva\\annotation_system\\FundamentalsProject\\GUI\\video.mp4"
+		dirname = os.path.dirname(__file__)
+		fileName = os.path.join(dirname, 'video.mp4')
+		##fileName = "C:\\Users\\asalv\\Documents\\Università\\Magistrale\\Fundamentals of Image and Video Processing\\progetto1\\FundamentalsProject\\GUI\\video.mp4"
 		#fileName = str(pathlib.Path("video.mp4").parent.absolute()) + "\\video.mp4" # NOT WORKING -> prende il path del file di startup
 			
 
@@ -42,7 +44,8 @@ class VideoPlayerOpenCV(QWidget):
 		### QLabel where video frames will be shown
 		self.videoFrame = QLabel()
 		self.videoFrame.setStyleSheet("border: 5px solid black;")
-		self.videoFrame.setScaledContents(True)
+		##self.videoFrame.setScaledContents(True)
+		self.videoFrame.setFixedSize(512,512)
 		
 
 

@@ -3,6 +3,7 @@ from PyQt5.QtCore import QPoint
 from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Annotation
+from GUI import AnnotationBreak
 
 class AnnotationsContainer(QWidget):
 	def __init__(self, MainWindow):
@@ -31,6 +32,9 @@ class AnnotationsContainer(QWidget):
 			)
 		elif(annotationType == 3):	# BREAKPOINT
 			print("Creating BREAKPOINT")
+			self.mw.listOfAnnotations.append(
+				AnnotationBreak.AnnotationBreak(self, QPoint(100,100), QWidget(), self.mw, currentSecond)
+			)
 
 
 	def removeAnnotation(self, annotationToRemove):

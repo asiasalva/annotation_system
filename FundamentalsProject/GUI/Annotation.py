@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray
-from PyQt5.QtGui import QColor, QCursor
+from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray, Qt
+from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
 
@@ -311,10 +311,7 @@ class Annotation(QWidget):
 	def getDimensions(self):
 		return (self.annotationWidth, self.annotationHeight)
 
-	#endregion
-
-
-
+	
 	### QPLAINTEXTEDIT VARIABLES AND METHODS ###
 	#region
 
@@ -393,8 +390,6 @@ class Annotation(QWidget):
 	
 
 	#endregion
-
-
 
 	### QSVGWIDGET VARIABLES AND METHODS ###
 	#region
