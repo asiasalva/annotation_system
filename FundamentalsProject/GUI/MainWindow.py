@@ -397,3 +397,8 @@ class Ui_MainWindow(object):
 				item.setFocus()
 				self.videoPlayer.goToPosition(item.getSecStart())
 				self.setLastFocusAnnotation(item)
+
+
+	def removeAnnotation(self, annotationToRemove):
+		self.annotationsTable.removeRow(annotationToRemove)
+		self.listOfAnnotations.remove(annotationToRemove)

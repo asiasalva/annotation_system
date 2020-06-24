@@ -33,8 +33,8 @@ class AnnotationsContainer(QWidget):
 			print("Creating BREAKPOINT")
 
 
-	def removeAnnotation(self, annotationToRemove):
-		self.mw.listOfAnnotations.remove(annotationToRemove)
+	#def removeAnnotation(self, annotationToRemove):
+		#self.mw.listOfAnnotations.remove(annotationToRemove)
 
 
 	def showAnnotations(self, nFrame):

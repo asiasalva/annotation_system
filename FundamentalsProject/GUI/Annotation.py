@@ -115,7 +115,7 @@ class Annotation(QWidget):
 		# Remove annotation
 		if e.key() == QtCore.Qt.Key_Delete:
 			self.deleteLater()
-			self.parentWidget().removeAnnotation(self)
+			self.mw.removeAnnotation(self)#self.parentWidget().removeAnnotation(self)
 		# Moving container with arrows
 		if QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
 			newPos = QPoint(self.x(), self.y())

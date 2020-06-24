@@ -217,8 +217,8 @@ class VideoPlayerOpenCV(QWidget):
   
 	import time 
   
-	def convert(seconds): 
-		return time.strftime("%H:%M:%S", time.gmtime(n)) 
+	def convertTime(self, seconds): 
+		return time.strftime("%H:%M:%S", time.gmtime(seconds))
       
 	# Driver program 
 	n = 12345
