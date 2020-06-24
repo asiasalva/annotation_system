@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
 from GUI import WindowPaint
-
+from GUI import AnnotationBreak
 
 class VideoPlayerOpenCV(QWidget):
 	
@@ -186,7 +186,22 @@ class VideoPlayerOpenCV(QWidget):
 
 	def nextBreakpoint(self):
 		print("nextBreakpoint")
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
 
+		# Scorro le annotazioni del breakpoint e proseguo
+		for annotation in self.mw.listOfBreaks:
+			# If I am at the last break, start by the first one
+			if self.mw.listOfBreaks[-1] == annotation:
+				videoPos = self.mw.listOfBreaks[0].getSecStart()
+			elif (annotation.getSecStart)*1000 < videoPos :
+				#non faccio niente
+				print('')
+			# Else, move to the next breakpoint
+			else:
+				videoPos = annotation.getSecStart()
+
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos)
 
 	def getDuration(self):
 		return self.duration

@@ -32,9 +32,12 @@ class AnnotationsContainer(QWidget):
 			)
 		elif(annotationType == 3):	# BREAKPOINT
 			print("Creating BREAKPOINT")
+			# append alla lista di annotazioni generale
 			self.mw.listOfAnnotations.append(
-				AnnotationBreak.AnnotationBreak(self, QPoint(100,100), QWidget(), self.mw, currentSecond)
+				AnnotationBreak.AnnotationBreak(self, QPoint(50,50), QWidget(), self.mw, currentSecond)
 			)
+			self.mw.listOfBreaks.append(self.mw.listOfAnnotations[-1])
+
 			print('ho aggiunto il breakpoint alla lista')
 
 

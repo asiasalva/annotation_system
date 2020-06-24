@@ -18,7 +18,7 @@ class AnnotationBreak(QWidget):
     def __init__(self, parent, p, cWidget, MainWindow, currentSecond):
         QWidget.__init__(self, parent)
         # setGeometry(x_pos, y_pos, width, height)
-        # self.setGeometry(300, 300, 350, 350)
+        self.setGeometry(300, 300, 350, 350)
         print('sono nella classe giusta')
         self.mw = MainWindow
         self.childWidget = None
@@ -54,14 +54,14 @@ class AnnotationBreak(QWidget):
         print('sto disegnando il cerchio')
         paint = QPainter()
         paint.begin(self)
-        paint.drawRect(event.rect())
-        radx = 50
-        rady = 50
+        ## paint.drawRect(event.rect())
+        radx = 30
+        rady = 30
         # draw red circles
         # paint.setPen(Qt.red)
-        center = QPoint(125, 125)
+        ## center = QPoint(10, 10)
         paint.setBrush(Qt.blue)
-        paint.drawEllipse(100, 100, radx, rady)
+        paint.drawEllipse(10, 10, radx, rady)
         paint.end() 
         print('ho disegnato il cerchio')
 
@@ -114,3 +114,5 @@ class AnnotationBreak(QWidget):
 
     def getDimensions(self):
         return (self.annotationWidth, self.annotationHeight)
+
+    def 
