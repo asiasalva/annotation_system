@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QColor, QBrush, QPainter
 from PyQt5.QtSvg import QSvgWidget
 
-
+from GUI import AnnotationBreak
 
 class AnnotationsProperties(QWidget):
 
@@ -134,6 +134,8 @@ class AnnotationsProperties(QWidget):
 
 			self.spinboxSecStart.setHidden(True)
 			self.spinboxSecEnd.setHidden(True)
+		elif annotationClass is AnnotationBreak:
+			print('non so cosa metterci')
 		else:
 			# Annotation -> remove rubber from colors
 			if(self.comboboxColor.itemData(0) is None):

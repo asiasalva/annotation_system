@@ -114,5 +114,3 @@ class AnnotationBreak(QWidget):
 
     def getDimensions(self):
         return (self.annotationWidth, self.annotationHeight)
-
-    def 
