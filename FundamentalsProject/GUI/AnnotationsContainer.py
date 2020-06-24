@@ -35,6 +35,7 @@ class AnnotationsContainer(QWidget):
 			self.mw.listOfAnnotations.append(
 				AnnotationBreak.AnnotationBreak(self, QPoint(100,100), QWidget(), self.mw, currentSecond)
 			)
+			print('ho aggiunto il breakpoint alla lista')
 
 
 	def removeAnnotation(self, annotationToRemove):
@@ -42,6 +43,7 @@ class AnnotationsContainer(QWidget):
 
 
 	def showAnnotations(self, nFrame):
+		print('sono nella funzione di stampa dell annotazione')
 		for annotation in self.mw.listOfAnnotations:
 
 			frameRange = annotation.getFrameRange()

@@ -26,16 +26,20 @@ class AnnotationBreak(QWidget):
         self.setVisible(True)
         self.vLayout = QVBoxLayout(self)
         self.setChildWidget(cWidget, currentSecond)
+        print('ho richiamato il setchildwidget')
 
     def setChildWidget(self, cWidget, currentSecond):
+        print('set child widget')
         if cWidget:
             self.childWidget = cWidget
             self.childWidget.setParent(self)
             self.vLayout.addWidget(cWidget)
             self.vLayout.setContentsMargins(0,0,0,0)
             self.setupAnnotationVariables(currentSecond)
+            print('ho settato il child widget')
 
     def setupAnnotationVariables(self, currentSecond):
+        print('setupannotation var')
         self.annotationType = self.childWidget.__class__.__name__
         self.annotationFrameStart = 0
         self.annotationFrameEnd = 0
@@ -62,3 +66,51 @@ class AnnotationBreak(QWidget):
         print('ho disegnato il cerchio')
 
 
+    def setFrameRange(self, fStart, fEnd):
+        print('framerange')
+        self.annotationFrameStart = fStart
+        self.annotationFrameEnd = fEnd
+
+    def setSecRange(self, sStart, sEnd):
+        print('second range')
+        self.annotationSecondStart = sStart
+        self.annotationSecondEnd = sEnd
+
+    def setSecStart(self, sStart):
+        print('secstart')
+        self.annotationSecondStart = sStart
+
+    def setSecEnd(self, sEnd):
+        print('sec end')
+        self.annotationSecondEnd = sEnd
+
+    def getFrameRange(self):
+        print('get frame range')
+        return (self.annotationFrameStart, self.annotationFrameEnd)
+
+    def getSecRange(self):
+        print('get sec range')
+        return (self.annotationSecondStart, self.annotationSecondEnd)
+
+    def getSecStart(self):
+        print('get sec start')
+        return self.annotationSecondStart
+
+    def getSecEnd(self):
+        print('get sec end')
+        return self.annotationSecondEnd
+
+    def setPosition(self, newPos):
+        self.annotationPosition = newPos
+        self.move(self.annotationPosition)
+
+    def getPosition(self):
+        return self.annotationPosition
+
+    def setDimensions(self, width, height):
+        self.annotationWidth = width
+        self.annotationHeight = height
+        self.resize(width, height)
+
+    def getDimensions(self):
+        return (self.annotationWidth, self.annotationHeight)
