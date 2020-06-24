@@ -123,13 +123,13 @@ class Ui_MainWindow(object):
 		self.annotationsProperties.setEnabled(False)
 		
 		# Add TableAnnotations widget
-		#self.annotationsTable = AnnotationsTable.AnnotationsTable()
-		#self.annotationsTable.setupUi(self)
+		self.annotationsTable = AnnotationsTable.AnnotationsTable()
+		self.annotationsTable.setupUi(self)
 
 		# Put "annotations side" components inside splitter container previously defined
 		self.splitterAnnotation.addWidget(self.annotationsList)
 		self.splitterAnnotation.addWidget(self.annotationsProperties)
-		#self.splitterAnnotation.addWidget(self.annotationsTable)
+		self.splitterAnnotation.addWidget(self.annotationsTable)
 		
 
 
@@ -160,6 +160,7 @@ class Ui_MainWindow(object):
 
 		elif(command == 1):
 			print("Load annotations from file")
+			self.annotationsTable.insertRows(self.listOfAnnotations)
 
 		elif(command == 2):
 			print("Frame n°: " + str(nFrame))
@@ -242,6 +243,7 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setTextboxBackgroundOpacity(value2)
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
 			self.lastFocusAnnotation.setSvgColor(colorString)
@@ -249,6 +251,7 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSvgTransform(str(value2)),
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		# LINE
 		else:
 			self.lastFocusAnnotation.setSvgColor(colorString)
@@ -256,6 +259,7 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSvgTransform(str(value2)),
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 
 
 
@@ -372,3 +376,23 @@ class Ui_MainWindow(object):
 			self.videoPlayer.setLayoutWidget(2)
 
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
+			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber())
+			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
+
+
+	### ACTIONS: AnnotationsTable -> ???
+	def showAnnotationSelected(self, annotationID):
+
+		# If user is drawing, stop WindowPaint from drawing
+		if self.windowPaint.getTrackingMouse():
+			self.annotationsList.changeDrawButtonText(False)
+			self.windowPaint.setTrackingMouse(False)
+			self.videoPlayer.setLayoutWidget(2)
+			self.windowPaint.setRubber(False)
+
+		# Find annotation selected and show it
+		for item in self.listOfAnnotations:
+			if annotationID == str(item):
+				item.setFocus()
+				self.videoPlayer.goToPosition(item.getSecStart())
+				self.setLastFocusAnnotation(item)

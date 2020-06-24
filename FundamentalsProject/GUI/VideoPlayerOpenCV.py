@@ -203,6 +203,7 @@ class VideoPlayerOpenCV(QWidget):
 	# Go to specific position (second) in video
 	def goToPosition(self, position):
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, (position*1000))
+		self.nextFrameSlot()
 
 	# Change slider position as video go forward/backward
 	def positionChanged(self, position):

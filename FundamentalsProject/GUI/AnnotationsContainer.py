@@ -43,8 +43,16 @@ class AnnotationsContainer(QWidget):
 			frameRange = annotation.getFrameRange()
 
 			if frameRange[0] <= nFrame <= frameRange[1]:
-				annotation.setHidden(False)
+				#annotation.setHidden(False)
+				annotation.setVisible(True)
+				print(annotation.getDimensions())
+				print(annotation.width())
+				print(annotation.height())
 			else:
-				annotation.setHidden(True)
+				#annotation.setHidden(True)
+				annotation.setVisible(False)
+				print(annotation.getDimensions())
+				print(annotation.width())
+				print(annotation.height())
 
 

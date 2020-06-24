@@ -188,8 +188,8 @@ class AnnotationsProperties(QWidget):
 				self.spinboxSecStart.setValue(secondEnd)
 			elif self.sender() is self.spinboxSecEnd:
 				self.spinboxSecEnd.setValue(secondStart)
-
-		self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
+		else:
+			self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
 		
 
 	def setDuration(self, duration):
