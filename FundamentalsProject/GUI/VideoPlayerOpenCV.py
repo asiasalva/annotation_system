@@ -19,6 +19,9 @@ class VideoPlayerOpenCV(QWidget):
 		### Video path
 		dirname = os.path.dirname(__file__)
 		fileName = os.path.join(dirname, 'video.mp4')
+
+		self.dir = dirname#print(dirname)
+		self.fi = fileName#print(fileName)
 			
 
 		### OpenCV video capture

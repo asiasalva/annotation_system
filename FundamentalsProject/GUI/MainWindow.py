@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing, XMLSerializer
 
 class Ui_MainWindow(object):
 
@@ -379,6 +379,7 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
 			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber())
 			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
+			XMLSerializer.XMLSerializer().writeXML(self.videoPlayer.dir, "1.xml", self.videoPlayer.fi, self.listOfAnnotations)
 
 
 	### ACTIONS: AnnotationsTable -> ???

@@ -200,9 +200,8 @@ class Annotation(QWidget):
 	def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseReleaseEvent(self, e)
 		# Save new annotation's position
-		self.annotationPosition = self.pos()
-		self.annotationWidth = self.width()
-		self.annotationHeight = self.height()
+		self.setPosition(self.pos())
+		self.setDimensions(self.width(), self.height())
 
 	def mouseMoveEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseMoveEvent(self, e)
