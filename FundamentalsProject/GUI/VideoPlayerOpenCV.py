@@ -1,12 +1,10 @@
 import cv2
-#import pathlib
+import os, time
 
-from PyQt5.QtWidgets import QVBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import QPixmap, QImage
-
-from GUI import WindowPaint
 
 
 class VideoPlayerOpenCV(QWidget):
@@ -19,8 +17,8 @@ class VideoPlayerOpenCV(QWidget):
 
 
 		### Video path
-		fileName = "C:\\Users\\Brugix\\source\\repos\\asiasalva\\annotation_system\\FundamentalsProject\\GUI\\video.mp4"
-		#fileName = str(pathlib.Path("video.mp4").parent.absolute()) + "\\video.mp4" # NOT WORKING -> prende il path del file di startup
+		dirname = os.path.dirname(__file__)
+		fileName = os.path.join(dirname, 'video.mp4')
 			
 
 		### OpenCV video capture
@@ -50,13 +48,20 @@ class VideoPlayerOpenCV(QWidget):
 		#self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
 		#self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
 
+		### QLabel where video time will be shown
+		self.lblTime = QLabel(time.strftime("%H:%M:%S", time.gmtime(0)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
 
 		### Slider of video player
 		self.positionSlider = QSlider(Qt.Horizontal)
 		self.positionSlider.setRange(0, self.duration)
 		self.positionSlider.sliderMoved.connect(self.goToPosition)
-		self.positionSlider.setTickPosition(QSlider.TicksBelow)
+		self.positionSlider.setTickPosition(QSlider.TicksBothSides)
 		self.positionSlider.setTickInterval(10)
+
+		### Slider and time label container
+		timeSlider = QHBoxLayout()
+		timeSlider.addWidget(self.positionSlider)
+		timeSlider.addWidget(self.lblTime)
 
 
 		### QStackedLayout
@@ -70,7 +75,7 @@ class VideoPlayerOpenCV(QWidget):
 		### Widget container
 		container = QVBoxLayout(self)
 		container.addLayout(self.stackedLayout)
-		container.addWidget(self.positionSlider)
+		container.addLayout(timeSlider)
 
 
 		self.speed = 1.0
@@ -208,6 +213,7 @@ class VideoPlayerOpenCV(QWidget):
 	# Change slider position as video go forward/backward
 	def positionChanged(self, position):
 		self.positionSlider.setValue(position)
+		self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(position)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
 
 
 
