@@ -20,6 +20,7 @@ class AnnotationsContainer(QWidget):
 			self.mw.listOfAnnotations.append(
 				Annotation.Annotation(self, QPoint(10,10), QSvgWidget(), False, self.mw, currentSecond)
 			)
+			print('sono in annotation container')
 		elif(annotationType == 1):	# ARROW
 			print("Creating ARROW")
 			self.mw.listOfAnnotations.append(
@@ -38,7 +39,7 @@ class AnnotationsContainer(QWidget):
 			)
 			#append alla lista di soli breaks che serve per poi saltare da un break all'altro
 			self.mw.listOfBreaks.append(self.mw.listOfAnnotations[-1])
-			print('ho aggiunto il breakpoint alla lista')
+			# print('ho aggiunto il breakpoint alla lista')
 
 
 	def removeAnnotation(self, annotationToRemove):

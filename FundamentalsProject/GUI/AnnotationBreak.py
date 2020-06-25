@@ -23,7 +23,7 @@ class AnnotationBreak(QWidget):
 
 		self.mw = MainWindow
 		self.childWidget = None
-		self.setGeometry(300, 300, 350, 350)
+		# self.setGeometry(500, 500, 500, 500)
 
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
@@ -77,19 +77,17 @@ class AnnotationBreak(QWidget):
 		self.m_infocus = False
 
 	def paintEvent(self, event):
-		print('sto disegnando il cerchio')
+		#♥ print('sto disegnando il cerchio')
 		paint = QPainter()
 		paint.begin(self)
         ## paint.drawRect(event.rect())
-		radx = 30
-		rady = 30
         # draw red circles
-        # paint.setPen(Qt.red)
-        ## center = QPoint(10, 10)
+		paint.setPen(Qt.red)
+		center = QPoint(10, 10)
 		paint.setBrush(Qt.blue)
-		paint.drawEllipse(10, 10, radx, rady)
+		paint.drawEllipse(10, 10, 15, 15)
 		paint.end() 
-		print('ho disegnato il cerchio')
+		# print('ho disegnato il cerchio')
 
 	def mousePressEvent(self, e: QtGui.QMouseEvent):
 		self.position = QPoint(e.globalX() - self.geometry().x(), e.globalY() - self.geometry().y())

@@ -185,7 +185,7 @@ class Ui_MainWindow(object):
 
 
 	def setLastFocusAnnotation(self, lastFocusAnnotation):
-		
+		print('set last focus annotation in main window')
 		self.lastFocusAnnotation = lastFocusAnnotation
 
 		self.windowPaint.setRubber(False)
@@ -222,13 +222,19 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecEnd()
 			)
 		else:
-			self.lastFocusAnnotation.childWidget.__class__, 
-			self.lastFocusAnnotation.getSecStart(),
-			self.lastFocusAnnotation.getSecEnd()
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__, 
+				None, 
+				None,
+				0,
+				0,
+				self.lastFocusAnnotation.getSecStart(),
+				self.lastFocusAnnotation.getSecEnd()
+			)
 		
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):
-		
+		print('sono nella new annotation properties')
 		# DRAWING
 		if self.lastFocusAnnotation is None:
 			# RUBBER
@@ -253,6 +259,7 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
+			print('sono nella new annotation properties')
 			self.lastFocusAnnotation.setSvgColor(colorString)
 			self.lastFocusAnnotation.setSvgExtraAttribute(str(value1/100))
 			self.lastFocusAnnotation.setSvgTransform(str(value2)),
