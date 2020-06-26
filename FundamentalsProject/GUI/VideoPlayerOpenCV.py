@@ -119,25 +119,25 @@ class VideoPlayerOpenCV(QWidget):
 
 	def play(self):
 		if(not self.timer.isActive()):
-			print("play")
+			# print("play")
 			#self.start()
 			self.timer.start()
 
 
 	def pause(self):
 		if(self.timer.isActive()):
-			print("pause")
+			# print("pause")
 			self.timer.stop()
 
 
 	def stop(self): ### Cosa fa lo STOP? (??? TOGLIERE O LASCIARE ???)
 		if(self.timer.isActive()):
-			print("stop")
+			# print("stop")
 			self.timer.stop()
 
 
 	def backward(self):
-		print("backward")
+		# print("backward")
 
 		# Get videoCapture position (in milliseconds)
 		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
@@ -187,21 +187,31 @@ class VideoPlayerOpenCV(QWidget):
 	def nextBreakpoint(self):
 		print("nextBreakpoint")
 		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
+		print('videopos: ', videoPos)
 
 		# Scorro le annotazioni del breakpoint e proseguo
-		for annotation in self.mw.listOfBreaks:
+		for i in range(1, len(self.mw.listOfBreaks)):
+			print('annotation: ', self.mw.listOfBreaks[i], 'i: ', i)
+			tmp =  ( (self.mw.listOfBreaks[i]).getSecStart() )*1000
+			print('tmp: ', tmp)
 			# If I am at the last break, start by the first one
-			if self.mw.listOfBreaks[-1] == annotation:
+			if i == (len(self.mw.listOfBreaks)):
+				print('è l ultima annotazione disponibile')
 				videoPos = self.mw.listOfBreaks[0].getSecStart()
-			elif (annotation.getSecStart)*1000 < videoPos :
-				#non faccio niente
-				print('')
+				print('sec:', videoPos)
+				break
+			elif tmp < videoPos :
+				#non faccio niente e vado avanti nella lista
+				print('provo con l indice successivo')
 			# Else, move to the next breakpoint
 			else:
-				videoPos = annotation.getSecStart()
+				print('non e l ultima')
+				videoPos = self.mw.listOfBreaks[i].getSecStart()
+				print('sec', videoPos)
+				break
 
 		# Set videoCapture position
-		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos)
+		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos*1000)
 
 	def getDuration(self):
 		return self.duration

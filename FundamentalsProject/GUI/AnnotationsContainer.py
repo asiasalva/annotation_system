@@ -39,6 +39,7 @@ class AnnotationsContainer(QWidget):
 			)
 			#append alla lista di soli breaks che serve per poi saltare da un break all'altro
 			self.mw.listOfBreaks.append(self.mw.listOfAnnotations[-1])
+			print('ho aggiunto il break point alla lista e ora ci sono: ', len(self.mw.listOfBreaks))
 			# print('ho aggiunto il breakpoint alla lista')
 
 
@@ -47,7 +48,7 @@ class AnnotationsContainer(QWidget):
 
 
 	def showAnnotations(self, nFrame):
-		print('sono nella funzione di stampa dell annotazione')
+		# print('sono nella funzione di stampa dell annotazione')
 		for annotation in self.mw.listOfAnnotations:
 
 			frameRange = annotation.getFrameRange()
