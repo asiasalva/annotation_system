@@ -92,7 +92,7 @@ class Ui_MainWindow(object):
 		self.windowPaint.setEnabled(False)
 		self.annotationsContainer = AnnotationsContainer.AnnotationsContainer(self)
 		self.annotationsContainer.setEnabled(False)
-
+		self.xmlSerializer = XMLSerializer.XMLSerializer(self)
 
 		### Custom widgets - "Video side"
 
@@ -160,7 +160,9 @@ class Ui_MainWindow(object):
 
 		elif(command == 1):
 			print("Load annotations from file")
+			self.xmlSerializer.readXML(self.videoPlayer.dir, "1.xml")
 			self.annotationsTable.insertRows(self.listOfAnnotations)
+			self.annotationsContainer.showAnnotations(0)
 
 		elif(command == 2):
 			print("Frame n°: " + str(nFrame))
@@ -379,7 +381,7 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
 			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber())
 			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
-			XMLSerializer.XMLSerializer().writeXML(self.videoPlayer.dir, "1.xml", self.videoPlayer.fi, self.listOfAnnotations)
+			#self.xmlSerializer.writeXML(self.videoPlayer.dir, "1.xml", self.videoPlayer.fi, self.listOfAnnotations)
 
 
 	### ACTIONS: AnnotationsTable -> ???

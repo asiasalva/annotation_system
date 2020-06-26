@@ -1,14 +1,100 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from PyQt5.QtCore import QPoint
+
 class XMLSerializer(object):
-	def __init__(self, *args, **kwargs):
-		return super().__init__(*args, **kwargs)
+	def __init__(self, MainWindow):
+		super().__init__()
+
+		self.mw = MainWindow
 
 	
 
-	def readXML(self, filePath):
+	def readXML(self, filePath, fileName):
 		print("readXML")
+
+		tree = ET.parse(filePath + "/" + fileName)
+		root = tree.getroot()
+
+		name = root.attrib["name"]
+		videoPath = root[0].text
+
+		for item in root[1]:
+			frame_start = int(float(item[0].text))
+			frame_end = int(float(item[1].text))
+			second_start = int(float(item[2].text))
+			second_end = int(float(item[3].text))
+			position = QPoint(int(item[4][0].text), int(item[4][0].text))
+			width = int(item[5][0].text)
+			height = int(item[5][1].text)
+
+			child = item[6]
+			if child.attrib["type"] == "QPlainTextEdit":
+				self.mw.annotationsContainer.createAnnotation(2, frame_start)
+				self.mw.listOfAnnotations[-1].setTextboxText(child[0].text)
+				self.mw.listOfAnnotations[-1].setTextboxBackgroundOpacity(int(child[1].text))
+				self.mw.listOfAnnotations[-1].setTextboxFontColor(child[2].text)
+				self.mw.listOfAnnotations[-1].setTextboxFontSize(int(child[3].text))
+
+			elif child.attrib["type"] == "QSvgWidget":
+				if child[0].text == "False":
+					self.mw.annotationsContainer.createAnnotation(0, frame_start)
+				else:
+					self.mw.annotationsContainer.createAnnotation(1, frame_start)
+
+				self.mw.listOfAnnotations[-1].setSvgColor(child[1].text)
+				self.mw.listOfAnnotations[-1].setSvgExtraAttribute(child[2].text)
+				self.mw.listOfAnnotations[-1].setSvgTransform(child[3].text)
+
+
+			self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
+			self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
+			self.mw.listOfAnnotations[-1].setPosition(position)
+			self.mw.listOfAnnotations[-1].setDimensions(width, height)
+
+
+	'''
+	XML STRUCTURE
+
+	<project name="name_project" date="date_modified">
+		<video>video_path</video>
+		<list_annotations>
+			<annotation>
+				<frame_start>n°</frame_start>
+				<frame_end>n°</frame_end>
+				<second_start>n°</second_start>
+				<second_end>n°</second_end>
+				<position>
+					<x>n°</x>
+					<y>n°</y>
+				</position>
+				<dimensions>
+					<width>n°</width>
+					<height>n°</height>
+				</dimensions>
+
+				<child type="annotation_type">
+					IF TYPE=QPLAINTEXTEDIT
+					<text>textbox_text</text>
+					<background_opacity>n°</background_opacity>
+					<font_color>#000000</font_color>
+					<font_size>n°</font_size>
+
+					IF TYPE=QSVGWIDGET
+					<is_arrow>bool</is_arrow>
+					<color>#000000</color>
+					<extra>n°</extra>
+					<transform>n°</transform>
+
+					IF TYPE=BREAKPOINT
+					EMPTY
+				</child>
+
+			</annotation>
+		</list_annotations>
+	</project>
+	'''
 
 	def writeXML(self, filePath, fileName, videoPath, listOfAnnotations):
 		print("writeXML")
@@ -87,39 +173,4 @@ class XMLSerializer(object):
 		#print(reparsed.toprettyxml(indent="  "))
 
 
-	'''
-	XML STRUCTURE
-
-	<project name="name_project" date="date_modified">
-		<video>video_path</video>
-		<list_annotations>
-			<annotation>
-				<frame_start>n°</frame_start>
-				<frame_end>n°</frame_end>
-				<second_start>n°</second_start>
-				<second_end>n°</second_end>
-				<position>n°,n°</position>
-				<width>n°</width>
-				<height>n°</height>
-
-				<child type="annotation_type">
-					IF TYPE=QPLAINTEXTEDIT
-					<text>textbox_text</text>
-					<background_opacity>n°</background_opacity>
-					<font_color>#000000</font_color>
-					<font_size>n°</font_size>
-
-					IF TYPE=QSVGWIDGET
-					<is_arrow>bool</is_arrow>
-					<color>#000000</color>
-					<extra>n°</extra>
-					<transform>n°</transform>
-
-					IF TYPE=BREAKPOINT
-					EMPTY
-				</child>
-
-			</annotation>
-		</list_annotations>
-	</project>
-	'''
+	
