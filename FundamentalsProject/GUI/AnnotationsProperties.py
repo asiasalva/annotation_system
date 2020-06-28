@@ -264,3 +264,9 @@ class AnnotationsProperties(QWidget):
 		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
 		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
 		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0
+
+
+
+
+	def setPropertiesVisible(self, visible):
+		self.setVisible(visible)

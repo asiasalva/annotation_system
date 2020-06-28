@@ -11,13 +11,13 @@ class XMLSerializer(object):
 
 	
 
-	def readXML(self, filePath, fileName):
+	def readXML(self, projectPath):
 		print("readXML")
 
-		tree = ET.parse(filePath + "/" + fileName)
+		tree = ET.parse(projectPath)
 		root = tree.getroot()
 
-		name = root.attrib["name"]
+		projectName = root.attrib["name"]
 		videoPath = root[0].text
 
 		for item in root[1]:
@@ -52,6 +52,8 @@ class XMLSerializer(object):
 			self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
 			self.mw.listOfAnnotations[-1].setPosition(position)
 			self.mw.listOfAnnotations[-1].setDimensions(width, height)
+
+		return projectName, videoPath
 
 
 	'''
@@ -96,15 +98,15 @@ class XMLSerializer(object):
 	</project>
 	'''
 
-	def writeXML(self, filePath, fileName, videoPath, listOfAnnotations):
+	def writeXML(self, projectPath, projectName, videoPath, listOfAnnotations):
 		print("writeXML")
 
 		root = ET.Element("project")
-		root.attrib["name"] = fileName
+		root.attrib["name"] = projectName
 		root.attrib["date"] = str((datetime.now()).strftime("%d/%m/%Y %H:%M:%S"))
 
 		video = ET.SubElement(root, "video")
-		video.text = filePath
+		video.text = videoPath
 
 		list_annotations = ET.SubElement(root, "list_annotations")
 
@@ -164,7 +166,7 @@ class XMLSerializer(object):
 
 
 		tree = ET.ElementTree(root)
-		tree.write(filePath + "/" + fileName)
+		tree.write(projectPath)
 
 
 		# TO PRETTY XML
