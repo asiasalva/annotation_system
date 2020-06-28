@@ -136,9 +136,12 @@ class VideoPlayerOpenCV(QWidget):
 
 
 	def stop(self): ### Cosa fa lo STOP? (??? TOGLIERE O LASCIARE ???)
-		if(self.timer.isActive()):
-			print("stop")
-			self.timer.stop()
+		#if(self.timer.isActive()):
+		print("stop")
+		self.timer.stop()
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, 0)
+		self.nextFrameSlot()
 
 
 	def backward(self):
