@@ -44,8 +44,8 @@ class VideoPlayerOpenCV(QWidget):
 		### QLabel where video frames will be shown
 		self.videoFrame = QLabel()
 		self.videoFrame.setStyleSheet("border: 5px solid black;")
-		##self.videoFrame.setScaledContents(True)
-		self.videoFrame.setFixedSize(512,512)
+		self.videoFrame.setScaledContents(True)
+		# self.videoFrame.setFixedSize(512,512)
 		
 
 
