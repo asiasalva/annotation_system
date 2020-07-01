@@ -10,7 +10,6 @@ class AnnotationDrawing(object):
 	def __init__(self, dType, pen, pStart, pEnd, rSize, rPoint): 
 		
 		self.drawingType = dType	# 0 -> LINE, 1 -> RUBBER
-		print('disegno')
 		self.drawingFrameStart = 0
 		self.drawingFrameEnd = 0
 		self.drawingSecondStart = 0
