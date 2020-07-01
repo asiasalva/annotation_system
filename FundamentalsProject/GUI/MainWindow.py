@@ -529,6 +529,8 @@ class Ui_MainWindow(object):
 		elif retval == QtWidgets.QMessageBox.Discard:
 			# Close application
 			QtCore.QCoreApplication.instance().quit()
+
+		return retval
 		
 
 		
