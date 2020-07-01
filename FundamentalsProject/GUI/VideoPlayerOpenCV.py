@@ -208,26 +208,10 @@ class VideoPlayerOpenCV(QWidget):
 					# videoPos = self.mw.listOfBreaks[0].getSecStart()
 					break
 
-			# If I am at the last break, start by the first one
-			
-			# if i == ((len(self.mw.listOfBreaks))-1):
-			#	print('è l ultima annotazione disponibile')
-			#	videoPos = self.mw.listOfBreaks[0].getSecStart()
-			#	print('sec:', videoPos)
-			#	break
-			#elif tmp < videoPos :
-				##non faccio niente e vado avanti nella lista
-				#rint('provo con l indice successivo')
-			# Else, move to the next breakpoint
-			#else:
-			#	print('non e l ultima')
-			#	videoPos = self.mw.listOfBreaks[i].getSecStart()
-			#	print('sec', videoPos)
-			#	break
-
 		# Set videoCapture position
 		print('sono uscita dal ciclo for')
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos*1000)
+		 # self.pause()
 
 	def getDuration(self):
 		return self.duration

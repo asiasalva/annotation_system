@@ -4,6 +4,7 @@ from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Annotation
 from GUI import AnnotationBreak
+from GUI import VideoPlayerOpenCV
 
 class AnnotationsContainer(QWidget):
 	def __init__(self, MainWindow):
@@ -50,6 +51,10 @@ class AnnotationsContainer(QWidget):
 	def showAnnotations(self, nFrame):
 		# print('sono nella funzione di stampa dell annotazione')
 		for annotation in self.mw.listOfAnnotations:
+			# print('annotation type: ', type(annotation))
+			if annotation.annotationType == 'QWidget':
+				print('sono nell if')
+				self.mw.controlBarCommand(1)
 
 			frameRange = annotation.getFrameRange()
 
