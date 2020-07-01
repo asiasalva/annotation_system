@@ -270,8 +270,11 @@ class AnnotationBreak(QWidget):
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
 		self.annotationPosition = self.pos()
+		self.resize(self.width()+1, self.height()+1)
+		self.resize(self.width()-1, self.height()-1)
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
+
 
 	def setFrameRange(self, fStart, fEnd):
 		self.annotationFrameStart = fStart

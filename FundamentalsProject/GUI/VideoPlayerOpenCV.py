@@ -190,27 +190,43 @@ class VideoPlayerOpenCV(QWidget):
 		print('videopos: ', videoPos)
 
 		# Scorro le annotazioni del breakpoint e proseguo
-		for i in range(1, len(self.mw.listOfBreaks)):
-			print('annotation: ', self.mw.listOfBreaks[i], 'i: ', i)
+		for i in range(len(self.mw.listOfBreaks)):
+			#print('len of for:', len(self.mw.listOfBreaks))
+			print('i: ', i)
 			tmp =  ( (self.mw.listOfBreaks[i]).getSecStart() )*1000
 			print('tmp: ', tmp)
-			# If I am at the last break, start by the first one
-			if i == (len(self.mw.listOfBreaks)):
-				print('è l ultima annotazione disponibile')
-				videoPos = self.mw.listOfBreaks[0].getSecStart()
-				print('sec:', videoPos)
+			if videoPos < tmp :
+				print('video pos <= tmp')
+				videoPos = (self.mw.listOfBreaks[i]).getSecStart()
+				print('videoPos: ', videoPos)
 				break
-			elif tmp < videoPos :
-				#non faccio niente e vado avanti nella lista
-				print('provo con l indice successivo')
-			# Else, move to the next breakpoint
 			else:
-				print('non e l ultima')
-				videoPos = self.mw.listOfBreaks[i].getSecStart()
-				print('sec', videoPos)
-				break
+				if i == (len( self.mw.listOfBreaks)-1 ) :
+					print('else and if')
+					videoPos = self.mw.listOfBreaks[0].getSecStart()
+					print('videoPos: ', videoPos)
+					# videoPos = self.mw.listOfBreaks[0].getSecStart()
+					break
+
+			# If I am at the last break, start by the first one
+			
+			# if i == ((len(self.mw.listOfBreaks))-1):
+			#	print('è l ultima annotazione disponibile')
+			#	videoPos = self.mw.listOfBreaks[0].getSecStart()
+			#	print('sec:', videoPos)
+			#	break
+			#elif tmp < videoPos :
+				##non faccio niente e vado avanti nella lista
+				#rint('provo con l indice successivo')
+			# Else, move to the next breakpoint
+			#else:
+			#	print('non e l ultima')
+			#	videoPos = self.mw.listOfBreaks[i].getSecStart()
+			#	print('sec', videoPos)
+			#	break
 
 		# Set videoCapture position
+		print('sono uscita dal ciclo for')
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos*1000)
 
 	def getDuration(self):
