@@ -47,6 +47,8 @@ class XMLSerializer(object):
 				self.mw.listOfAnnotations[-1].setSvgExtraAttribute(child[2].text)
 				self.mw.listOfAnnotations[-1].setSvgTransform(child[3].text)
 
+			elif child.attrib["type"] == "QWidget":
+				self.mw.annotationsContainer.createAnnotation(3, frame_start)
 
 			self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 			self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)

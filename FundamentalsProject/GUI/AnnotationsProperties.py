@@ -244,8 +244,14 @@ class AnnotationsProperties(QWidget):
 		
 
 	def setDuration(self, duration):
+		self.spinboxSecStart.blockSignals(True)
+		self.spinboxSecEnd.blockSignals(True)
+
 		self.spinboxSecStart.setRange(0, duration)
 		self.spinboxSecEnd.setRange(0, duration)
+		
+		self.spinboxSecStart.blockSignals(False)
+		self.spinboxSecEnd.blockSignals(False)
 
 		
 
