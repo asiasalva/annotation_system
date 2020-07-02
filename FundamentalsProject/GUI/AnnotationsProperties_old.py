@@ -1,37 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QIcon, QBrush, QPainter, QValidator
+from PyQt5.QtGui import QPixmap, QIcon, QColor, QBrush, QPainter
 from PyQt5.QtSvg import QSvgWidget
-
-import time
-import datetime
-
-
-class SpinBoxTime(QSpinBox):
-	def __init__(self, *args, **kwargs):
-		super(SpinBoxTime, self).__init__(*args, **kwargs)
-
-	def textFromValue(self, value):
-		return time.strftime("%H:%M:%S", time.gmtime(value))
-
-	def valueFromText(self, text):
-		if self.parseString(text):
-			date_time = datetime.datetime.strptime(text, "%H:%M:%S")
-			timedelta = date_time - datetime.datetime(1900, 1, 1)
-			return (timedelta.total_seconds())
-	
-	def validate(self, text, pos):
-		if self.parseString(text):
-			return (QValidator.Acceptable, text, pos)
-		else:
-			return (QValidator.Invalid, text, pos)
-
-	def parseString(self, text):
-		try:
-			time.strptime(str(text), '%H:%M:%S')
-			return True
-		except ValueError:
-			return False
 
 
 
@@ -57,8 +27,8 @@ class AnnotationsProperties(QWidget):
 		self.comboboxColor = QComboBox()
 		self.spinboxValue1 = QSpinBox()
 		self.spinboxValue2 = QSpinBox()
-		self.spinboxSecStart = SpinBoxTime()
-		self.spinboxSecEnd = SpinBoxTime()
+		self.spinboxSecStart = QSpinBox()
+		self.spinboxSecEnd = QSpinBox()
 
 		self.setStandardColors(self.comboboxColor)
 		self.comboboxColor.activated.connect(self.changeProperties)
@@ -115,6 +85,7 @@ class AnnotationsProperties(QWidget):
 		container = QVBoxLayout(self)
 		container.addWidget(QLabel("Properties"))
 		container.addWidget(self.scroll)
+
 
 
 	def setProperties(self, annotationClass, isArrow, colorString, value1, value2, secStart, secEnd):
@@ -264,9 +235,3 @@ class AnnotationsProperties(QWidget):
 		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
 		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
 		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0
-
-
-
-
-	def setPropertiesVisible(self, visible):
-		self.setVisible(visible)

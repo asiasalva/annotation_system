@@ -1,13 +1,11 @@
 import cv2
-import os
+import os, time
 
-from PyQt5.QtWidgets import QVBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
-from GUI import WindowPaint
-from GUI import AnnotationBreak
 
 class VideoPlayerOpenCV(QWidget):
 	
@@ -16,12 +14,17 @@ class VideoPlayerOpenCV(QWidget):
 	def setupUi(self, MainWindow):
 
 		self.mw = MainWindow
+		self.videoPath = ""
 
-
+		'''
 		### Video path
 		dirname = os.path.dirname(__file__)
-		fileName = os.path.join(dirname, 'video.mp4')			
+		fileName = os.path.join(dirname, 'video.mp4')
 
+		self.dir = dirname#print(dirname)
+		self.fi = fileName#print(fileName)
+		'''
+		'''
 		### OpenCV video capture
 		# Select file to capture
 		self.videoCapture = cv2.VideoCapture(fileName)
@@ -36,13 +39,12 @@ class VideoPlayerOpenCV(QWidget):
 
 		# Video duration (in seconds)
 		self.duration = int(self.videoCapture_nFrame / self.videoCapture_fps)
-
+		'''
 
 		### QLabel where video frames will be shown
 		self.videoFrame = QLabel()
 		self.videoFrame.setStyleSheet("border: 5px solid black;")
 		self.videoFrame.setScaledContents(True)
-		# self.videoFrame.setFixedSize(512,512)
 		
 
 
@@ -50,13 +52,20 @@ class VideoPlayerOpenCV(QWidget):
 		#self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)
 		#self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
 
+		### QLabel where video time will be shown
+		self.lblTime = QLabel(time.strftime("%H:%M:%S", time.gmtime(0)) + " / " + time.strftime("%H:%M:%S", time.gmtime(0)))
 
 		### Slider of video player
 		self.positionSlider = QSlider(Qt.Horizontal)
-		self.positionSlider.setRange(0, self.duration)
+		self.positionSlider.setRange(0, 0)
 		self.positionSlider.sliderMoved.connect(self.goToPosition)
-		self.positionSlider.setTickPosition(QSlider.TicksBelow)
+		self.positionSlider.setTickPosition(QSlider.TicksBothSides)
 		self.positionSlider.setTickInterval(10)
+
+		### Slider and time label container
+		timeSlider = QHBoxLayout()
+		timeSlider.addWidget(self.positionSlider)
+		timeSlider.addWidget(self.lblTime)
 
 
 		### QStackedLayout
@@ -70,14 +79,14 @@ class VideoPlayerOpenCV(QWidget):
 		### Widget container
 		container = QVBoxLayout(self)
 		container.addLayout(self.stackedLayout)
-		container.addWidget(self.positionSlider)
+		container.addLayout(timeSlider)
 
-
+		'''
 		self.speed = 1.0
 		self.timer = QTimer()
 		self.timer.timeout.connect(self.nextFrameSlot)
 		self.timer.setInterval((1000./self.videoCapture_fps) * self.speed)
-
+		'''
 
 
 
@@ -116,25 +125,27 @@ class VideoPlayerOpenCV(QWidget):
 
 	def play(self):
 		if(not self.timer.isActive()):
-			# print("play")
-			#self.start()
+			print("play")
 			self.timer.start()
 
 
 	def pause(self):
 		if(self.timer.isActive()):
-			# print("pause")
+			print("pause")
 			self.timer.stop()
 
 
 	def stop(self): ### Cosa fa lo STOP? (??? TOGLIERE O LASCIARE ???)
-		if(self.timer.isActive()):
-			# print("stop")
-			self.timer.stop()
+		#if(self.timer.isActive()):
+		print("stop")
+		self.timer.stop()
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, 0)
+		self.nextFrameSlot()
 
 
 	def backward(self):
-		# print("backward")
+		print("backward")
 
 		# Get videoCapture position (in milliseconds)
 		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
@@ -183,32 +194,7 @@ class VideoPlayerOpenCV(QWidget):
 
 	def nextBreakpoint(self):
 		print("nextBreakpoint")
-		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
-		print('videopos: ', videoPos)
 
-		# Scorro le annotazioni del breakpoint e proseguo
-		for i in range(len(self.mw.listOfBreaks)):
-			#print('len of for:', len(self.mw.listOfBreaks))
-			print('i: ', i)
-			tmp =  ( (self.mw.listOfBreaks[i]).getSecStart() )*1000
-			print('tmp: ', tmp)
-			if videoPos < tmp :
-				print('video pos <= tmp')
-				videoPos = (self.mw.listOfBreaks[i]).getSecStart()
-				print('videoPos: ', videoPos)
-				break
-			else:
-				if i == (len( self.mw.listOfBreaks)-1 ) :
-					print('else and if')
-					videoPos = self.mw.listOfBreaks[0].getSecStart()
-					print('videoPos: ', videoPos)
-					# videoPos = self.mw.listOfBreaks[0].getSecStart()
-					break
-
-		# Set videoCapture position
-		print('sono uscita dal ciclo for')
-		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos*1000)
-		 # self.pause()
 
 	def getDuration(self):
 		return self.duration
@@ -228,68 +214,52 @@ class VideoPlayerOpenCV(QWidget):
 	# Go to specific position (second) in video
 	def goToPosition(self, position):
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, (position*1000))
+		self.nextFrameSlot()
 
 	# Change slider position as video go forward/backward
 	def positionChanged(self, position):
 		self.positionSlider.setValue(position)
+		self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(position)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
 
 
 
-	'''
-	# Python Program to Convert seconds 
-	# into hours, minutes and seconds 
-  
-	import time 
-  
-	def convert(seconds): 
-		return time.strftime("%H:%M:%S", time.gmtime(n)) 
-      
-	# Driver program 
-	n = 12345
-	print(convert(n)) 
-	'''
 
 
 
-	'''
-
-	### Functions of VideoPlayer
-
-	# Go to specific position/frame/second in video
-	def goToPosition(self, position):
-		self.mediaPlayer.setPosition(position)
-
-	# Change slider position as video go forward/backward
-	def positionChanged(self, position):
-		self.positionSlider.setValue(position)
-
-	# Change slider moving speed
-	def durationChanged(self, duration):
-		self.positionSlider.setRange(0, duration)
-		self.time = duration
-
-		#print("4 -> " + str(self.mediaPlayer.metaData("Resolution")))
 
 
-	'''
-	'''
-	def openFile(self):
-		fileName, _ = QFileDialog.getOpenFileName(self, "Open Movie",
-		QDir.homePath())
 
-		fileName = "C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\video.mp4"
-		if fileName != '':
-			print(fileName)
-			self.mediaPlayer.setMedia(
-				QMediaContent(QUrl.fromLocalFile(fileName)))
-			self.playButton.setEnabled(True)
+	def setupVariables(self, videoPath, videoDir, videoName):
 
-	def exitCall(self):
-		sys.exit(app.exec_())
+		### Video path, directory, and name
+		self.videoPath =  videoPath
+		self.videoDir = videoDir
+		self.videoName = videoName
 
-	def play(self):
-		if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
-			self.mediaPlayer.pause()
-		else:
-			self.mediaPlayer.play()		
-	'''
+		### OpenCV video capture
+		# Select file to capture
+		self.videoCapture = cv2.VideoCapture(self.videoPath)
+		# Get video FPS
+		self.videoCapture_fps = self.videoCapture.get(cv2.CAP_PROP_FPS)
+		# Get video number of frames
+		self.videoCapture_nFrame = self.videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
+		# Get video frame width
+		self.videoCapture_frameWidth = self.videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)
+		# Get video frame height
+		self.videoCapture_frameHeight = self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+		# Video duration (in seconds)
+		self.duration = int(self.videoCapture_nFrame / self.videoCapture_fps)
+
+		### VideoPlayer speed
+		self.speed = 1.0
+		self.timer = QTimer()
+		self.timer.timeout.connect(self.nextFrameSlot)
+		self.timer.setInterval((1000./self.videoCapture_fps) * self.speed)
+
+		### Set labels with new duration
+		self.positionSlider.setRange(0, self.duration)
+		self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(0)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
+
+
+	def getvideoPath(self):
+		return self.videoPath

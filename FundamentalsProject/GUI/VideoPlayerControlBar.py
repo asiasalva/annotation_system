@@ -92,18 +92,20 @@ class VideoPlayerControlBar(QWidget):
 		
 		self.setFixedHeight(self.btnBackward.sizeHint().height())
 
-		self.btnPlay.setEnabled(True)
-		self.btnPause.setEnabled(True)
-		self.btnStop.setEnabled(True)
-		self.btnBackward.setEnabled(True)
-		self.btnDecreaseSpeed.setEnabled(True)
-		self.btnIncreaseSpeed.setEnabled(True)
-		self.btnForward.setEnabled(True)
-		self.btnNextBreakpoint.setEnabled(True)
-
 
 
 	def sendCommand(self, command):
 		print("sendCommand")
 		self.mw.controlBarCommand(command)
 
+	def enablePlayButton(self, enable):
+		self.btnPlay.setEnabled(enable)
+
+	def enableButtons(self, enable):
+		self.btnPause.setEnabled(enable)
+		self.btnStop.setEnabled(enable)
+		self.btnBackward.setEnabled(enable)
+		self.btnDecreaseSpeed.setEnabled(enable)
+		self.btnIncreaseSpeed.setEnabled(enable)
+		self.btnForward.setEnabled(enable)
+		self.btnNextBreakpoint.setEnabled(enable)

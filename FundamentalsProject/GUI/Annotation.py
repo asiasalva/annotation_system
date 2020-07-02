@@ -54,7 +54,6 @@ class Annotation(QWidget):
 			elif(isinstance(self.childWidget, QSvgWidget)):
 				self.setupSvgVariables(isArrow)
 
-
 			self.mw.setLastFocusAnnotation(self)
 
 	
@@ -107,7 +106,7 @@ class Annotation(QWidget):
 		# Remove annotation
 		if e.key() == QtCore.Qt.Key_Delete:
 			self.deleteLater()
-			self.parentWidget().removeAnnotation(self)
+			self.mw.removeAnnotation(self)
 		# Moving container with arrows
 		if QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
 			newPos = QPoint(self.x(), self.y())
@@ -192,9 +191,8 @@ class Annotation(QWidget):
 	def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseReleaseEvent(self, e)
 		# Save new annotation's position
-		self.annotationPosition = self.pos()
-		self.annotationWidth = self.width()
-		self.annotationHeight = self.height()
+		self.setPosition(self.pos())
+		self.setDimensions(self.width(), self.height())
 
 	def mouseMoveEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseMoveEvent(self, e)
@@ -267,8 +265,21 @@ class Annotation(QWidget):
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
 		self.annotationPosition = self.pos()
+
+		# These two lines of code (which change annotation's size and put it back 
+		#	are used to prevent that Qt automatically adjust the widget's size 
+		#	to a useful default using adjustSize()
+		# For more information -> https://doc.qt.io/qt-5/qwidget.html#visible-prop
+		# "If its size or position has changed, Qt guarantees that a widget 
+		#	gets move and resize events just before it is shown. 
+		#	If the widget has not been resized yet, Qt will adjust the widget's size 
+		#	to a useful default using adjustSize()."
+		self.resize(self.width()+1, self.height()+1)
+		self.resize(self.width()-1, self.height()-1)
+
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
+
 
 	def setFrameRange(self, fStart, fEnd):
 		self.annotationFrameStart = fStart

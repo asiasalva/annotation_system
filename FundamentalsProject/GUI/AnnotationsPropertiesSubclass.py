@@ -1,10 +1,35 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit, QTimeEdit, QDateTimeEdit
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QIcon, QBrush, QPainter, QValidator
+from PyQt5.QtGui import QPixmap, QIcon, QColor, QBrush, QPainter, QValidator
 from PyQt5.QtSvg import QSvgWidget
 
 import time
 import datetime
+
+
+
+class MyTimeEdit(QTimeEdit):
+	def __init__(self, *args, **kwargs):
+		super(MyTimeEdit, self).__init__(*args, **kwargs)
+
+	def stepBy(self, steps):
+		#if (self.currentSection() == QDateTimeEdit.MinuteSection):
+		#	self.setTime(self.time().addSecs(steps*60))
+		#elif (self.currentSection() == QDateTimeEdit.SecondSection):
+		#	self.setTime(self.time().addSecs(steps))
+
+		if (self.currentSection() == QDateTimeEdit.MinuteSection):
+			m = self.time().minute()
+			if ((m == 0) and (steps < 0)):
+				self.setTime(self.time().addSecs(-3600))
+			elif ((m == 59) and (steps > 0)):
+				self.setTime(self.time().addSecs(3600))
+		elif (self.currentSection() == QDateTimeEdit.SecondSection):
+			s = self.time().second()
+			if ((s == 0) and (steps < 0)):
+				self.setTime(self.time().addSecs(-60))
+			elif ((s == 59) and (steps > 0)):
+				self.setTime(self.time().addSecs(60))
 
 
 class SpinBoxTime(QSpinBox):
@@ -16,9 +41,11 @@ class SpinBoxTime(QSpinBox):
 
 	def valueFromText(self, text):
 		if self.parseString(text):
-			date_time = datetime.datetime.strptime(text, "%H:%M:%S")
-			timedelta = date_time - datetime.datetime(1900, 1, 1)
-			return (timedelta.total_seconds())
+			time_string = text
+			date_time = datetime.datetime.strptime(time_string, "%H:%M:%S")
+			a_timedelta = date_time - datetime.datetime(1900, 1, 1)
+			seconds = a_timedelta.total_seconds()
+			return seconds
 	
 	def validate(self, text, pos):
 		if self.parseString(text):
@@ -35,7 +62,7 @@ class SpinBoxTime(QSpinBox):
 
 
 
-class AnnotationsProperties(QWidget):
+class AnnotationsPropertiesSubclass(QWidget):
 
 	### "List view" for annotation properties ###
 
@@ -57,8 +84,13 @@ class AnnotationsProperties(QWidget):
 		self.comboboxColor = QComboBox()
 		self.spinboxValue1 = QSpinBox()
 		self.spinboxValue2 = QSpinBox()
-		self.spinboxSecStart = SpinBoxTime()
-		self.spinboxSecEnd = SpinBoxTime()
+		self.spinboxSecStart = QSpinBox()
+		self.spinboxSecEnd = QSpinBox()
+		self.timeEditSecStart = MyTimeEdit()
+		self.timeEditSecStart.setDisplayFormat("hh:mm:ss")
+		self.spinboxtime = SpinBoxTime()
+		self.spinboxtime.setRange(0, 61)
+		self.spinboxtime.valueChanged.connect(self.prova)
 
 		self.setStandardColors(self.comboboxColor)
 		self.comboboxColor.activated.connect(self.changeProperties)
@@ -77,6 +109,8 @@ class AnnotationsProperties(QWidget):
 		secRange.addWidget(QLabel(" to "))
 		secRange.addWidget(self.spinboxSecEnd)
 		self.formLayout.addRow(secRange)
+		self.formLayout.addRow(self.timeEditSecStart)
+		self.formLayout.addRow(self.spinboxtime)
 		self.frame.setLayout(self.formLayout)
 		self.scroll.setWidget(self.frame)
 		self.scroll.setWidgetResizable(True)
@@ -115,6 +149,17 @@ class AnnotationsProperties(QWidget):
 		container = QVBoxLayout(self)
 		container.addWidget(QLabel("Properties"))
 		container.addWidget(self.scroll)
+
+	def prova(self):
+		x = self.spinboxtime.value()
+		print("x = " + str(x))
+		print(self.spinboxtime.text())
+
+		try:
+			time.strptime(str(x), '%H:%M:%S')
+			print("ok")
+		except ValueError:
+			print("no")
 
 
 	def setProperties(self, annotationClass, isArrow, colorString, value1, value2, secStart, secEnd):
@@ -264,9 +309,3 @@ class AnnotationsProperties(QWidget):
 		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
 		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
 		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0
-
-
-
-
-	def setPropertiesVisible(self, visible):
-		self.setVisible(visible)

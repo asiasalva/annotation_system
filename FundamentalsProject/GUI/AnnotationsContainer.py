@@ -44,10 +44,6 @@ class AnnotationsContainer(QWidget):
 			# print('ho aggiunto il breakpoint alla lista')
 
 
-	def removeAnnotation(self, annotationToRemove):
-		self.mw.listOfAnnotations.remove(annotationToRemove)
-
-
 	def showAnnotations(self, nFrame):
 		# print('sono nella funzione di stampa dell annotazione')
 		for annotation in self.mw.listOfAnnotations:

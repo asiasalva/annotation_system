@@ -1,41 +1,11 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QIcon, QBrush, QPainter, QValidator
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QPushButton, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit, QTimeEdit
+from PyQt5.QtCore import Qt, QTime
+from PyQt5.QtGui import QPixmap, QIcon, QColor, QBrush, QPainter
 from PyQt5.QtSvg import QSvgWidget
 
-import time
-import datetime
 
 
-class SpinBoxTime(QSpinBox):
-	def __init__(self, *args, **kwargs):
-		super(SpinBoxTime, self).__init__(*args, **kwargs)
-
-	def textFromValue(self, value):
-		return time.strftime("%H:%M:%S", time.gmtime(value))
-
-	def valueFromText(self, text):
-		if self.parseString(text):
-			date_time = datetime.datetime.strptime(text, "%H:%M:%S")
-			timedelta = date_time - datetime.datetime(1900, 1, 1)
-			return (timedelta.total_seconds())
-	
-	def validate(self, text, pos):
-		if self.parseString(text):
-			return (QValidator.Acceptable, text, pos)
-		else:
-			return (QValidator.Invalid, text, pos)
-
-	def parseString(self, text):
-		try:
-			time.strptime(str(text), '%H:%M:%S')
-			return True
-		except ValueError:
-			return False
-
-
-
-class AnnotationsProperties(QWidget):
+class AnnotationsPropertiesTime(QWidget):
 
 	### "List view" for annotation properties ###
 
@@ -57,15 +27,23 @@ class AnnotationsProperties(QWidget):
 		self.comboboxColor = QComboBox()
 		self.spinboxValue1 = QSpinBox()
 		self.spinboxValue2 = QSpinBox()
-		self.spinboxSecStart = SpinBoxTime()
-		self.spinboxSecEnd = SpinBoxTime()
+		#self.spinboxSecStart = QSpinBox()
+		#self.spinboxSecEnd = QSpinBox()
+		self.timeEditSecStart = QTimeEdit()
+		self.timeEditSecEnd = QTimeEdit()
+
+		self.timeEditSecStart.setDisplayFormat("hh:mm:ss")
+		self.timeEditSecEnd.setDisplayFormat("hh:mm:ss")
+		self.timeEditSecStart.stepBy(1)
 
 		self.setStandardColors(self.comboboxColor)
 		self.comboboxColor.activated.connect(self.changeProperties)
 		self.spinboxValue1.valueChanged.connect(self.changeProperties)
 		self.spinboxValue2.valueChanged.connect(self.changeProperties)
-		self.spinboxSecStart.valueChanged.connect(self.changeProperties)
-		self.spinboxSecEnd.valueChanged.connect(self.changeProperties)
+		#self.spinboxSecStart.valueChanged.connect(self.changeProperties)
+		#self.spinboxSecEnd.valueChanged.connect(self.changeProperties)
+		self.timeEditSecStart.timeChanged.connect(self.changeProperties)
+		self.timeEditSecEnd.timeChanged.connect(self.changeProperties)
 
 		self.formLayout.addRow(self.lblColor, self.comboboxColor)
 		self.formLayout.addRow(self.lblValue1, self.spinboxValue1)
@@ -73,9 +51,11 @@ class AnnotationsProperties(QWidget):
 		secRange = QHBoxLayout()
 		secRange.addWidget(QLabel("On screen (sec):"))
 		secRange.addWidget(QLabel(" from "))
-		secRange.addWidget(self.spinboxSecStart)
+		#secRange.addWidget(self.spinboxSecStart)
+		secRange.addWidget(self.timeEditSecStart)
 		secRange.addWidget(QLabel(" to "))
-		secRange.addWidget(self.spinboxSecEnd)
+		#secRange.addWidget(self.spinboxSecEnd)
+		secRange.addWidget(self.timeEditSecEnd)
 		self.formLayout.addRow(secRange)
 		self.frame.setLayout(self.formLayout)
 		self.scroll.setWidget(self.frame)
@@ -117,12 +97,15 @@ class AnnotationsProperties(QWidget):
 		container.addWidget(self.scroll)
 
 
+
 	def setProperties(self, annotationClass, isArrow, colorString, value1, value2, secStart, secEnd):
 
 		self.spinboxValue1.blockSignals(True)
 		self.spinboxValue2.blockSignals(True)
-		self.spinboxSecStart.blockSignals(True)
-		self.spinboxSecEnd.blockSignals(True)
+		#self.spinboxSecStart.blockSignals(True)
+		#self.spinboxSecEnd.blockSignals(True)
+		self.timeEditSecStart.blockSignals(True)
+		self.timeEditSecEnd.blockSignals(True)
 
 
 
@@ -132,8 +115,10 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue1.setHidden(False)
 		self.spinboxValue2.setHidden(False)
 		self.comboboxColor.setHidden(False)
-		self.spinboxSecStart.setHidden(False)
-		self.spinboxSecEnd.setHidden(False)
+		#self.spinboxSecStart.setHidden(False)
+		#self.spinboxSecEnd.setHidden(False)
+		self.timeEditSecStart.setHidden(False)
+		self.timeEditSecEnd.setHidden(False)
 		
 
 
@@ -143,8 +128,11 @@ class AnnotationsProperties(QWidget):
 		# Parte comune a tutte le annotazioni
 		self.spinboxValue1.setValue(value1)
 		self.spinboxValue2.setValue(value2)
-		self.spinboxSecStart.setValue(secStart)
-		self.spinboxSecEnd.setValue(secEnd)
+		#self.spinboxSecStart.setValue(secStart)
+		#self.spinboxSecEnd.setValue(secEnd)
+		self.timeEditSecStart.setTime(QTime(0,0,0,0).addSecs(secStart))
+		self.timeEditSecEnd.setTime(QTime(0,0,0,0).addSecs(secEnd))
+
 
 
 		if annotationClass is None:
@@ -161,8 +149,10 @@ class AnnotationsProperties(QWidget):
 			self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 
 
-			self.spinboxSecStart.setHidden(True)
-			self.spinboxSecEnd.setHidden(True)
+			#self.spinboxSecStart.setHidden(True)
+			#self.spinboxSecEnd.setHidden(True)
+			self.timeEditSecStart.setHidden(True)
+			self.timeEditSecEnd.setHidden(True)
 		else:
 			# Annotation -> remove rubber from colors
 			if(self.comboboxColor.itemData(0) is None):
@@ -200,8 +190,10 @@ class AnnotationsProperties(QWidget):
 		
 		self.spinboxValue1.blockSignals(False)
 		self.spinboxValue2.blockSignals(False)
-		self.spinboxSecStart.blockSignals(False)
-		self.spinboxSecEnd.blockSignals(False)
+		#self.spinboxSecStart.blockSignals(False)
+		#self.spinboxSecEnd.blockSignals(False)
+		self.timeEditSecStart.blockSignals(False)
+		self.timeEditSecEnd.blockSignals(False)
 
 
 
@@ -209,21 +201,27 @@ class AnnotationsProperties(QWidget):
 		selectedColor = self.comboboxColor.currentData()
 		selectedValue1 = self.spinboxValue1.value()
 		selectedValue2 = self.spinboxValue2.value()
-		secondStart = self.spinboxSecStart.value()
-		secondEnd = self.spinboxSecEnd.value()
+		#secondStart = self.spinboxSecStart.value()
+		#secondEnd = self.spinboxSecEnd.value()
+		secondStart = (-1)*(self.timeEditSecStart.time()).secsTo(QTime(0,0,0.0))
+		secondEnd = (-1)*(self.timeEditSecEnd.time()).secsTo(QTime(0,0,0,0))
 
 		if secondStart > secondEnd:
-			if self.sender() is self.spinboxSecStart:
-				self.spinboxSecStart.setValue(secondEnd)
-			elif self.sender() is self.spinboxSecEnd:
-				self.spinboxSecEnd.setValue(secondStart)
+			if self.sender() is self.timeEditSecStart:#self.spinboxSecStart:
+				#self.spinboxSecStart.setValue(secondEnd)
+				self.timeEditSecStart.setTime(QTime(0,0,0,0).addSecs(secondEnd))
+			elif self.sender() is self.timeEditSecEnd:#self.spinboxSecEnd:
+				#self.spinboxSecEnd.setValue(secondStart)
+				self.timeEditSecEnd.setTime(QTime(0,0,0,0).addSecs(secondStart))
 		else:
 			self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
 		
 
 	def setDuration(self, duration):
-		self.spinboxSecStart.setRange(0, duration)
-		self.spinboxSecEnd.setRange(0, duration)
+		#self.spinboxSecStart.setRange(0, duration)
+		#self.spinboxSecEnd.setRange(0, duration)
+		#self.timeEditSecStart.setTimeRange(QTime(0,0,0), QTime(0,0,50))#QTime(0,0,0).addSecs(duration))
+		self.timeEditSecEnd.setTimeRange(QTime(0,0,0,0), QTime(0,0,50,0))#QTime(0,0,0).addSecs(duration))
 
 		
 
@@ -264,9 +262,3 @@ class AnnotationsProperties(QWidget):
 		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
 		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
 		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0
-
-
-
-
-	def setPropertiesVisible(self, visible):
-		self.setVisible(visible)
