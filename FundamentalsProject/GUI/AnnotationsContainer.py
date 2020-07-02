@@ -56,6 +56,9 @@ class AnnotationsContainer(QWidget):
 
 			if frameRange[0] <= nFrame <= frameRange[1]:
 				annotation.setHidden(False)
+				if annotation.annotationType == "QWidget":
+					# Annotation is a breakpoint -> pause the video
+					self.mw.controlBarCommand(1)
 			else:
 				annotation.setHidden(True)
 

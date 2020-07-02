@@ -135,8 +135,7 @@ class VideoPlayerOpenCV(QWidget):
 			self.timer.stop()
 
 
-	def stop(self): ### Cosa fa lo STOP? (??? TOGLIERE O LASCIARE ???)
-		#if(self.timer.isActive()):
+	def stop(self):
 		print("stop")
 		self.timer.stop()
 		# Set videoCapture position
@@ -158,6 +157,9 @@ class VideoPlayerOpenCV(QWidget):
 
 		# Set videoCapture position
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos)
+
+		if(not self.timer.isActive()):
+			self.nextFrameSlot()
 
 
 	def decreaseSpeed(self):
@@ -191,35 +193,40 @@ class VideoPlayerOpenCV(QWidget):
 		# Set videoCapture position
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos)
 
+		if(not self.timer.isActive()):
+			self.nextFrameSlot()
+
 
 	def nextBreakpoint(self):
 		print("nextBreakpoint")
-		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
-		print('videopos: ', videoPos)
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES)
+		#--print('videopos: ', videoPos)
+		breakpointFound = False
 
 		# Scorro le annotazioni del breakpoint e proseguo
 		for i in range(len(self.mw.listOfBreaks)):
-			#print('len of for:', len(self.mw.listOfBreaks))
-			print('i: ', i)
-			tmp =  ( (self.mw.listOfBreaks[i]).getSecStart() )*1000
-			print('tmp: ', tmp)
+			#--print('i: ', i)
+			tmp =  (self.mw.listOfBreaks[i]).getFrameRange()[0]
+			#--print('tmp: ', tmp)
 			if videoPos < tmp :
-				print('video pos <= tmp')
-				videoPos = (self.mw.listOfBreaks[i]).getSecStart()
-				print('videoPos: ', videoPos)
+				#--print('video pos <= tmp')
+				videoPos = tmp
+				#--print('videoPos: ', videoPos)
+				breakpointFound = True
 				break
-			else:
-				if i == (len( self.mw.listOfBreaks)-1 ) :
-					print('else and if')
-					videoPos = self.mw.listOfBreaks[0].getSecStart()
-					print('videoPos: ', videoPos)
-					# videoPos = self.mw.listOfBreaks[0].getSecStart()
-					break
+			elif i == (len(self.mw.listOfBreaks) - 1):
+				#--print('else and if')
+				videoPos = self.mw.listOfBreaks[0].getFrameRange()[0]
+				#--print('videoPos: ', videoPos)
+				breakpointFound = True
+				break
 
-		# Set videoCapture position
-		print('sono uscita dal ciclo for')
-		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos*1000)
-		 # self.pause()
+		if breakpointFound:
+			# Set videoCapture position
+			#--print('sono uscita dal ciclo for')
+			self.videoCapture.set(cv2.CAP_PROP_POS_FRAMES, videoPos-1)
+			self.pause()
+			self.nextFrameSlot()
 
 
 	def getDuration(self):
@@ -261,6 +268,7 @@ class VideoPlayerOpenCV(QWidget):
 		self.videoPath =  videoPath
 		self.videoDir = videoDir
 		self.videoName = videoName
+		self.onBreakpoint = False
 
 		### OpenCV video capture
 		# Select file to capture
