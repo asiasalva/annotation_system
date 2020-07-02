@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray
 from PyQt5.QtGui import QColor, QCursor
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Mode
@@ -37,10 +37,6 @@ class Annotation(QWidget):
 		self.m_isEditing = True
 		self.installEventFilter(parent)
 
-		policy = self.sizePolicy()
-		policy.setRetainSizeWhenHidden(True)
-		self.setSizePolicy(policy)
-
 	def setChildWidget(self, cWidget, isArrow, currentSecond):
 		if cWidget:
 			self.childWidget = cWidget
@@ -57,10 +53,6 @@ class Annotation(QWidget):
 				self.setupTextboxVariables()
 			elif(isinstance(self.childWidget, QSvgWidget)):
 				self.setupSvgVariables(isArrow)
-			
-			policy = self.sizePolicy()
-			policy.setRetainSizeWhenHidden(True)
-			self.childWidget.setSizePolicy(policy)
 			
 
 			self.mw.setLastFocusAnnotation(self)
