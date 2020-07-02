@@ -17,7 +17,7 @@ class AnnotationsTable(QWidget):
 		self.table.setColumnCount(3)
 		self.table.setHorizontalHeaderLabels(["Start", "End", "Type"])#, "ID"])
 		
-		header = self.table.horizontalHeader()  
+		header = self.table.horizontalHeader()
 		header.setSectionResizeMode(0, QHeaderView.Stretch)
 		header.setSectionResizeMode(1, QHeaderView.Stretch)
 		header.setSectionResizeMode(2, QHeaderView.Stretch)

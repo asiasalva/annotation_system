@@ -248,7 +248,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecEnd()
 			)
 		elif self.lastFocusAnnotation.isArrow == False:
-			self.annotationProperties.setProperties(
+			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				self.lastFocusAnnotation.isArrow, 
 				self.lastFocusAnnotation.svgColor, 
@@ -261,7 +261,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				None,
-				None, 
+				False, 
 				0, 
 				0,
 				self.lastFocusAnnotation.getSecStart(),
@@ -294,7 +294,7 @@ class Ui_MainWindow(object):
 		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QWidget)):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
-			
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
 			self.lastFocusAnnotation.setSvgColor(colorString)
@@ -403,7 +403,6 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
 			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber())
 			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
-			#self.xmlSerializer.writeXML(self.videoPlayer.dir, "1.xml", self.videoPlayer.fi, self.listOfAnnotations)
 
 
 	### ACTIONS: AnnotationsTable -> ???
