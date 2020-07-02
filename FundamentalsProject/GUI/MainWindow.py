@@ -312,6 +312,8 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 
+		self.orderAnnotations()
+
 
 
 
@@ -403,6 +405,7 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
 			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber())
 			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
+			self.orderAnnotations()
 
 
 	### ACTIONS: AnnotationsTable -> ???
@@ -563,3 +566,14 @@ class Ui_MainWindow(object):
 		msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
 
 		return msg.exec_()
+
+
+
+
+
+	def byFrameStart(self, elem):
+		return elem.getFrameRange()[0]
+
+	def orderAnnotations(self):
+		self.listOfAnnotations.sort(key=self.byFrameStart)
+		self.listOfBreaks.sort(key=self.byFrameStart)
