@@ -54,6 +54,9 @@ class AnnotationsProperties(QWidget):
 		self.lblColor = QLabel("Color:")
 		self.lblValue1 = QLabel("Value1:")
 		self.lblValue2 = QLabel("Value2:")
+		self.lblTime = QLabel("On screen (sec):")
+		self.lblFrom = QLabel(" from ")
+		self.lblTo = QLabel(" to ")
 		self.comboboxColor = QComboBox()
 		self.spinboxValue1 = QSpinBox()
 		self.spinboxValue2 = QSpinBox()
@@ -71,10 +74,10 @@ class AnnotationsProperties(QWidget):
 		self.formLayout.addRow(self.lblValue1, self.spinboxValue1)
 		self.formLayout.addRow(self.lblValue2, self.spinboxValue2)
 		secRange = QHBoxLayout()
-		secRange.addWidget(QLabel("On screen (sec):"))
-		secRange.addWidget(QLabel(" from "))
+		secRange.addWidget(self.lblTime)
+		secRange.addWidget(self.lblFrom)
 		secRange.addWidget(self.spinboxSecStart)
-		secRange.addWidget(QLabel(" to "))
+		secRange.addWidget(self.lblTo)
 		secRange.addWidget(self.spinboxSecEnd)
 		self.formLayout.addRow(secRange)
 		self.frame.setLayout(self.formLayout)
@@ -125,31 +128,34 @@ class AnnotationsProperties(QWidget):
 		self.spinboxSecEnd.blockSignals(True)
 
 
-
-		self.lblColor.setHidden(False)
-		self.lblValue1.setHidden(False)
-		self.lblValue2.setHidden(False)
-		self.spinboxValue1.setHidden(False)
-		self.spinboxValue2.setHidden(False)
-		self.comboboxColor.setHidden(False)
-		self.spinboxSecStart.setHidden(False)
-		self.spinboxSecEnd.setHidden(False)
-		
-
-
-		if annotationClass is QWidget: 
+		if annotationClass is QWidget:
+			# BREAKPOINT
 			self.lblColor.setHidden(True)
 			self.lblValue1.setHidden(True)
 			self.lblValue2.setHidden(True)
+			self.lblTime.setHidden(False)
+			self.lblFrom.setHidden(False)
+			self.lblTo.setHidden(False)
 			self.spinboxValue1.setHidden(True)
 			self.spinboxValue2.setHidden(True)
 			self.comboboxColor.setHidden(True)
 			self.spinboxSecStart.setHidden(False)
-			self.spinboxSecEnd.setHidden(False)
+			self.spinboxSecEnd.setHidden(True)
 			self.spinboxSecStart.setValue(secStart)
-			self.spinboxSecEnd.setValue(secEnd)
 		else:
-			# Parte comune a tutte le annotazioni
+			# Parte comune a tutte le altre annotazioni
+			self.lblColor.setHidden(False)
+			self.lblValue1.setHidden(False)
+			self.lblValue2.setHidden(False)
+			self.lblTime.setHidden(False)
+			self.lblFrom.setHidden(False)
+			self.lblTo.setHidden(False)
+			self.spinboxValue1.setHidden(False)
+			self.spinboxValue2.setHidden(False)
+			self.comboboxColor.setHidden(False)
+			self.spinboxSecStart.setHidden(False)
+			self.spinboxSecEnd.setHidden(False)
+
 			self.spinboxValue1.setValue(value1)
 			self.spinboxValue2.setValue(value2)
 			self.spinboxSecStart.setValue(secStart)
@@ -169,12 +175,12 @@ class AnnotationsProperties(QWidget):
 
 				self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 
-
+				
+				self.lblTime.setHidden(True)
+				self.lblFrom.setHidden(True)
+				self.lblTo.setHidden(True)
 				self.spinboxSecStart.setHidden(True)
 				self.spinboxSecEnd.setHidden(True)
-			elif annotationClass is QWidget:
-				self.spinboxValue1.setRange(1, 100)
-				self.spinboxValue2.setRange(1, 100)
 			else:
 				# Annotation -> remove rubber from colors
 				if(self.comboboxColor.itemData(0) is None):
@@ -218,19 +224,23 @@ class AnnotationsProperties(QWidget):
 
 
 	def changeProperties(self):
-		selectedColor = self.comboboxColor.currentData()
-		selectedValue1 = self.spinboxValue1.value()
-		selectedValue2 = self.spinboxValue2.value()
-		secondStart = self.spinboxSecStart.value()
-		secondEnd = self.spinboxSecEnd.value()
 
-		if secondStart > secondEnd:
-			if self.sender() is self.spinboxSecStart:
-				self.spinboxSecStart.setValue(secondEnd)
-			elif self.sender() is self.spinboxSecEnd:
-				self.spinboxSecEnd.setValue(secondStart)
+		if self.spinboxSecEnd.isHidden():
+			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
 		else:
-			self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
+			selectedColor = self.comboboxColor.currentData()
+			selectedValue1 = self.spinboxValue1.value()
+			selectedValue2 = self.spinboxValue2.value()
+			secondStart = self.spinboxSecStart.value()
+			secondEnd = self.spinboxSecEnd.value()
+
+			if secondStart > secondEnd:
+				if self.sender() is self.spinboxSecStart:
+					self.spinboxSecStart.setValue(secondEnd)
+				elif self.sender() is self.spinboxSecEnd:
+					self.spinboxSecEnd.setValue(secondStart)
+			else:
+				self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
 		
 
 	def setDuration(self, duration):
