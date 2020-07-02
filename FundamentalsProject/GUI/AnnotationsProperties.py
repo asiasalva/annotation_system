@@ -137,64 +137,76 @@ class AnnotationsProperties(QWidget):
 		
 
 
-
-
-
-		# Parte comune a tutte le annotazioni
-		self.spinboxValue1.setValue(value1)
-		self.spinboxValue2.setValue(value2)
-		self.spinboxSecStart.setValue(secStart)
-		self.spinboxSecEnd.setValue(secEnd)
-
-
-		if annotationClass is None:
-			# DRAWING
-			self.lblColor.setText("Brush color:")
-			self.lblValue1.setText("Brush size:")
-			self.lblValue2.setText("Rubber size:")
-			self.spinboxValue1.setRange(1, 100)
-			self.spinboxValue2.setRange(1, 100)
-
-			if(self.comboboxColor.itemData(0) is not None):
-				self.insertRubber(self.comboboxColor, 0)
-
-			self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
-
-
-			self.spinboxSecStart.setHidden(True)
-			self.spinboxSecEnd.setHidden(True)
+		if annotationClass is QWidget: 
+			self.lblColor.setHidden(True)
+			self.lblValue1.setHidden(True)
+			self.lblValue2.setHidden(True)
+			self.spinboxValue1.setHidden(True)
+			self.spinboxValue2.setHidden(True)
+			self.comboboxColor.setHidden(True)
+			self.spinboxSecStart.setHidden(False)
+			self.spinboxSecEnd.setHidden(False)
+			self.spinboxSecStart.setValue(secStart)
+			self.spinboxSecEnd.setValue(secEnd)
 		else:
-			# Annotation -> remove rubber from colors
-			if(self.comboboxColor.itemData(0) is None):
-				self.removeRubber(self.comboboxColor, 0)
+			# Parte comune a tutte le annotazioni
+			self.spinboxValue1.setValue(value1)
+			self.spinboxValue2.setValue(value2)
+			self.spinboxSecStart.setValue(secStart)
+			self.spinboxSecEnd.setValue(secEnd)
 
-			if annotationClass is QPlainTextEdit:
-				# TEXTBOX
-				self.lblColor.setText("Text color:")
-				self.lblValue1.setText("Text size:")
-				self.lblValue2.setText("Background opacity:")
+
+			if annotationClass is None:
+				# DRAWING
+				self.lblColor.setText("Brush color:")
+				self.lblValue1.setText("Brush size:")
+				self.lblValue2.setText("Rubber size:")
 				self.spinboxValue1.setRange(1, 100)
-				self.spinboxValue2.setRange(0, 100)
+				self.spinboxValue2.setRange(1, 100)
+
+				if(self.comboboxColor.itemData(0) is not None):
+					self.insertRubber(self.comboboxColor, 0)
+
 				self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 
-			if annotationClass is QSvgWidget:
-				# SVG
-				if isArrow:
-					# ARROW
-					self.lblColor.setText("Arrow color:")
-					self.lblValue1.setText("Arrow opacity:")
-					self.lblValue2.setText("Arrow rotation:")
-					self.spinboxValue1.setRange(0, 100)
-					self.spinboxValue2.setRange(0, 360)
+
+				self.spinboxSecStart.setHidden(True)
+				self.spinboxSecEnd.setHidden(True)
+			elif annotationClass is QWidget:
+				self.spinboxValue1.setRange(1, 100)
+				self.spinboxValue2.setRange(1, 100)
+			else:
+				# Annotation -> remove rubber from colors
+				if(self.comboboxColor.itemData(0) is None):
+					self.removeRubber(self.comboboxColor, 0)
+
+				if annotationClass is QPlainTextEdit:
+					# TEXTBOX
+					self.lblColor.setText("Text color:")
+					self.lblValue1.setText("Text size:")
+					self.lblValue2.setText("Background opacity:")
+					self.spinboxValue1.setRange(1, 100)
+					self.spinboxValue2.setRange(0, 100)
 					self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
-				else:
-					# LINE
-					self.lblColor.setText("Line color:")
-					self.lblValue1.setText("Line width:")
-					self.lblValue2.setText("Line rotation:")
-					self.spinboxValue1.setRange(1, 25)
-					self.spinboxValue2.setRange(0, 360)
-					self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
+
+				if annotationClass is QSvgWidget:
+					# SVG
+					if isArrow:
+						# ARROW
+						self.lblColor.setText("Arrow color:")
+						self.lblValue1.setText("Arrow opacity:")
+						self.lblValue2.setText("Arrow rotation:")
+						self.spinboxValue1.setRange(0, 100)
+						self.spinboxValue2.setRange(0, 360)
+						self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
+					else:
+						# LINE
+						self.lblColor.setText("Line color:")
+						self.lblValue1.setText("Line width:")
+						self.lblValue2.setText("Line rotation:")
+						self.spinboxValue1.setRange(1, 25)
+						self.spinboxValue2.setRange(0, 360)
+						self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 
 
 		
