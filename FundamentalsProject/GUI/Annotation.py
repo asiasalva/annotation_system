@@ -53,7 +53,6 @@ class Annotation(QWidget):
 				self.setupTextboxVariables()
 			elif(isinstance(self.childWidget, QSvgWidget)):
 				self.setupSvgVariables(isArrow)
-			
 
 			self.mw.setLastFocusAnnotation(self)
 
