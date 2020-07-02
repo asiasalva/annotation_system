@@ -246,13 +246,23 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
-		else:
-			self.annotationsProperties.setProperties(
+		elif self.lastFocusAnnotation.isArrow == False:
+			self.annotationProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				self.lastFocusAnnotation.isArrow, 
 				self.lastFocusAnnotation.svgColor, 
 				int(self.lastFocusAnnotation.svgExtraAttribute), 
 				int(self.lastFocusAnnotation.svgTransform),
+				self.lastFocusAnnotation.getSecStart(),
+				self.lastFocusAnnotation.getSecEnd()
+			)
+		else:
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__, 
+				None,
+				None, 
+				0, 
+				0,
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
@@ -279,6 +289,11 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		#BREAKPOINT 
+		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QWidget)):
+			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
+			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			
 		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
 			self.lastFocusAnnotation.setSvgColor(colorString)
