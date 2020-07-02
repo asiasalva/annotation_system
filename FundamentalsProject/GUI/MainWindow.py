@@ -177,6 +177,7 @@ class Ui_MainWindow(object):
 		if(command == 0):					# First setup
 			self.listOfAnnotations = list()
 			self.listOfDrawing = list()
+			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
 			#--self.setDurationProperty()
 			self.projectPath = ""
