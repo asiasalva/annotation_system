@@ -150,11 +150,12 @@ class Ui_MainWindow(object):
 
 
 	def setupAnnotations(self, command, fileName = "", nFrame = None):
-		print("setupAnnotations")
+		# print("setupAnnotations")
 
 		if(command == 0):					# First setup
 			self.listOfAnnotations = list()
 			self.listOfDrawing = list()
+			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
 			self.setDurationProperty()
 
@@ -162,7 +163,7 @@ class Ui_MainWindow(object):
 			print("Load annotations from file")
 
 		elif(command == 2):
-			print("Frame n°: " + str(nFrame))
+			# print("Frame n°: " + str(nFrame))
 
 			# Load annotations present in this specific frame
 			self.annotationsContainer.showAnnotations(nFrame)
@@ -184,7 +185,7 @@ class Ui_MainWindow(object):
 
 
 	def setLastFocusAnnotation(self, lastFocusAnnotation):
-		
+		# print('set last focus annotation in main window')
 		self.lastFocusAnnotation = lastFocusAnnotation
 
 		self.windowPaint.setRubber(False)
@@ -210,7 +211,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
-		else:
+		elif self.lastFocusAnnotation.isArrow == False:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				self.lastFocusAnnotation.isArrow, 
@@ -220,10 +221,20 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+		else:
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__, 
+				None, 
+				None,
+				0,
+				0,
+				self.lastFocusAnnotation.getSecStart(),
+				self.lastFocusAnnotation.getSecEnd()
+			)
 		
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):
-		
+		# print('sono nella new annotation properties')
 		# DRAWING
 		if self.lastFocusAnnotation is None:
 			# RUBBER
@@ -242,8 +253,14 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setTextboxBackgroundOpacity(value2)
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+		#BREAKPOINT 
+		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QWidget)):
+
+			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
+			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
+			# print('sono nella new annotation properties')
 			self.lastFocusAnnotation.setSvgColor(colorString)
 			self.lastFocusAnnotation.setSvgExtraAttribute(str(value1/100))
 			self.lastFocusAnnotation.setSvgTransform(str(value2)),
@@ -272,7 +289,7 @@ class Ui_MainWindow(object):
 	### ACTIONS: VideoPlayerControlBar -> VideoPlayerOpenCV
 
 	def controlBarCommand(self, command):
-		print("controlBarCommand -> " + str(command))
+		# print("controlBarCommand -> " + str(command))
 
 		if(command == 0):
 			self.videoPlayer.play()
@@ -372,3 +389,4 @@ class Ui_MainWindow(object):
 			self.videoPlayer.setLayoutWidget(2)
 
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
+			self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(),self.videoPlayer.getCurrentFrameNumber())

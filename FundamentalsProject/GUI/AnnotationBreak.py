@@ -5,8 +5,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Mode
+from GUI import Annotation 
 
-class Annotation(QWidget):
+class AnnotationBreak(QWidget):
 
 	### TCONTAINER VARIABLES AND METHODS ###
 	#region
@@ -15,12 +16,14 @@ class Annotation(QWidget):
 	inFocus = pyqtSignal(bool)
 	outFocus = pyqtSignal(bool)
 	newGeometry = pyqtSignal(QRect)
+	isArrow = None  
 
-	def __init__(self, parent, p, cWidget, isArrow, MainWindow, currentSecond): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
+	def __init__(self, parent, p, cWidget, MainWindow, currentSecond): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
 		self.childWidget = None
+		# self.setGeometry(500, 500, 500, 500)
 
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
@@ -31,13 +34,14 @@ class Annotation(QWidget):
 		self.move(p)
 
 		self.vLayout = QVBoxLayout(self)
-		self.setChildWidget(cWidget, isArrow, currentSecond)
+		self.setChildWidget(cWidget, currentSecond)
 
 		self.m_infocus = True
 		self.m_isEditing = True
 		self.installEventFilter(parent)
 
-	def setChildWidget(self, cWidget, isArrow, currentSecond):
+
+	def setChildWidget(self, cWidget, currentSecond):
 		if cWidget:
 			self.childWidget = cWidget
 			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
@@ -49,10 +53,7 @@ class Annotation(QWidget):
 
 			self.setupAnnotationVariables(currentSecond)
 			
-			if(isinstance(self.childWidget, QPlainTextEdit)):
-				self.setupTextboxVariables()
-			elif(isinstance(self.childWidget, QSvgWidget)):
-				self.setupSvgVariables(isArrow)
+			# self.setUpVars()
 
 
 			self.mw.setLastFocusAnnotation(self)
@@ -75,16 +76,18 @@ class Annotation(QWidget):
 		self.outFocus.emit(False)
 		self.m_infocus = False
 
-	def paintEvent(self, e: QtGui.QPaintEvent):
-		painter = QtGui.QPainter(self)
-		color = (r, g, b, a) = (255, 0, 0, 0)
-		painter.fillRect(e.rect(), QColor(r, g, b, a))
-
-		if self.m_infocus:
-			rect = e.rect()
-			rect.adjust(0,0,-1,-1)
-			painter.setPen(QColor(r, g, b))
-			painter.drawRect(rect)
+	def paintEvent(self, event):
+		#♥ print('sto disegnando il cerchio')
+		paint = QPainter()
+		paint.begin(self)
+        ## paint.drawRect(event.rect())
+        # draw red circles
+		paint.setPen(Qt.red)
+		center = QPoint(10, 10)
+		paint.setBrush(Qt.blue)
+		paint.drawEllipse(10, 10, 15, 15)
+		paint.end() 
+		# print('ho disegnato il cerchio')
 
 	def mousePressEvent(self, e: QtGui.QMouseEvent):
 		self.position = QPoint(e.globalX() - self.geometry().x(), e.globalY() - self.geometry().y())
@@ -267,8 +270,11 @@ class Annotation(QWidget):
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
 		self.annotationPosition = self.pos()
+		self.resize(self.width()+1, self.height()+1)
+		self.resize(self.width()-1, self.height()-1)
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
+
 
 	def setFrameRange(self, fStart, fEnd):
 		self.annotationFrameStart = fStart
@@ -314,31 +320,16 @@ class Annotation(QWidget):
 	
 	### QPLAINTEXTEDIT VARIABLES AND METHODS ###
 	#region
-
-	def setupTextboxVariables(self):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.textboxText = ""
-			self.textboxBackgroundOpacity = 100
-			self.textboxFontColor = "#000000"
-			self.textboxFontSize = 10
-			self.setTextboxPalette()
 			
-
-	def setTextboxPalette(self):
-		textboxPalette = self.childWidget.palette()
-		self.childWidget.setFont(QtGui.QFont(self.childWidget.font().rawName(), self.textboxFontSize))
-		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Text, QColor(self.textboxFontColor))
-		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QColor(255, 255, 255, (int(self.textboxBackgroundOpacity*2.55))))
-		self.childWidget.setPalette(textboxPalette)
-
-		self.setTextboxText(self.getTextboxText())
-
+	def setColor(self, newColor):
+		if(isinstance(self.childWidget, QWidget)):
+			self.color = newColor
 
 	def mouseDoubleClickEvent(self, event):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
 			self.childWidget.installEventFilter(self)
-			self.childWidget.textChanged.connect(self.updateTextboxText)
+			# self.childWidget.textChanged.connect(self.updateTextboxText)
 
 	def eventFilter(self, obj, event):
 		if event.type() == QtCore.QEvent.FocusOut:
@@ -351,133 +342,5 @@ class Annotation(QWidget):
 	def updateTextboxText(self):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.textboxText = self.childWidget.toPlainText()
-
-	def setTextboxText(self, newText):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.textboxText = newText
-			self.childWidget.setPlainText(self.textboxText)
-
-	def setTextboxBackgroundOpacity(self, newOpacity):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.textboxBackgroundOpacity = newOpacity
-			self.setTextboxPalette()
-
-	def setTextboxFontColor(self, newColor):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.textboxFontColor = newColor
-			self.setTextboxPalette()
-
-	def setTextboxFontSize(self, newSize):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.textboxFontSize = newSize
-			self.setTextboxPalette()
-
-	def getTextboxText(self):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			return self.textboxText
-
-	def getTextboxBackgroundOpacity(self):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			return self.textboxBackgroundOpacity
-
-	def getTextboxFontColor(self):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			return self.textboxFontColor
-
-	def getTextboxFontSize(self):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			return self.textboxFontSize
-	
-
-	#endregion
-
-	### QSVGWIDGET VARIABLES AND METHODS ###
-	#region
-
-	def setupSvgVariables(self, isArrow):
-		if(isinstance(self.childWidget, QSvgWidget)):
-
-			'''
-				Arrow SVG code:
-					<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-						<rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/>
-						<path d="M24 11.871l-5-4.871v3h-19v4h19v3z" fill="#000000" fill-opacity="1" transform="rotate(0,12,12)"/>
-					</svg>
-
-				Line SVG code:
-					<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-						<rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/>
-						<path d="M0,12h24" stroke="#000000" stroke-width="1" transform="rotate(0,12,12)"/>
-					</svg>
-			'''
-
-			self.isArrow = isArrow
-
-			if self.isArrow:
-				self.svgString_start = r'<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/><path d="M24 11.871l-5-4.871v3h-19v4h19v3z"'
-			else:
-				self.svgString_start = r'<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/><path d="M0,12h24"'
-
-			self.svgString_end = r',12,12)"/></svg>'
-
-			self.svgColor = "#000000"			# Color of the SVG image (both LINE or ARROW)
-			self.svgExtraAttribute = "1"		# Extra attribute of the SVG image ('stroke-width' for LINE, 'fill-opacity' for ARROW)
-			self.svgTransform = "0"				# Rotation of the SVG image
-
-
-
-			self.showSVG()
-
-
-	def setSvgColor(self, newColor):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			self.svgColor = newColor
-			self.showSVG()
-
-	def setSvgExtraAttribute(self, newExtraAttribute):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			self.svgExtraAttribute = newExtraAttribute
-			self.showSVG()
-
-	def setSvgTransform(self, newTransform):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			self.svgTransform = newTransform
-			self.showSVG()
-
-	def getSvgColor(self):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			return self.svgColor
-
-	def getSvgExtraAttribute(self):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			return self.svgExtraAttribute
-
-	def getSvgTransform(self):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			return self.svgTransform
-
-
-	def showSVG(self):
-		if(isinstance(self.childWidget, QSvgWidget)):
-			qba = QByteArray()
-
-			if self.isArrow:
-				qba.append(
-					 self.svgString_start +  
-					 ' fill="' + self.svgColor + 
-					 '" fill-opacity="' + self.svgExtraAttribute +
-					 '" transform="rotate(' + self.svgTransform + 
-					 self.svgString_end)
-			else:
-				qba.append(
-					 self.svgString_start +  
-					 ' stroke="' + self.svgColor + 
-					 '" stroke-width="' + self.svgExtraAttribute +
-					 '" transform="rotate(' + self.svgTransform + 
-					 self.svgString_end)
-
-
-			self.childWidget.load(qba)
-
-
-	#endregion
+			
+#♦endregion

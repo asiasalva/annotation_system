@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt, QUrl, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
 from GUI import WindowPaint
-
+from GUI import AnnotationBreak
 
 class VideoPlayerOpenCV(QWidget):
 	
@@ -20,10 +20,7 @@ class VideoPlayerOpenCV(QWidget):
 
 		### Video path
 		dirname = os.path.dirname(__file__)
-		fileName = os.path.join(dirname, 'video.mp4')
-		# fileName = "C:\\Users\\Brugix\\source\\repos\\asiasalva\\annotation_system\\FundamentalsProject\\GUI\\video.mp4"
-		#fileName = str(pathlib.Path("video.mp4").parent.absolute()) + "\\video.mp4" # NOT WORKING -> prende il path del file di startup
-			
+		fileName = os.path.join(dirname, 'video.mp4')			
 
 		### OpenCV video capture
 		# Select file to capture
@@ -45,6 +42,7 @@ class VideoPlayerOpenCV(QWidget):
 		self.videoFrame = QLabel()
 		self.videoFrame.setStyleSheet("border: 5px solid black;")
 		self.videoFrame.setScaledContents(True)
+		# self.videoFrame.setFixedSize(512,512)
 		
 
 
@@ -118,25 +116,25 @@ class VideoPlayerOpenCV(QWidget):
 
 	def play(self):
 		if(not self.timer.isActive()):
-			print("play")
+			# print("play")
 			#self.start()
 			self.timer.start()
 
 
 	def pause(self):
 		if(self.timer.isActive()):
-			print("pause")
+			# print("pause")
 			self.timer.stop()
 
 
 	def stop(self): ### Cosa fa lo STOP? (??? TOGLIERE O LASCIARE ???)
 		if(self.timer.isActive()):
-			print("stop")
+			# print("stop")
 			self.timer.stop()
 
 
 	def backward(self):
-		print("backward")
+		# print("backward")
 
 		# Get videoCapture position (in milliseconds)
 		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
@@ -185,7 +183,32 @@ class VideoPlayerOpenCV(QWidget):
 
 	def nextBreakpoint(self):
 		print("nextBreakpoint")
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_MSEC)
+		print('videopos: ', videoPos)
 
+		# Scorro le annotazioni del breakpoint e proseguo
+		for i in range(len(self.mw.listOfBreaks)):
+			#print('len of for:', len(self.mw.listOfBreaks))
+			print('i: ', i)
+			tmp =  ( (self.mw.listOfBreaks[i]).getSecStart() )*1000
+			print('tmp: ', tmp)
+			if videoPos < tmp :
+				print('video pos <= tmp')
+				videoPos = (self.mw.listOfBreaks[i]).getSecStart()
+				print('videoPos: ', videoPos)
+				break
+			else:
+				if i == (len( self.mw.listOfBreaks)-1 ) :
+					print('else and if')
+					videoPos = self.mw.listOfBreaks[0].getSecStart()
+					print('videoPos: ', videoPos)
+					# videoPos = self.mw.listOfBreaks[0].getSecStart()
+					break
+
+		# Set videoCapture position
+		print('sono uscita dal ciclo for')
+		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos*1000)
+		 # self.pause()
 
 	def getDuration(self):
 		return self.duration
