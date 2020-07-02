@@ -52,9 +52,9 @@ class AnnotationsContainer(QWidget):
 		# print('sono nella funzione di stampa dell annotazione')
 		for annotation in self.mw.listOfAnnotations:
 			# print('annotation type: ', type(annotation))
-			if annotation.annotationType == 'QWidget':
-				print('sono nell if')
-				self.mw.controlBarCommand(1)
+			# if annotation.annotationType == 'QWidget':
+				# print('sono nell if')
+				# self.mw.controlBarCommand(1)
 
 			frameRange = annotation.getFrameRange()
 
