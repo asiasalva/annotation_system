@@ -12,6 +12,7 @@ The project was created using Visual Studio and Python.
 
 - PyQt5
 - OpenCV
+- K-Lite Codec Pack Basic
 
 # Usage
 
