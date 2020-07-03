@@ -14,7 +14,7 @@ class Ui_MainWindow(object):
 		# set vertical layout (i.e., main layout)
 		# N.B.: you need to put a layout (any kind of layout) in order to make content auto resizable
 		MainWindow.setObjectName("MainWindow")
-		MainWindow.resize(1280, 720)
+		#MainWindow.resize(1280, 720)
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -30,6 +30,7 @@ class Ui_MainWindow(object):
 		# Vertical container for "video side" components
 		self.vboxVideoLayoutWidget = QtWidgets.QWidget(self.splitterWindow)
 		self.vboxVideoLayoutWidget.setObjectName("vboxLayoutWidget")
+		self.vboxVideoLayoutWidget.setMaximumWidth(2 * QtWidgets.QDesktopWidget().width() / 3)
 		self.vboxVideo = QtWidgets.QVBoxLayout(self.vboxVideoLayoutWidget)
 		self.vboxVideo.setContentsMargins(0, 0, 0, 0)
 		self.vboxVideo.setObjectName("vboxVideo")
@@ -163,7 +164,7 @@ class Ui_MainWindow(object):
 
 		self.actionNew_Project.setEnabled(True)
 		self.actionOpen_Project.setEnabled(True)
-		self.actionAdd_Video.setEnabled(False)
+		self.actionAdd_Video.setEnabled(True)
 		self.actionSave_Project.setEnabled(True)
 		self.actionExport.setEnabled(False)
 		#--self.actionClose.setEnabled(False)
@@ -290,11 +291,6 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
-		#BREAKPOINT 
-		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QWidget)):
-			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
-			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
-			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
 			self.lastFocusAnnotation.setSvgColor(colorString)
@@ -304,13 +300,19 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		# LINE
-		else:
+		elif not self.lastFocusAnnotation.isArrow:
 			self.lastFocusAnnotation.setSvgColor(colorString)
 			self.lastFocusAnnotation.setSvgExtraAttribute(str(value1))
 			self.lastFocusAnnotation.setSvgTransform(str(value2)),
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		#BREAKPOINT 
+		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QWidget)):
+			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
+			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		
 
 		self.orderAnnotations()
 

@@ -15,7 +15,7 @@ class VideoPlayerOpenCV(QWidget):
 
 		self.mw = MainWindow
 		self.videoPath = ""
-		self.setMaximumSize(780,550)
+		#self.setMaximumSize(780,550)
 		'''
 		### Video path
 		dirname = os.path.dirname(__file__)

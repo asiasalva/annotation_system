@@ -1,6 +1,6 @@
 # Video Annotation System
 
-This repository is aimed to contain the project for the course Fundamentals of image and video processing held in University of Trento for the Computer Science Master Degree. 
+This repository is aimed to contain the project for the course "Fundamentals of Image and Video Processing" held in University of Trento for the Computer Science Master Degree. 
 The developer team is composed of two students: Federico Brugiolo and Asia Salvaterra.
 
 
@@ -11,7 +11,7 @@ The project was created using Visual Studio and Python.
 ## Project Libraries
 
 - PyQt5
-- OpenCv
+- OpenCV
 
 # Usage
 
@@ -29,7 +29,7 @@ In the video side there is the box in which the video will be played and then al
 - Go back: go back for 10 seconds;
 - Move forward of one frame
 - Move backword for one frame
--  Go to next breakpoint: move between different breakpoints
+- Go to next breakpoint: move between different breakpoints
 
 
 ## Types of Annotations
