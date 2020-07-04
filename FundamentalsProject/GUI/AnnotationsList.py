@@ -5,16 +5,13 @@ class AnnotationsList(QWidget):
 	### "List view" for annotation types ###
 
 	def setupUi(self, MainWindow):
-
 		self.mw = MainWindow
-
-
+		
 		### Widgets simulating a list view
 		self.formLayout = QFormLayout()
 		self.frame = QFrame()
 		self.scroll = QScrollArea()
 		
-
 		### Annotations type buttons:
 
 		# Line button
@@ -42,7 +39,6 @@ class AnnotationsList(QWidget):
 		self.btnDrawing.setEnabled(True)
 		self.btnDrawing.clicked.connect(lambda: self.sendCommand(4))
 
-
 		### Widget container
 		self.formLayout.addRow(self.btnLine)
 		self.formLayout.addRow(self.btnArrow)
@@ -58,13 +54,8 @@ class AnnotationsList(QWidget):
 		container.addWidget(QLabel("Types"))
 		container.addWidget(self.scroll)
 
-
-
-
 	def sendCommand(self, command):
-		print("sendCommand")
 		self.mw.annotationsListCommand(command)
-
 
 	def changeDrawButtonText(self, drawing):
 		if drawing:

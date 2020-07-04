@@ -7,6 +7,8 @@ from PyQt5.QtSvg import QSvgWidget
 from GUI import Mode
 from GUI import Annotation 
 
+#class for the annotations of type BreakPoint
+
 class AnnotationBreak(QWidget):
 
 	### TCONTAINER VARIABLES AND METHODS ###
@@ -18,13 +20,11 @@ class AnnotationBreak(QWidget):
 	newGeometry = pyqtSignal(QRect)
 	isArrow = None  
 
-	def __init__(self, parent, p, cWidget, MainWindow, currentSecond): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
+	def __init__(self, parent, p, cWidget, MainWindow, currentSecond): 
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
 		self.childWidget = None
-		# self.setGeometry(500, 500, 500, 500)
-
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
 		self.setAutoFillBackground(False)
@@ -32,14 +32,11 @@ class AnnotationBreak(QWidget):
 		self.setFocusPolicy(QtCore.Qt.ClickFocus)
 		self.setFocus()
 		self.move(p)
-
 		self.vLayout = QVBoxLayout(self)
 		self.setChildWidget(cWidget, currentSecond)
-
 		self.m_infocus = True
 		self.m_isEditing = True
 		self.installEventFilter(parent)
-
 
 	def setChildWidget(self, cWidget, currentSecond):
 		if cWidget:
@@ -49,15 +46,8 @@ class AnnotationBreak(QWidget):
 			self.childWidget.releaseMouse()
 			self.vLayout.addWidget(cWidget)
 			self.vLayout.setContentsMargins(0,0,0,0)
-
-
 			self.setupAnnotationVariables(currentSecond)
-			
-			# self.setUpVars()
-
-
 			self.mw.setLastFocusAnnotation(self)
-
 	
 	def focusInEvent(self, a0: QtGui.QFocusEvent):
 		self.m_infocus = True
@@ -65,7 +55,6 @@ class AnnotationBreak(QWidget):
 		p.installEventFilter(self)
 		p.repaint()
 		self.inFocus.emit(True)
-
 		if self.childWidget is not None:
 			self.mw.setLastFocusAnnotation(self)
 
@@ -77,17 +66,14 @@ class AnnotationBreak(QWidget):
 		self.m_infocus = False
 
 	def paintEvent(self, event):
-		#♥ print('sto disegnando il cerchio')
 		paint = QPainter()
 		paint.begin(self)
-        ## paint.drawRect(event.rect())
         # draw red circles
 		paint.setPen(Qt.red)
 		center = QPoint(10, 10)
 		paint.setBrush(Qt.blue)
 		paint.drawEllipse(10, 10, 15, 15)
 		paint.end() 
-		# print('ho disegnato il cerchio')
 
 	def mousePressEvent(self, e: QtGui.QMouseEvent):
 		self.position = QPoint(e.globalX() - self.geometry().x(), e.globalY() - self.geometry().y())
@@ -101,7 +87,6 @@ class AnnotationBreak(QWidget):
 		if e.button() == QtCore.Qt.RightButton:
 			self.popupShow(e.pos())
 			e.accept()
-
 		# Raises this widget to the top of the parent widget’s stack.
 		self.raise_()
 
@@ -123,7 +108,6 @@ class AnnotationBreak(QWidget):
 			if e.key() == QtCore.Qt.Key_Right:
 				newPos.setX(newPos.x() + 1)
 			self.move(newPos)
-
 		if QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
 			if e.key() == QtCore.Qt.Key_Up:
 				self.resize(self.width(), self.height() - 1)
@@ -209,7 +193,6 @@ class AnnotationBreak(QWidget):
 			p = QPoint(e.x() + self.geometry().x(), e.y() + self.geometry().y())
 			self.setCursorShape(p)
 			return
-
 		if (self.mode == Mode.Mode.MOVE or self.mode == Mode.Mode.NONE) and e.buttons() and QtCore.Qt.LeftButton:
 			toMove = e.globalPos() - self.position
 			if toMove.x() < 0:return
@@ -259,7 +242,6 @@ class AnnotationBreak(QWidget):
 	#endregion
 
 
-
 	### ANNOTATION VARIABLES AND METHODS ###
 	#region
 
@@ -274,7 +256,6 @@ class AnnotationBreak(QWidget):
 		self.resize(self.width()-1, self.height()-1)
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
-
 
 	def setFrameRange(self, fStart, fEnd):
 		self.annotationFrameStart = fStart
@@ -316,31 +297,4 @@ class AnnotationBreak(QWidget):
 
 	def getDimensions(self):
 		return (self.annotationWidth, self.annotationHeight)
-
-	
-	### QPLAINTEXTEDIT VARIABLES AND METHODS ###
-	#region
-			
-	def setColor(self, newColor):
-		if(isinstance(self.childWidget, QWidget)):
-			self.color = newColor
-
-	def mouseDoubleClickEvent(self, event):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
-			self.childWidget.installEventFilter(self)
-			# self.childWidget.textChanged.connect(self.updateTextboxText)
-
-	def eventFilter(self, obj, event):
-		if event.type() == QtCore.QEvent.FocusOut:
-			if(isinstance(self.childWidget, QPlainTextEdit)):
-				if obj is self.childWidget and event.type() == QtCore.QEvent.FocusOut:
-					self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
-
-		return super().eventFilter(obj, event)
-
-	def updateTextboxText(self):
-		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.textboxText = self.childWidget.toPlainText()
-			
-#♦endregion
+	#endregion

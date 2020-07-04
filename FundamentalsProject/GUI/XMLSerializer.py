@@ -9,11 +9,7 @@ class XMLSerializer(object):
 
 		self.mw = MainWindow
 
-	
-
 	def readXML(self, projectPath):
-		print("readXML")
-
 		tree = ET.parse(projectPath)
 		root = tree.getroot()
 
@@ -57,11 +53,11 @@ class XMLSerializer(object):
 
 		return projectName, videoPath
 
-
 	'''
 	XML STRUCTURE
 
-	<project name="name_project" date="date_modified">
+	<project name="name_project" da
+	te="date_modified">
 		<video>video_path</video>
 		<list_annotations>
 			<annotation>
@@ -98,11 +94,10 @@ class XMLSerializer(object):
 			</annotation>
 		</list_annotations>
 	</project>
+
 	'''
 
 	def writeXML(self, projectPath, projectName, videoPath, listOfAnnotations):
-		print("writeXML")
-
 		root = ET.Element("project")
 		root.attrib["name"] = projectName
 		root.attrib["date"] = str((datetime.now()).strftime("%d/%m/%Y %H:%M:%S"))
@@ -169,7 +164,6 @@ class XMLSerializer(object):
 
 		tree = ET.ElementTree(root)
 		tree.write(projectPath)
-
 
 		# TO PRETTY XML
 		#from xml.dom import minidom

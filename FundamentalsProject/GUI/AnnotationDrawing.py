@@ -5,6 +5,8 @@ from PyQt5.QtGui import QImage, QPainter, QPen, QBrush, QColor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 '''
 
+# class for the drawing annotation
+
 class AnnotationDrawing(object):
     
 	def __init__(self, dType, pen, pStart, pEnd, rSize, rPoint): 

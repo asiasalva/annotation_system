@@ -6,6 +6,8 @@ from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Mode
 
+#class annotation for the textbox, arrow and line 
+
 class Annotation(QWidget):
 
 	### TCONTAINER VARIABLES AND METHODS ###
@@ -16,12 +18,12 @@ class Annotation(QWidget):
 	outFocus = pyqtSignal(bool)
 	newGeometry = pyqtSignal(QRect)
 
-	def __init__(self, parent, p, cWidget, isArrow, MainWindow, currentSecond): # isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
+	# isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
+	def __init__(self, parent, p, cWidget, isArrow, MainWindow, currentSecond): 
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
 		self.childWidget = None
-
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
 		self.setAutoFillBackground(False)
@@ -29,10 +31,9 @@ class Annotation(QWidget):
 		self.setFocusPolicy(QtCore.Qt.ClickFocus)
 		self.setFocus()
 		self.move(p)
-
 		self.vLayout = QVBoxLayout(self)
 		self.setChildWidget(cWidget, isArrow, currentSecond)
-
+		#set the focus and the event handler
 		self.m_infocus = True
 		self.m_isEditing = True
 		self.installEventFilter(parent)
@@ -45,25 +46,20 @@ class Annotation(QWidget):
 			self.childWidget.releaseMouse()
 			self.vLayout.addWidget(cWidget)
 			self.vLayout.setContentsMargins(0,0,0,0)
-
-
-			self.setupAnnotationVariables(currentSecond)
-			
+			self.setupAnnotationVariables(currentSecond)		
 			if(isinstance(self.childWidget, QPlainTextEdit)):
 				self.setupTextboxVariables()
 			elif(isinstance(self.childWidget, QSvgWidget)):
 				self.setupSvgVariables(isArrow)
-
+	
 			self.mw.setLastFocusAnnotation(self)
 
-	
 	def focusInEvent(self, a0: QtGui.QFocusEvent):
 		self.m_infocus = True
 		p = self.parentWidget()
 		p.installEventFilter(self)
 		p.repaint()
 		self.inFocus.emit(True)
-
 		if self.childWidget is not None:
 			self.mw.setLastFocusAnnotation(self)
 
@@ -78,7 +74,6 @@ class Annotation(QWidget):
 		painter = QtGui.QPainter(self)
 		color = (r, g, b, a) = (255, 0, 0, 0)
 		painter.fillRect(e.rect(), QColor(r, g, b, a))
-
 		if self.m_infocus:
 			rect = e.rect()
 			rect.adjust(0,0,-1,-1)
@@ -97,7 +92,6 @@ class Annotation(QWidget):
 		if e.button() == QtCore.Qt.RightButton:
 			self.popupShow(e.pos())
 			e.accept()
-
 		# Raises this widget to the top of the parent widget’s stack.
 		self.raise_()
 
@@ -253,8 +247,6 @@ class Annotation(QWidget):
 
 	#endregion
 
-
-
 	### ANNOTATION VARIABLES AND METHODS ###
 	#region
 
@@ -276,7 +268,6 @@ class Annotation(QWidget):
 		#	to a useful default using adjustSize()."
 		self.resize(self.width()+1, self.height()+1)
 		self.resize(self.width()-1, self.height()-1)
-
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
 
@@ -322,7 +313,8 @@ class Annotation(QWidget):
 	def getDimensions(self):
 		return (self.annotationWidth, self.annotationHeight)
 
-	
+	#endregion
+
 	### QPLAINTEXTEDIT VARIABLES AND METHODS ###
 	#region
 
@@ -332,8 +324,7 @@ class Annotation(QWidget):
 			self.textboxBackgroundOpacity = 100
 			self.textboxFontColor = "#000000"
 			self.textboxFontSize = 10
-			self.setTextboxPalette()
-			
+			self.setTextboxPalette()	
 
 	def setTextboxPalette(self):
 		textboxPalette = self.childWidget.palette()
@@ -341,9 +332,7 @@ class Annotation(QWidget):
 		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Text, QColor(self.textboxFontColor))
 		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QColor(255, 255, 255, (int(self.textboxBackgroundOpacity*2.55))))
 		self.childWidget.setPalette(textboxPalette)
-
 		self.setTextboxText(self.getTextboxText())
-
 
 	def mouseDoubleClickEvent(self, event):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
@@ -399,7 +388,6 @@ class Annotation(QWidget):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			return self.textboxFontSize
 	
-
 	#endregion
 
 	### QSVGWIDGET VARIABLES AND METHODS ###
@@ -407,38 +395,17 @@ class Annotation(QWidget):
 
 	def setupSvgVariables(self, isArrow):
 		if(isinstance(self.childWidget, QSvgWidget)):
-
-			'''
-				Arrow SVG code:
-					<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-						<rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/>
-						<path d="M24 11.871l-5-4.871v3h-19v4h19v3z" fill="#000000" fill-opacity="1" transform="rotate(0,12,12)"/>
-					</svg>
-
-				Line SVG code:
-					<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24">
-						<rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/>
-						<path d="M0,12h24" stroke="#000000" stroke-width="1" transform="rotate(0,12,12)"/>
-					</svg>
-			'''
-
 			self.isArrow = isArrow
-
 			if self.isArrow:
 				self.svgString_start = r'<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/><path d="M24 11.871l-5-4.871v3h-19v4h19v3z"'
 			else:
 				self.svgString_start = r'<svg xmlns="http://www.w3.org/2000/svg" height="24" width="24"><rect stroke="none" fill="none" y="0" x="0" height="100%" width="100%"/><path d="M0,12h24"'
 
 			self.svgString_end = r',12,12)"/></svg>'
-
 			self.svgColor = "#000000"			# Color of the SVG image (both LINE or ARROW)
 			self.svgExtraAttribute = "1"		# Extra attribute of the SVG image ('stroke-width' for LINE, 'fill-opacity' for ARROW)
 			self.svgTransform = "0"				# Rotation of the SVG image
-
-
-
 			self.showSVG()
-
 
 	def setSvgColor(self, newColor):
 		if(isinstance(self.childWidget, QSvgWidget)):
@@ -467,11 +434,9 @@ class Annotation(QWidget):
 		if(isinstance(self.childWidget, QSvgWidget)):
 			return self.svgTransform
 
-
 	def showSVG(self):
 		if(isinstance(self.childWidget, QSvgWidget)):
 			qba = QByteArray()
-
 			if self.isArrow:
 				qba.append(
 					 self.svgString_start +  
@@ -487,8 +452,5 @@ class Annotation(QWidget):
 					 '" transform="rotate(' + self.svgTransform + 
 					 self.svgString_end)
 
-
 			self.childWidget.load(qba)
-
-
 	#endregion

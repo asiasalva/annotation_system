@@ -5,7 +5,9 @@ from PyQt5.QtSvg import QSvgWidget
 
 import time
 import datetime
+import os 
 
+#Class annotation Properties needed to show properties on the GUI 
 
 class SpinBoxTime(QSpinBox):
 	def __init__(self, *args, **kwargs):
@@ -33,24 +35,15 @@ class SpinBoxTime(QSpinBox):
 		except ValueError:
 			return False
 
-
-
 class AnnotationsProperties(QWidget):
 
 	### "List view" for annotation properties ###
-
 	def setupUi(self, MainWindow):
-
 		self.mw = MainWindow
-
-
 		### Widgets simulating a list view
 		self.formLayout = QFormLayout()
 		self.frame = QFrame()
 		self.scroll = QScrollArea()
-
-
-
 		self.lblColor = QLabel("Color:")
 		self.lblValue1 = QLabel("Value1:")
 		self.lblValue2 = QLabel("Value2:")
@@ -62,7 +55,7 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue2 = QSpinBox()
 		self.spinboxSecStart = SpinBoxTime()
 		self.spinboxSecEnd = SpinBoxTime()
-
+		
 		self.setStandardColors(self.comboboxColor)
 		self.comboboxColor.activated.connect(self.changeProperties)
 		self.spinboxValue1.valueChanged.connect(self.changeProperties)
@@ -83,51 +76,17 @@ class AnnotationsProperties(QWidget):
 		self.frame.setLayout(self.formLayout)
 		self.scroll.setWidget(self.frame)
 		self.scroll.setWidgetResizable(True)
-		
-
-		''' 
-		List of properties for each type of annotation
-
-		LINE:
-			color			QComboBox
-			width			QSpinBox	(range: 1, 25)	(default: 1)
-			rotation		QSpinBox	(range: 0, 360)	(default: 0)
-
-		ARROW:
-			color			QComboBox
-			opacity			QSpinBox	(range: 0, 100)	(default: 100)
-			rotation		QSpinBox	(range: 0, 360)	(default: 0)
-
-		TEXTBOX:
-			background color ???	QComboBox
-			???
-
-		BREAKPOINT:
-			???
-
-		DRAWING:
-			LINE:
-				color		QComboBox	(add rubber on top position)
-				size		QSpinBox	(range: 1, 100)	(default: 1)
-			
-			RUBBER:
-				size		QSpinBox	(range: 1, 100)	(default: 10)
-		'''
-		
+				
 		### Widget container
 		container = QVBoxLayout(self)
 		container.addWidget(QLabel("Properties"))
 		container.addWidget(self.scroll)
 
-
 	def setProperties(self, annotationClass, isArrow, colorString, value1, value2, secStart, secEnd):
-
 		self.spinboxValue1.blockSignals(True)
 		self.spinboxValue2.blockSignals(True)
 		self.spinboxSecStart.blockSignals(True)
 		self.spinboxSecEnd.blockSignals(True)
-
-
 		if annotationClass is QWidget:
 			# BREAKPOINT
 			self.lblColor.setHidden(True)
@@ -143,7 +102,7 @@ class AnnotationsProperties(QWidget):
 			self.spinboxSecEnd.setHidden(True)
 			self.spinboxSecStart.setValue(secStart)
 		else:
-			# Parte comune a tutte le altre annotazioni
+			# Common section to all the annotations
 			self.lblColor.setHidden(False)
 			self.lblValue1.setHidden(False)
 			self.lblValue2.setHidden(False)
@@ -155,12 +114,10 @@ class AnnotationsProperties(QWidget):
 			self.comboboxColor.setHidden(False)
 			self.spinboxSecStart.setHidden(False)
 			self.spinboxSecEnd.setHidden(False)
-
 			self.spinboxValue1.setValue(value1)
 			self.spinboxValue2.setValue(value2)
 			self.spinboxSecStart.setValue(secStart)
 			self.spinboxSecEnd.setValue(secEnd)
-
 
 			if annotationClass is None:
 				# DRAWING
@@ -169,13 +126,10 @@ class AnnotationsProperties(QWidget):
 				self.lblValue2.setText("Rubber size:")
 				self.spinboxValue1.setRange(1, 100)
 				self.spinboxValue2.setRange(1, 100)
-
 				if(self.comboboxColor.itemData(0) is not None):
 					self.insertRubber(self.comboboxColor, 0)
 
-				self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
-
-				
+				self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))				
 				self.lblTime.setHidden(True)
 				self.lblFrom.setHidden(True)
 				self.lblTo.setHidden(True)
@@ -185,7 +139,6 @@ class AnnotationsProperties(QWidget):
 				# Annotation -> remove rubber from colors
 				if(self.comboboxColor.itemData(0) is None):
 					self.removeRubber(self.comboboxColor, 0)
-
 				if annotationClass is QPlainTextEdit:
 					# TEXTBOX
 					self.lblColor.setText("Text color:")
@@ -194,7 +147,6 @@ class AnnotationsProperties(QWidget):
 					self.spinboxValue1.setRange(1, 100)
 					self.spinboxValue2.setRange(0, 100)
 					self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
-
 				if annotationClass is QSvgWidget:
 					# SVG
 					if isArrow:
@@ -213,18 +165,13 @@ class AnnotationsProperties(QWidget):
 						self.spinboxValue1.setRange(1, 25)
 						self.spinboxValue2.setRange(0, 360)
 						self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
-
-
 		
 		self.spinboxValue1.blockSignals(False)
 		self.spinboxValue2.blockSignals(False)
 		self.spinboxSecStart.blockSignals(False)
 		self.spinboxSecEnd.blockSignals(False)
 
-
-
 	def changeProperties(self):
-
 		if self.spinboxSecEnd.isHidden():
 			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
 		else:
@@ -233,7 +180,6 @@ class AnnotationsProperties(QWidget):
 			selectedValue2 = self.spinboxValue2.value()
 			secondStart = self.spinboxSecStart.value()
 			secondEnd = self.spinboxSecEnd.value()
-
 			if secondStart > secondEnd:
 				if self.sender() is self.spinboxSecStart:
 					self.spinboxSecStart.setValue(secondEnd)
@@ -242,21 +188,19 @@ class AnnotationsProperties(QWidget):
 			else:
 				self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
 		
-
 	def setDuration(self, duration):
 		self.spinboxSecStart.blockSignals(True)
 		self.spinboxSecEnd.blockSignals(True)
-
 		self.spinboxSecStart.setRange(0, duration)
 		self.spinboxSecEnd.setRange(0, duration)
-		
 		self.spinboxSecStart.blockSignals(False)
 		self.spinboxSecEnd.blockSignals(False)
 
-		
-
 	def insertRubber(self, combobox, index):
-		combobox.insertItem(index, QIcon(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\rubber.svg").scaled(12,12)), "Rubber", None)
+		dirname = os.path.dirname(__file__)
+		fileName = os.path.join(dirname, 'rubber.svg')
+		# combobox.insertItem(index, QIcon(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\rubber.svg").scaled(12,12)), "Rubber", None)
+		combobox.insertItem(index, QIcon(QPixmap(fileName).scaled(12,12)), "Rubber", None)
 
 	def removeRubber(self, combobox, index):
 		combobox.removeItem(index)
@@ -264,15 +208,11 @@ class AnnotationsProperties(QWidget):
 	def insertColor(self, combobox, brushColor, name):
 		pix = QPixmap(12, 12)
 		painter = QPainter(pix)
-
 		painter.setPen(Qt.gray)
 		painter.setBrush(brushColor)
 		painter.drawRect(0, 0, 12, 12)
-
 		painter.end()
-
 		combobox.addItem(QIcon(pix), name, brushColor.color().name())
-
 
 	def setStandardColors(self, combobox):
 		self.insertColor(combobox, QBrush(Qt.black), "Black")					# 2		#000000
@@ -292,9 +232,6 @@ class AnnotationsProperties(QWidget):
 		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
 		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
 		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0
-
-
-
 
 	def setPropertiesVisible(self, visible):
 		self.setVisible(visible)

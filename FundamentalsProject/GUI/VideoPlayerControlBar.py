@@ -1,21 +1,12 @@
 from PyQt5.QtWidgets import QHBoxLayout, QWidget, QPushButton, QStyle, QFrame
 
-
-'''
-Come funzioni di camcorder metterei quelle classiche
-(avanti, indietro, pausa, stop, possibilmente con un variatore di velocità 0.5x 1x 2x 4x)
-e poi, importante, un "vai a breakpoint".
-'''
-
-
 class VideoPlayerControlBar(QWidget):
 
 	### Control bar for video player ###
-
 	def setupUi(self, MainWindow):
-
 		self.mw = MainWindow
-		
+		self.setMaximumSize(780,550)
+
 		### Control buttons:
 
 		# Play button
@@ -74,8 +65,6 @@ class VideoPlayerControlBar(QWidget):
 		self.separatorLine2.setFrameShape( QFrame.VLine )
 		self.separatorLine2.setFrameShadow( QFrame.Raised )
 
-
-
 		### Widget container
 		container = QHBoxLayout(self)
 		container.setContentsMargins(0, 0, 0, 0)
@@ -92,10 +81,7 @@ class VideoPlayerControlBar(QWidget):
 		
 		self.setFixedHeight(self.btnBackward.sizeHint().height())
 
-
-
 	def sendCommand(self, command):
-		print("sendCommand")
 		self.mw.controlBarCommand(command)
 
 	def enablePlayButton(self, enable):
