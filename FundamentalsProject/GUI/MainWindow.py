@@ -171,7 +171,7 @@ class Ui_MainWindow(object):
 		elif(command == 1):
 			projectName, videoPath = self.xmlSerializer.readXML(projectPath)
 			if projectName != "":
-				self.videoPlayer.setupVariables(videoPath, os.path.dirname(videoPath), os.path.basename(videoPath))
+				self.videoPlayer.setupVariables(videoPath)
 				self.setDurationProperty()
 				self.actionAdd_Video.setEnabled(False)
 				self.videoPlayerControlBar.enablePlayButton(True)
@@ -384,9 +384,7 @@ class Ui_MainWindow(object):
 		if self.videoPlayer.getvideoPath() == "":
 			videoPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Video", QtCore.QDir.homePath())#, "Video files")
 			if videoPath != "":
-				videoDir = os.path.dirname(videoPath)
-				videoName = os.path.basename(videoPath)
-				self.videoPlayer.setupVariables(videoPath, videoDir, videoName)
+				self.videoPlayer.setupVariables(videoPath)
 				self.setDurationProperty()
 				self.actionAdd_Video.setEnabled(False)
 				self.videoPlayerControlBar.enablePlayButton(True)

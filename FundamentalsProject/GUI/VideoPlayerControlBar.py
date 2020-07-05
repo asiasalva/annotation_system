@@ -5,7 +5,6 @@ class VideoPlayerControlBar(QWidget):
 	### Control bar for video player ###
 	def setupUi(self, MainWindow):
 		self.mw = MainWindow
-		self.setMaximumSize(780,550)
 
 		### Control buttons:
 

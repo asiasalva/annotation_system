@@ -1,5 +1,5 @@
 import cv2
-import os, time
+import os, time, ffmpeg
 
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
 from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
@@ -54,6 +54,11 @@ class VideoPlayerOpenCV(QWidget):
 		if(ret == True):
 			# OpenCV yields frames in BGR format
 			frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+			# If frame needs rotation
+			if self.rotateCode is not None:
+				frame = self.correctVideoRotation(frame, self.rotateCode)
+
 			img = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
 			pix = QPixmap.fromImage(img)
 			self.videoFrame.setPixmap(pix)
@@ -158,12 +163,13 @@ class VideoPlayerOpenCV(QWidget):
 		self.positionSlider.setValue(position)
 		self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(position)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
 
-	def setupVariables(self, videoPath, videoDir, videoName):
+
+	### Support functions
+
+	def setupVariables(self, videoPath):
 
 		### Video path, directory, and name
 		self.videoPath =  videoPath
-		self.videoDir = videoDir
-		self.videoName = videoName
 		self.onBreakpoint = False
 
 		### OpenCV video capture
@@ -190,5 +196,30 @@ class VideoPlayerOpenCV(QWidget):
 		self.positionSlider.setRange(0, self.duration)
 		self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(0)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
 
+		### Check if video requires rotation
+		self.rotateCode = self.checkVideoRotation(self.videoPath)
+
 	def getvideoPath(self):
 		return self.videoPath
+
+	def checkVideoRotation(self, path_video_file):
+		# This returns meta-data of the video file in form of a dictionary
+		meta_dict = ffmpeg.probe(path_video_file)
+		rotateCode = None
+
+		if 'rotate' in meta_dict['streams'][0]['tags']:
+		
+			# From the dictionary, meta_dict['streams'][0]['tags']['rotate'] is the key
+			#	we are looking for
+			
+			if int(meta_dict['streams'][0]['tags']['rotate']) == 90:
+				rotateCode = cv2.ROTATE_90_CLOCKWISE
+			elif int(meta_dict['streams'][0]['tags']['rotate']) == 180:
+				rotateCode = cv2.ROTATE_180
+			elif int(meta_dict['streams'][0]['tags']['rotate']) == 270:
+				rotateCode = cv2.ROTATE_90_COUNTERCLOCKWISE
+
+		return rotateCode
+
+	def correctVideoRotation(self, frame, rotateCode):  
+		return cv2.rotate(frame, rotateCode) 
