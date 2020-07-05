@@ -13,6 +13,7 @@ The project was created using Visual Studio and Python.
 - PyQt5
 - OpenCV
 - K-Lite Codec Pack Basic
+- FFMPEG (both https://ffmpeg.org/ and https://pypi.org/project/ffmpeg-python/)
 
 # Usage
 
