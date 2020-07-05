@@ -10,9 +10,9 @@ The project was created using Visual Studio and Python.
 
 ## Project Libraries
 
-- PyQt5
-- OpenCV
-- K-Lite Codec Pack Basic
+- PyQt5 (https://pypi.org/project/PyQt5/)
+- OpenCV (https://pypi.org/project/opencv-python/)
+- K-Lite Codec Pack Basic (https://codecguide.com/download_k-lite_codec_pack_basic.htm)
 - FFMPEG (both https://ffmpeg.org/ and https://pypi.org/project/ffmpeg-python/)
 
 # Usage
