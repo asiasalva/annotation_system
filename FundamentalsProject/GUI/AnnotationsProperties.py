@@ -105,6 +105,10 @@ class AnnotationsProperties(QWidget):
 			self.spinboxSecStart.setHidden(False)
 			self.spinboxSecEnd.setHidden(True)
 			self.spinboxSecStart.setValue(secStart)
+			
+			# Breakpoint -> remove rubber from colors
+			if(self.comboboxColor.itemData(0) is None):
+				self.removeRubber(self.comboboxColor, 0)
 		else:
 			# Common section to all the annotations
 			self.lblColor.setHidden(False)
@@ -181,7 +185,8 @@ class AnnotationsProperties(QWidget):
 
 	def changeProperties(self):
 
-		if self.spinboxSecEnd.isHidden():
+		# If RUBBER is not present in combobox (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
+		if (self.comboboxColor.itemData(0) is not None) and (self.spinboxSecEnd.isHidden()):
 			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
 
 		else:
