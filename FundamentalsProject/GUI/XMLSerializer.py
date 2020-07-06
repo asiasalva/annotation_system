@@ -21,7 +21,7 @@ class XMLSerializer(object):
 			frame_end = int(float(item[1].text))
 			second_start = int(float(item[2].text))
 			second_end = int(float(item[3].text))
-			position = QPoint(int(item[4][0].text), int(item[4][0].text))
+			position = QPoint(int(item[4][0].text), int(item[4][1].text))
 			width = int(item[5][0].text)
 			height = int(item[5][1].text)
 
