@@ -210,6 +210,9 @@ class WindowPaint(QWidget):
 				painter.drawLine(drawing.pointStart, drawing.pointEnd)
 
 
+	def clearWindowPaint(self):
+		self.image.fill(QtGui.qRgba(0,0,0,0));
+
 
 
 

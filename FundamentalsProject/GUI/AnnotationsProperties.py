@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit, QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QBrush, QPainter, QValidator
 from PyQt5.QtSvg import QSvgWidget
@@ -57,6 +57,7 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue2 = QSpinBox()
 		self.spinboxSecStart = SpinBoxTime()
 		self.spinboxSecEnd = SpinBoxTime()
+		self.btnClear = QPushButton("Clear drawings")
 		
 		self.setStandardColors(self.comboboxColor)
 		self.comboboxColor.activated.connect(self.changeProperties)
@@ -64,6 +65,7 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue2.valueChanged.connect(self.changeProperties)
 		self.spinboxSecStart.valueChanged.connect(self.changeProperties)
 		self.spinboxSecEnd.valueChanged.connect(self.changeProperties)
+		self.btnClear.clicked.connect(self.clearWindowPaint)
 
 		self.formLayout.addRow(self.lblColor, self.comboboxColor)
 		self.formLayout.addRow(self.lblValue1, self.spinboxValue1)
@@ -75,6 +77,7 @@ class AnnotationsProperties(QWidget):
 		secRange.addWidget(self.lblTo)
 		secRange.addWidget(self.spinboxSecEnd)
 		self.formLayout.addRow(secRange)
+		self.formLayout.addRow(self.btnClear)
 		self.frame.setLayout(self.formLayout)
 		self.scroll.setWidget(self.frame)
 		self.scroll.setWidgetResizable(True)
@@ -89,8 +92,8 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue1.blockSignals(True)
 		self.spinboxValue2.blockSignals(True)
 		self.spinboxSecStart.blockSignals(True)
-		
 		self.spinboxSecEnd.blockSignals(True)
+
 		if annotationClass is QWidget:
 			# BREAKPOINT
 			self.lblColor.setHidden(True)
@@ -105,6 +108,7 @@ class AnnotationsProperties(QWidget):
 			self.spinboxSecStart.setHidden(False)
 			self.spinboxSecEnd.setHidden(True)
 			self.spinboxSecStart.setValue(secStart)
+			self.btnClear.setHidden(True)
 			
 			# Breakpoint -> remove rubber from colors
 			if(self.comboboxColor.itemData(0) is None):
@@ -126,6 +130,7 @@ class AnnotationsProperties(QWidget):
 			self.spinboxValue2.setValue(value2)
 			self.spinboxSecStart.setValue(secStart)
 			self.spinboxSecEnd.setValue(secEnd)
+			self.btnClear.setHidden(True)
 
 			if annotationClass is None:
 				# DRAWING
@@ -145,6 +150,7 @@ class AnnotationsProperties(QWidget):
 				self.lblTo.setHidden(True)
 				self.spinboxSecStart.setHidden(True)
 				self.spinboxSecEnd.setHidden(True)
+				self.btnClear.setHidden(False)
 			else:
 				# Annotation -> remove rubber from colors
 				if(self.comboboxColor.itemData(0) is None):
@@ -186,7 +192,9 @@ class AnnotationsProperties(QWidget):
 	def changeProperties(self):
 
 		# If RUBBER is not present in combobox (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
-		if (self.comboboxColor.itemData(0) is not None) and (self.spinboxSecEnd.isHidden()):
+		#if (self.comboboxColor.itemData(0) is not None) and (self.spinboxSecEnd.isHidden()):
+		# If btnClear is hidden (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
+		if (self.btnClear.isHidden() and self.spinboxSecEnd.isHidden()):
 			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
 
 		else:
@@ -203,6 +211,9 @@ class AnnotationsProperties(QWidget):
 					self.spinboxSecEnd.setValue(secondStart)
 			else:
 				self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
+
+	def clearWindowPaint(self):
+		self.mw.clearWindowPaint()
 		
 	def setDuration(self, duration):
 		self.spinboxSecStart.blockSignals(True)

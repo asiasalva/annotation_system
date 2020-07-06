@@ -461,3 +461,10 @@ class Ui_MainWindow(object):
 	def orderAnnotations(self):
 		self.listOfAnnotations.sort(key=self.byFrameStart)
 		self.listOfBreaks.sort(key=self.byFrameStart)
+
+
+
+
+
+	def clearWindowPaint(self):
+		self.windowPaint.clearWindowPaint()
