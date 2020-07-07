@@ -170,7 +170,7 @@ class VideoPlayerOpenCV(QWidget):
 
 		### Video path, directory, and name
 		self.videoPath =  videoPath
-		self.onBreakpoint = False
+		#self.onBreakpoint = False
 
 		### OpenCV video capture
 		# Select file to capture
@@ -198,6 +198,10 @@ class VideoPlayerOpenCV(QWidget):
 
 		### Check if video requires rotation
 		self.rotateCode = self.checkVideoRotation(self.videoPath)
+
+
+
+		self.mw.setFrameDimensions(self.videoCapture_frameWidth, self.videoCapture_frameHeight)
 
 	def getvideoPath(self):
 		return self.videoPath

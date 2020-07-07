@@ -152,7 +152,7 @@ class Ui_MainWindow(object):
 		self.actionNew_Project.setEnabled(True)
 		self.actionOpen_Project.setEnabled(True)
 		self.actionAdd_Video.setEnabled(True)
-		self.actionSave_Project.setEnabled(True)
+		self.actionSave_Project.setEnabled(False)
 		self.actionExport.setEnabled(False)
 		#--self.actionClose.setEnabled(False)
 		self.actionExit.setEnabled(True)
@@ -166,7 +166,7 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation = None
 			#--self.setDurationProperty()
 			self.projectPath = ""
-			self.actionAdd_Video.setEnabled(True)
+			#self.actionAdd_Video.setEnabled(True)
 		#Load annotation from file
 		elif(command == 1):
 			projectName, videoPath = self.xmlSerializer.readXML(projectPath)
@@ -389,6 +389,7 @@ class Ui_MainWindow(object):
 				self.setDurationProperty()
 				self.actionAdd_Video.setEnabled(False)
 				self.videoPlayerControlBar.enablePlayButton(True)
+				self.actionSave_Project.setEnabled(True)
 
 	def openProject(self):
 		retval = self.messageBox()
@@ -400,6 +401,7 @@ class Ui_MainWindow(object):
 					# Load project (video + annotations)
 					self.setupUi(self.mw)
 					self.setupAnnotations(1, self.projectPath)
+					self.actionSave_Project.setEnabled(True)
 		elif retval == QtWidgets.QMessageBox.Discard:
 			# Close current project and load a project
 			self.projectPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Project", QtCore.QDir.homePath(), "XML files (*.xml)")
@@ -407,6 +409,7 @@ class Ui_MainWindow(object):
 				# Load project (video + annotations)
 				self.setupUi(self.mw)
 				self.setupAnnotations(1, self.projectPath)
+				self.actionSave_Project.setEnabled(True)
 
 	def saveProject(self):
 		# If project has not been saved yet (so it's a new project)
@@ -418,6 +421,8 @@ class Ui_MainWindow(object):
 				self.projectPath,
 				os.path.basename(self.projectPath),
 				self.videoPlayer.getvideoPath(),
+				self.frameWidth,
+				self.frameHeight,
 				self.listOfAnnotations
 			)
 			return True
@@ -469,3 +474,15 @@ class Ui_MainWindow(object):
 
 	def clearWindowPaint(self):
 		self.windowPaint.clearWindowPaint()
+
+
+
+
+
+
+	def setFrameDimensions(self, width, height):
+		self.frameWidth = width
+		self.frameHeight = height
+
+	def getFrameDimensions(self):
+		return (self.frameWidth, self.frameHeight)

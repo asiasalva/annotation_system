@@ -14,7 +14,11 @@ class XMLSerializer(object):
 		root = tree.getroot()
 
 		projectName = root.attrib["name"]
-		videoPath = root[0].text
+		video = root[0]
+		videoPath = video[0].text
+		videoWidth = int(float(video[1].text))
+		videoHeight = int(float(video[2].text))
+		self.mw.setFrameDimensions(videoWidth, videoHeight)
 
 		for item in root[1]:
 			frame_start = int(float(item[0].text))
@@ -58,7 +62,11 @@ class XMLSerializer(object):
 
 	<project name="name_project" da
 	te="date_modified">
-		<video>video_path</video>
+		<video>
+			<path>path</path>
+			<width>n°</width>
+			<height>n°</height>
+		</video>
 		<list_annotations>
 			<annotation>
 				<frame_start>n°</frame_start>
@@ -97,13 +105,18 @@ class XMLSerializer(object):
 
 	'''
 
-	def writeXML(self, projectPath, projectName, videoPath, listOfAnnotations):
+	def writeXML(self, projectPath, projectName, videoPath, videoWidth, videoHeight, listOfAnnotations):
 		root = ET.Element("project")
 		root.attrib["name"] = projectName
 		root.attrib["date"] = str((datetime.now()).strftime("%d/%m/%Y %H:%M:%S"))
 
 		video = ET.SubElement(root, "video")
-		video.text = videoPath
+		video_path = ET.SubElement(video, "video_path")
+		video_path.text = videoPath
+		video_width = ET.SubElement(video, "width")
+		video_width.text = str(videoWidth)
+		video_height = ET.SubElement(video, "height")
+		video_height.text = str(videoHeight)
 
 		list_annotations = ET.SubElement(root, "list_annotations")
 

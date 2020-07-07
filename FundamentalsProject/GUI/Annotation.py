@@ -23,6 +23,16 @@ class Annotation(QWidget):
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
+
+
+		self.frameWidth, self.frameHeight = self.mw.getFrameDimensions()
+		self.parentWidth = parent.width()
+		self.parentHeight = parent.height()
+
+
+
+
+
 		self.childWidget = None
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
@@ -30,9 +40,11 @@ class Annotation(QWidget):
 		self.setMouseTracking(True)
 		self.setFocusPolicy(QtCore.Qt.ClickFocus)
 		self.setFocus()
-		self.move(p)
+		#self.move(p)
 		self.vLayout = QVBoxLayout(self)
 		self.setChildWidget(cWidget, isArrow, currentSecond)
+		self.setPosition(p)
+		self.move(self.getFakePosition(p))
 		#set the focus and the event handler
 		self.m_infocus = True
 		self.m_isEditing = True
@@ -89,9 +101,6 @@ class Annotation(QWidget):
 		if not e.buttons() and QtCore.Qt.LeftButton:
 			self.setCursorShape(e.pos())
 			return
-		if e.button() == QtCore.Qt.RightButton:
-			self.popupShow(e.pos())
-			e.accept()
 		# Raises this widget to the top of the parent widget’s stack.
 		self.raise_()
 
@@ -185,7 +194,7 @@ class Annotation(QWidget):
 	def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseReleaseEvent(self, e)
 		# Save new annotation's position
-		self.setPosition(self.pos())
+		self.setPosition(self.getRealPosition(self.pos()))
 		self.setDimensions(self.width(), self.height())
 
 	def mouseMoveEvent(self, e: QtGui.QMouseEvent):
@@ -256,7 +265,7 @@ class Annotation(QWidget):
 		self.annotationFrameEnd = 0
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
-		self.annotationPosition = self.pos()
+		self.annotationPosition = 0#self.pos()
 
 		# These two lines of code (which change annotation's size and put it back 
 		#	are used to prevent that Qt automatically adjust the widget's size 
@@ -300,7 +309,7 @@ class Annotation(QWidget):
 
 	def setPosition(self, newPos):
 		self.annotationPosition = newPos
-		self.move(self.annotationPosition)
+		self.move(self.getFakePosition(self.annotationPosition))
 
 	def getPosition(self):
 		return self.annotationPosition
@@ -454,3 +463,39 @@ class Annotation(QWidget):
 
 			self.childWidget.load(qba)
 	#endregion
+
+
+
+
+
+
+
+	def setParentDimensions(self, width, height):
+		self.parentWidth = width
+		self.parentHeight = height
+
+		self.move(self.getFakePosition(self.annotationPosition))
+
+
+	def getRealPosition(self, fakePos):
+		print("getRealPosition")
+
+		#	realX:frameWidth = fakeX:parentWidth
+		#	realY:frameHeight = fakeY:parentHeight
+
+		realX = (self.frameWidth * fakePos.x()) / self.parentWidth
+		realY = (self.frameHeight * fakePos.y()) / self.parentHeight
+
+		return QPoint(realX, realY)
+
+
+	def getFakePosition(self, realPos):
+		print("getFakePosition")
+
+		#	realX:frameWidth = fakeX:parentWidth
+		#	realY:frameHeight = fakeY:parentHeight
+		
+		fakeX = (self.parentWidth * realPos.x()) / self.frameWidth
+		fakeY = (self.parentHeight * realPos.y()) / self.frameHeight
+
+		return QPoint(fakeX, fakeY)
