@@ -29,7 +29,8 @@ class Ui_MainWindow(object):
 		# Vertical container for "video side" components
 		self.vboxVideoLayoutWidget = QtWidgets.QWidget(self.splitterWindow)
 		self.vboxVideoLayoutWidget.setObjectName("vboxLayoutWidget")
-		self.vboxVideoLayoutWidget.setMaximumWidth(2 * QtWidgets.QDesktopWidget().width() / 3)
+		self.vboxVideoLayoutWidget.setMaximumWidth(QtWidgets.QDesktopWidget().width() * 2 / 3)
+		self.vboxVideoLayoutWidget.setMaximumHeight(QtWidgets.QDesktopWidget().height() - 100)
 		self.vboxVideo = QtWidgets.QVBoxLayout(self.vboxVideoLayoutWidget)
 		self.vboxVideo.setContentsMargins(0, 0, 0, 0)
 		self.vboxVideo.setObjectName("vboxVideo")
