@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 import os
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing, XMLSerializer
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing, XMLSerializer, AnnotationBreak
 
 class Ui_MainWindow(object):
 
@@ -255,18 +255,19 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		# LINE
-		elif not self.lastFocusAnnotation.isArrow:
+		elif self.lastFocusAnnotation.isArrow == False:
 			self.lastFocusAnnotation.setSvgColor(colorString)
 			self.lastFocusAnnotation.setSvgExtraAttribute(str(value1))
 			self.lastFocusAnnotation.setSvgTransform(str(value2)),
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
-		#BREAKPOINT 
-		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QWidget)):
+		#BREAKPOINT
+		elif(isinstance(self.lastFocusAnnotation, AnnotationBreak.AnnotationBreak)):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		
 		
 		self.orderAnnotations()
 
