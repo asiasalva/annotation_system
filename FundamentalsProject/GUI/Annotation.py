@@ -29,6 +29,8 @@ class Annotation(QWidget):
 		self.parentWidth = parent.width()
 		self.parentHeight = parent.height()
 
+		self.setMinimumSize(10,10)
+
 
 
 
@@ -121,6 +123,11 @@ class Annotation(QWidget):
 				newPos.setX(newPos.x() - 1)
 			if e.key() == QtCore.Qt.Key_Right:
 				newPos.setX(newPos.x() + 1)
+
+			if newPos.x() < 0:return
+			if newPos.y() < 0:return
+			if newPos.x() > self.parentWidget().width() - self.width(): return
+			if newPos.y() > self.parentWidget().height() - self.height(): return
 			self.move(newPos)
 
 		if QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
