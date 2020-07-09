@@ -66,8 +66,8 @@ class Ui_MainWindow(object):
 		self.actionAdd_Video.setObjectName("actionAdd_Video")
 		self.actionSave_Project = QtWidgets.QAction(MainWindow)
 		self.actionSave_Project.setObjectName("actionSave_Project")
-		self.actionExport = QtWidgets.QAction(MainWindow)
-		self.actionExport.setObjectName("actionExport")
+		#--self.actionExport = QtWidgets.QAction(MainWindow)
+		#--self.actionExport.setObjectName("actionExport")
 		#--self.actionClose = QtWidgets.QAction(MainWindow)
 		#--self.actionClose.setObjectName("actionClose")
 		self.actionExit = QtWidgets.QAction(MainWindow)
@@ -78,7 +78,7 @@ class Ui_MainWindow(object):
 		self.menuFile.addAction(self.actionAdd_Video)
 		self.menuFile.addSeparator()
 		self.menuFile.addAction(self.actionSave_Project)
-		self.menuFile.addAction(self.actionExport)
+		#--self.menuFile.addAction(self.actionExport)
 		self.menuFile.addSeparator()
 		#--self.menuFile.addAction(self.actionClose)
 		self.menuFile.addAction(self.actionExit)
@@ -139,7 +139,7 @@ class Ui_MainWindow(object):
 		self.actionAdd_Video.setText(_translate("MainWindow", "Add Video"))
 		self.actionSave_Project.setText(_translate("MainWindow", "Save Project"))
 		self.actionSave_Project.setShortcut(_translate("MainWindow", "Ctrl+S"))
-		self.actionExport.setText(_translate("MainWindow", "Export"))
+		#--self.actionExport.setText(_translate("MainWindow", "Export"))
 		#--self.actionClose.setText(_translate("MainWindow", "Close Project"))
 		self.actionExit.setText(_translate("MainWindow", "Exit"))
 		self.actionExit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
@@ -147,14 +147,14 @@ class Ui_MainWindow(object):
 		self.actionOpen_Project.triggered.connect(self.openProject)
 		self.actionAdd_Video.triggered.connect(self.addVideo)
 		self.actionSave_Project.triggered.connect(self.saveProject)
-		self.actionExport.triggered.connect(self.exportVideo)
+		#--self.actionExport.triggered.connect(self.exportVideo)
 		#--self.actionClose.triggered.connect(self.closeProject)
 		self.actionExit.triggered.connect(self.exitProgram)
 		self.actionNew_Project.setEnabled(True)
 		self.actionOpen_Project.setEnabled(True)
 		self.actionAdd_Video.setEnabled(True)
 		self.actionSave_Project.setEnabled(False)
-		self.actionExport.setEnabled(False)
+		#--self.actionExport.setEnabled(False)
 		#--self.actionClose.setEnabled(False)
 		self.actionExit.setEnabled(True)
 
@@ -430,9 +430,9 @@ class Ui_MainWindow(object):
 		else:
 			return False
 
-	def exportVideo(self):
-		print("exportVideo")
-		# TENERE ???
+	#--def exportVideo(self):
+	#--	print("exportVideo")
+	#--	# TENERE ???
 
 	#--def closeProject(self):
 	#--	print("closeProject")
