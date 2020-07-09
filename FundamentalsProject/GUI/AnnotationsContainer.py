@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit
 from PyQt5.QtCore import QPoint
 from PyQt5.QtSvg import QSvgWidget
+from PyQt5 import QtGui
 
 from GUI import Annotation
 from GUI import AnnotationBreak
@@ -11,9 +12,12 @@ from GUI import VideoPlayerOpenCV
 class AnnotationsContainer(QWidget):
 	def __init__(self, MainWindow):
 		super().__init__()
-		self.mw = MainWindow	
+		self.mw = MainWindow
+		self.annotationListReady = False
 
 	def createAnnotation(self, annotationType, currentSecond):
+		self.annotationListReady = True
+
 		if(annotationType == 0):	# LINE
 			self.mw.listOfAnnotations.append(
 				Annotation.Annotation(self, QPoint(10,10), QSvgWidget(), False, self.mw, currentSecond)
@@ -44,3 +48,13 @@ class AnnotationsContainer(QWidget):
 					self.mw.controlBarCommand(1)
 			else:
 				annotation.setHidden(True)
+
+
+
+
+	def resizeEvent(self, event: QtGui.QResizeEvent):
+		if self.annotationListReady:
+			for annotation in self.mw.listOfAnnotations:
+				annotation.setParentDimensions(self.width(), self.height())
+
+		super().resizeEvent(event)

@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray, Qt
+from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray, Qt, QSize
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
@@ -23,6 +23,18 @@ class Annotation(QWidget):
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
+
+
+		self.frameWidth, self.frameHeight = self.mw.getFrameDimensions()
+		self.parentWidth = parent.width()
+		self.parentHeight = parent.height()
+
+		self.setMinimumSize(10,10)
+
+
+
+
+
 		self.childWidget = None
 		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
@@ -30,9 +42,11 @@ class Annotation(QWidget):
 		self.setMouseTracking(True)
 		self.setFocusPolicy(QtCore.Qt.ClickFocus)
 		self.setFocus()
-		self.move(p)
+		#self.move(p)
 		self.vLayout = QVBoxLayout(self)
 		self.setChildWidget(cWidget, isArrow, currentSecond)
+		self.setPosition(p)
+		self.move(self.getFakePosition(p))
 		#set the focus and the event handler
 		self.m_infocus = True
 		self.m_isEditing = True
@@ -89,9 +103,6 @@ class Annotation(QWidget):
 		if not e.buttons() and QtCore.Qt.LeftButton:
 			self.setCursorShape(e.pos())
 			return
-		if e.button() == QtCore.Qt.RightButton:
-			self.popupShow(e.pos())
-			e.accept()
 		# Raises this widget to the top of the parent widget’s stack.
 		self.raise_()
 
@@ -112,6 +123,11 @@ class Annotation(QWidget):
 				newPos.setX(newPos.x() - 1)
 			if e.key() == QtCore.Qt.Key_Right:
 				newPos.setX(newPos.x() + 1)
+
+			if newPos.x() < 0:return
+			if newPos.y() < 0:return
+			if newPos.x() > self.parentWidget().width() - self.width(): return
+			if newPos.y() > self.parentWidget().height() - self.height(): return
 			self.move(newPos)
 
 		if QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
@@ -185,8 +201,9 @@ class Annotation(QWidget):
 	def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseReleaseEvent(self, e)
 		# Save new annotation's position
-		self.setPosition(self.pos())
-		self.setDimensions(self.width(), self.height())
+		self.setPosition(self.getRealPosition(self.pos()))
+		dim = self.getRealDimensions(self.width(), self.height())
+		self.setDimensions(dim.width(), dim.height())
 
 	def mouseMoveEvent(self, e: QtGui.QMouseEvent):
 		QWidget.mouseMoveEvent(self, e)
@@ -256,20 +273,21 @@ class Annotation(QWidget):
 		self.annotationFrameEnd = 0
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
-		self.annotationPosition = self.pos()
+		self.annotationPosition = 0#self.pos()
 
 		# These two lines of code (which change annotation's size and put it back 
 		#	are used to prevent that Qt automatically adjust the widget's size 
 		#	to a useful default using adjustSize()
 		# For more information -> https://doc.qt.io/qt-5/qwidget.html#visible-prop
 		# "If its size or position has changed, Qt guarantees that a widget 
-		#	gets move and resize events just before it is shown. 
+		#	gets move and resize events just before it is shown.
 		#	If the widget has not been resized yet, Qt will adjust the widget's size 
 		#	to a useful default using adjustSize()."
 		self.resize(self.width()+1, self.height()+1)
 		self.resize(self.width()-1, self.height()-1)
 		self.annotationWidth = self.width()
 		self.annotationHeight = self.height()
+		self.resize(self.getFakeDimensions(self.annotationWidth, self.annotationHeight))
 
 
 	def setFrameRange(self, fStart, fEnd):
@@ -300,7 +318,7 @@ class Annotation(QWidget):
 
 	def setPosition(self, newPos):
 		self.annotationPosition = newPos
-		self.move(self.annotationPosition)
+		self.move(self.getFakePosition(self.annotationPosition))
 
 	def getPosition(self):
 		return self.annotationPosition
@@ -308,7 +326,7 @@ class Annotation(QWidget):
 	def setDimensions(self, width, height):
 		self.annotationWidth = width
 		self.annotationHeight = height
-		self.resize(width, height)
+		self.resize(self.getFakeDimensions(self.annotationWidth, self.annotationHeight))
 
 	def getDimensions(self):
 		return (self.annotationWidth, self.annotationHeight)
@@ -454,3 +472,67 @@ class Annotation(QWidget):
 
 			self.childWidget.load(qba)
 	#endregion
+
+
+
+
+
+
+
+	def setParentDimensions(self, width, height):
+		self.parentWidth = width
+		self.parentHeight = height
+
+		self.move(self.getFakePosition(self.annotationPosition))
+		dim = self.getDimensions()
+		self.resize(self.getFakeDimensions(dim[0], dim[1]))
+
+
+	def getRealPosition(self, fakePos):
+		print("getRealPosition")
+
+		#	realX:frameWidth = fakeX:parentWidth
+		#	realY:frameHeight = fakeY:parentHeight
+
+		realX = round((self.frameWidth * fakePos.x()) / self.parentWidth)
+		realY = round((self.frameHeight * fakePos.y()) / self.parentHeight)
+
+		return QPoint(realX, realY)
+
+
+	def getFakePosition(self, realPos):
+		print("getFakePosition")
+
+		#	realX:frameWidth = fakeX:parentWidth
+		#	realY:frameHeight = fakeY:parentHeight
+		
+		fakeX = round((self.parentWidth * realPos.x()) / self.frameWidth)
+		fakeY = round((self.parentHeight * realPos.y()) / self.frameHeight)
+
+		return QPoint(fakeX, fakeY)
+
+
+
+
+	def getRealDimensions(self, fakeW, fakeH):
+		print("getRealDimensions")
+
+		#	realX:frameWidth = fakeX:parentWidth
+		#	realY:frameHeight = fakeY:parentHeight
+
+		realW = round((self.frameWidth * fakeW) / self.parentWidth)
+		realH = round((self.frameHeight * fakeH) / self.parentHeight)
+
+		return QSize(realW, realH)
+
+
+	def getFakeDimensions(self, realW, realH):
+		print("getFakeDimensions")
+
+		#	realX:frameWidth = fakeX:parentWidth
+		#	realY:frameHeight = fakeY:parentHeight
+		
+		fakeW = round((self.parentWidth * realW) / self.frameWidth)
+		fakeH = round((self.parentHeight * realH) / self.frameHeight)
+
+		return QSize(fakeW, fakeH)

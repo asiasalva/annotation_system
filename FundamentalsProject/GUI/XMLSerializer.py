@@ -10,55 +10,73 @@ class XMLSerializer(object):
 		self.mw = MainWindow
 
 	def readXML(self, projectPath):
-		tree = ET.parse(projectPath)
-		root = tree.getroot()
 
-		projectName = root.attrib["name"]
-		videoPath = root[0].text
+		success = False
 
-		for item in root[1]:
-			frame_start = int(float(item[0].text))
-			frame_end = int(float(item[1].text))
-			second_start = int(float(item[2].text))
-			second_end = int(float(item[3].text))
-			position = QPoint(int(item[4][0].text), int(item[4][1].text))
-			width = int(item[5][0].text)
-			height = int(item[5][1].text)
+		try:
+			tree = ET.parse(projectPath)
+			root = tree.getroot()
 
-			child = item[6]
-			if child.attrib["type"] == "QPlainTextEdit":
-				self.mw.annotationsContainer.createAnnotation(2, frame_start)
-				self.mw.listOfAnnotations[-1].setTextboxText(child[0].text)
-				self.mw.listOfAnnotations[-1].setTextboxBackgroundOpacity(int(child[1].text))
-				self.mw.listOfAnnotations[-1].setTextboxFontColor(child[2].text)
-				self.mw.listOfAnnotations[-1].setTextboxFontSize(int(child[3].text))
+			projectName = root.attrib["name"]
+			video = root[0]
+			videoPath = video[0].text
+			videoWidth = int(float(video[1].text))
+			videoHeight = int(float(video[2].text))
+			self.mw.setFrameDimensions(videoWidth, videoHeight)
 
-			elif child.attrib["type"] == "QSvgWidget":
-				if child[0].text == "False":
-					self.mw.annotationsContainer.createAnnotation(0, frame_start)
-				else:
-					self.mw.annotationsContainer.createAnnotation(1, frame_start)
+			for item in root[1]:
+				frame_start = int(float(item[0].text))
+				frame_end = int(float(item[1].text))
+				second_start = int(float(item[2].text))
+				second_end = int(float(item[3].text))
+				position = QPoint(int(item[4][0].text), int(item[4][1].text))
+				width = int(item[5][0].text)
+				height = int(item[5][1].text)
 
-				self.mw.listOfAnnotations[-1].setSvgColor(child[1].text)
-				self.mw.listOfAnnotations[-1].setSvgExtraAttribute(child[2].text)
-				self.mw.listOfAnnotations[-1].setSvgTransform(child[3].text)
+				child = item[6]
+				if child.attrib["type"] == "QPlainTextEdit":
+					self.mw.annotationsContainer.createAnnotation(2, frame_start)
+					self.mw.listOfAnnotations[-1].setTextboxText(child[0].text)
+					self.mw.listOfAnnotations[-1].setTextboxBackgroundOpacity(int(child[1].text))
+					self.mw.listOfAnnotations[-1].setTextboxFontColor(child[2].text)
+					self.mw.listOfAnnotations[-1].setTextboxFontSize(int(child[3].text))
 
-			elif child.attrib["type"] == "QWidget":
-				self.mw.annotationsContainer.createAnnotation(3, frame_start)
+				elif child.attrib["type"] == "QSvgWidget":
+					if child[0].text == "False":
+						self.mw.annotationsContainer.createAnnotation(0, frame_start)
+					else:
+						self.mw.annotationsContainer.createAnnotation(1, frame_start)
 
-			self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
-			self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
-			self.mw.listOfAnnotations[-1].setPosition(position)
-			self.mw.listOfAnnotations[-1].setDimensions(width, height)
+					self.mw.listOfAnnotations[-1].setSvgColor(child[1].text)
+					self.mw.listOfAnnotations[-1].setSvgExtraAttribute(child[2].text)
+					self.mw.listOfAnnotations[-1].setSvgTransform(child[3].text)
 
-		return projectName, videoPath
+				elif child.attrib["type"] == "QWidget":
+					self.mw.annotationsContainer.createAnnotation(3, frame_start)
+
+				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
+				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
+				self.mw.listOfAnnotations[-1].setPosition(position)
+				self.mw.listOfAnnotations[-1].setDimensions(width, height)
+
+				success = True
+		except:
+			success = False
+			projectName = None
+			videoPath = None
+
+		return success, projectName, videoPath
 
 	'''
 	XML STRUCTURE
 
 	<project name="name_project" da
 	te="date_modified">
-		<video>video_path</video>
+		<video>
+			<path>path</path>
+			<width>n°</width>
+			<height>n°</height>
+		</video>
 		<list_annotations>
 			<annotation>
 				<frame_start>n°</frame_start>
@@ -97,13 +115,18 @@ class XMLSerializer(object):
 
 	'''
 
-	def writeXML(self, projectPath, projectName, videoPath, listOfAnnotations):
+	def writeXML(self, projectPath, projectName, videoPath, videoWidth, videoHeight, listOfAnnotations):
 		root = ET.Element("project")
 		root.attrib["name"] = projectName
 		root.attrib["date"] = str((datetime.now()).strftime("%d/%m/%Y %H:%M:%S"))
 
 		video = ET.SubElement(root, "video")
-		video.text = videoPath
+		video_path = ET.SubElement(video, "video_path")
+		video_path.text = videoPath
+		video_width = ET.SubElement(video, "width")
+		video_width.text = str(videoWidth)
+		video_height = ET.SubElement(video, "height")
+		video_height.text = str(videoHeight)
 
 		list_annotations = ET.SubElement(root, "list_annotations")
 

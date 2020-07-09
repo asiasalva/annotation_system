@@ -168,36 +168,47 @@ class VideoPlayerOpenCV(QWidget):
 
 	def setupVariables(self, videoPath):
 
-		### Video path, directory, and name
-		self.videoPath =  videoPath
-		self.onBreakpoint = False
+		success = False
 
-		### OpenCV video capture
-		# Select file to capture
-		self.videoCapture = cv2.VideoCapture(self.videoPath)
-		# Get video FPS
-		self.videoCapture_fps = self.videoCapture.get(cv2.CAP_PROP_FPS)
-		# Get video number of frames
-		self.videoCapture_nFrame = self.videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
-		# Get video frame width
-		self.videoCapture_frameWidth = self.videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)
-		# Get video frame height
-		self.videoCapture_frameHeight = self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)
-		# Video duration (in seconds)
-		self.duration = int(self.videoCapture_nFrame / self.videoCapture_fps)
+		try:
+			### Video path, directory, and name
+			self.videoPath =  videoPath
+			#self.onBreakpoint = False
 
-		### VideoPlayer speed
-		self.speed = 1.0
-		self.timer = QTimer()
-		self.timer.timeout.connect(self.nextFrameSlot)
-		self.timer.setInterval((1000./self.videoCapture_fps) * self.speed)
+			### OpenCV video capture
+			# Select file to capture
+			self.videoCapture = cv2.VideoCapture(self.videoPath)
+			# Get video FPS
+			self.videoCapture_fps = self.videoCapture.get(cv2.CAP_PROP_FPS)
+			# Get video number of frames
+			self.videoCapture_nFrame = self.videoCapture.get(cv2.CAP_PROP_FRAME_COUNT)
+			# Get video frame width
+			self.videoCapture_frameWidth = self.videoCapture.get(cv2.CAP_PROP_FRAME_WIDTH)
+			# Get video frame height
+			self.videoCapture_frameHeight = self.videoCapture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+			# Video duration (in seconds)
+			self.duration = int(self.videoCapture_nFrame / self.videoCapture_fps)
 
-		### Set labels with new duration
-		self.positionSlider.setRange(0, self.duration)
-		self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(0)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
+			### VideoPlayer speed
+			self.speed = 1.0
+			self.timer = QTimer()
+			self.timer.timeout.connect(self.nextFrameSlot)
+			self.timer.setInterval((1000./self.videoCapture_fps) * self.speed)
 
-		### Check if video requires rotation
-		self.rotateCode = self.checkVideoRotation(self.videoPath)
+			### Set labels with new duration
+			self.positionSlider.setRange(0, self.duration)
+			self.lblTime.setText(time.strftime("%H:%M:%S", time.gmtime(0)) + " / " + time.strftime("%H:%M:%S", time.gmtime(self.duration)))
+
+			### Check if video requires rotation
+			self.rotateCode = self.checkVideoRotation(self.videoPath)
+
+			self.mw.setFrameDimensions(self.videoCapture_frameWidth, self.videoCapture_frameHeight)
+
+			success = True
+		except:
+			success = False
+
+		return success
 
 	def getvideoPath(self):
 		return self.videoPath
