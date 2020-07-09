@@ -170,14 +170,20 @@ class Ui_MainWindow(object):
 			#self.actionAdd_Video.setEnabled(True)
 		#Load annotation from file
 		elif(command == 1):
-			projectName, videoPath = self.xmlSerializer.readXML(projectPath)
-			if projectName != "":
-				self.videoPlayer.setupVariables(videoPath)
-				self.setDurationProperty()
-				self.actionAdd_Video.setEnabled(False)
-				self.videoPlayerControlBar.enablePlayButton(True)
-			self.annotationsTable.insertRows(self.listOfAnnotations)
-			self.annotationsContainer.showAnnotations(0)
+			success, projectName, videoPath = self.xmlSerializer.readXML(projectPath)
+			if success:
+				if projectName != "":
+					if self.videoPlayer.setupVariables(videoPath):
+						self.setDurationProperty()
+						self.actionAdd_Video.setEnabled(False)
+						self.videoPlayerControlBar.enablePlayButton(True)
+					else:
+						self.launchError()
+				self.annotationsTable.insertRows(self.listOfAnnotations)
+				self.annotationsContainer.showAnnotations(0)
+			else:
+				self.launchError()
+
 		elif(command == 2):
 			# Load annotations present in this specific frame
 			self.annotationsContainer.showAnnotations(nFrame)
@@ -386,11 +392,13 @@ class Ui_MainWindow(object):
 		if self.videoPlayer.getvideoPath() == "":
 			videoPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Video", QtCore.QDir.homePath())#, "Video files")
 			if videoPath != "":
-				self.videoPlayer.setupVariables(videoPath)
-				self.setDurationProperty()
-				self.actionAdd_Video.setEnabled(False)
-				self.videoPlayerControlBar.enablePlayButton(True)
-				self.actionSave_Project.setEnabled(True)
+				if self.videoPlayer.setupVariables(videoPath):
+					self.setDurationProperty()
+					self.actionAdd_Video.setEnabled(False)
+					self.videoPlayerControlBar.enablePlayButton(True)
+					self.actionSave_Project.setEnabled(True)
+				else:
+					self.launchError()
 
 	def openProject(self):
 		retval = self.messageBox()
@@ -461,6 +469,17 @@ class Ui_MainWindow(object):
 		msg.setWindowTitle(projectName)
 		msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
 		return msg.exec_()
+
+	def launchError(self):
+		msg = QtWidgets.QMessageBox()
+		msg.setIcon(QtWidgets.QMessageBox.Critical)
+		msg.setText("Something went wrong while opening the file, please check that the chosen file is correct and undamaged.")
+		msg.setWindowTitle("File opening error")
+		msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+		msg.exec_()
+
+		self.setupAnnotations(0)
+		self.setupUi(self.mw)
 
 	def byFrameStart(self, elem):
 		return elem.getFrameRange()[0]
