@@ -368,7 +368,7 @@ class Ui_MainWindow(object):
 		for item in self.listOfAnnotations:
 			if annotationID == str(item):
 				item.setFocus()
-				self.videoPlayer.goToPosition(item.getFrameStart())
+				self.videoPlayer.goToPosition(item.getSecStart())
 				self.setLastFocusAnnotation(item)
 
 	def removeAnnotation(self, annotationToRemove):
