@@ -1,20 +1,22 @@
 import sys
-from PyQt5 import QtWidgets
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+
 from GUI import MainWindow
+
 
 # This is the launcer class of the project
 
-class MyMainWindow(QtWidgets.QMainWindow):
+class MyMainWindow(QMainWindow):
 	def __init__(self, ui, parent = None):
 		return super(MyMainWindow, self).__init__(parent)
 
 	def closeEvent(self, event):
-		if ui.exitProgram() == QtWidgets.QMessageBox.Cancel:
+		if ui.exitProgram() == QMessageBox.Cancel:
 			event.ignore()
 
 if __name__ == "__main__":
-	app = QtWidgets.QApplication(sys.argv)
-	#mainWindow = QtWidgets.QMainWindow()
+	app = QApplication(sys.argv)
 	ui = MainWindow.Ui_MainWindow()
 	mainWindow = MyMainWindow(ui)
 	ui.setupUi(mainWindow)
