@@ -1,16 +1,14 @@
 import cv2
-import os, time, ffmpeg
+import time, ffmpeg
 
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
-from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
-from PyQt5.QtCore import Qt, QUrl, QTimer
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
 class VideoPlayerOpenCV(QWidget):
-	
-	### Video player ###
 
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 		self.videoPath = ""
 
@@ -49,6 +47,10 @@ class VideoPlayerOpenCV(QWidget):
 	def setLayoutWidget(self, index):
 		self.stackedLayout.setCurrentIndex(index)
 
+
+	### Functions of VideoPlayer
+
+	# Load next frame
 	def nextFrameSlot(self):
 		ret, frame = self.videoCapture.read()
 		if(ret == True):
@@ -59,15 +61,19 @@ class VideoPlayerOpenCV(QWidget):
 			if self.rotateCode is not None:
 				frame = self.correctVideoRotation(frame, self.rotateCode)
 
+			# Show frame in videoFrame
 			img = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
 			pix = QPixmap.fromImage(img)
 			self.videoFrame.setPixmap(pix)
+
+			# Change slider position
 			self.positionChanged(self.videoCapture.get(cv2.CAP_PROP_POS_MSEC) / 1000)
+
+			# Show annotations
 			self.mw.setupAnnotations(2, "", self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES))
 		else:
 			self.pause()
 
-	### Functions of VideoPlayer
 
 	def play(self):
 		if(not self.timer.isActive()):
@@ -138,6 +144,7 @@ class VideoPlayerOpenCV(QWidget):
 			self.pause()
 			self.nextFrameSlot()
 
+
 	def getDuration(self):
 		return self.duration
 
@@ -168,12 +175,12 @@ class VideoPlayerOpenCV(QWidget):
 
 	def setupVariables(self, videoPath):
 
+		# True at the end if all went well
 		success = False
 
 		try:
-			### Video path, directory, and name
+			### Video path
 			self.videoPath =  videoPath
-			#self.onBreakpoint = False
 
 			### OpenCV video capture
 			# Select file to capture
@@ -202,6 +209,7 @@ class VideoPlayerOpenCV(QWidget):
 			### Check if video requires rotation
 			self.rotateCode = self.checkVideoRotation(self.videoPath)
 
+			### Save video dimensions (for annotation resizing)
 			self.mw.setFrameDimensions(self.videoCapture_frameWidth, self.videoCapture_frameHeight)
 
 			success = True
@@ -210,8 +218,10 @@ class VideoPlayerOpenCV(QWidget):
 
 		return success
 
+
 	def getvideoPath(self):
 		return self.videoPath
+
 
 	def checkVideoRotation(self, path_video_file):
 		# This returns meta-data of the video file in form of a dictionary
@@ -233,4 +243,4 @@ class VideoPlayerOpenCV(QWidget):
 		return rotateCode
 
 	def correctVideoRotation(self, frame, rotateCode):  
-		return cv2.rotate(frame, rotateCode) 
+		return cv2.rotate(frame, rotateCode)

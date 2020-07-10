@@ -3,18 +3,20 @@ import time
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QAbstractItemView
 
+
 class AnnotationsTable(QWidget):
 
 	### Table of created annotations ###
 
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 
 		### Table
 		self.table = QTableWidget()
 		self.table.setRowCount(0)
 		self.table.setColumnCount(3)
-		self.table.setHorizontalHeaderLabels(["Start", "End", "Type"])#, "ID"])
+		self.table.setHorizontalHeaderLabels(["Start", "End", "Type"])
 		
 		header = self.table.horizontalHeader()
 		header.setSectionResizeMode(0, QHeaderView.Stretch)
@@ -38,8 +40,10 @@ class AnnotationsTable(QWidget):
 		container.addWidget(QLabel("Annotations"))
 		container.addWidget(self.table)
 
+
 	def getSelectedAnnotation(self):
 		self.mw.showAnnotationSelected((self.table.selectedItems())[2].data(Qt.UserRole))
+
 
 	def insertRows(self, listOfAnnotations):
 		self.table.setSortingEnabled(False)		
@@ -87,6 +91,7 @@ class AnnotationsTable(QWidget):
 		self.table.removeRow(item.row())
 		self.table.setSortingEnabled(True)
 
+
 	def aliasAnnotationType(self, annotation):
 		if annotation.annotationType == "QPlainTextEdit":
 			return "Textbox"
@@ -96,6 +101,7 @@ class AnnotationsTable(QWidget):
 			return "Arrow"
 		else:
 			return "Line"
+
 
 	def convertTime(self, seconds): 
 		return time.strftime("%H:%M:%S", time.gmtime(seconds))

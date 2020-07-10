@@ -1,9 +1,11 @@
 from PyQt5.QtWidgets import QHBoxLayout, QWidget, QPushButton, QStyle, QFrame
 
+
 class VideoPlayerControlBar(QWidget):
 
 	### Control bar for video player ###
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 
 		### Control buttons:
@@ -80,8 +82,10 @@ class VideoPlayerControlBar(QWidget):
 		
 		self.setFixedHeight(self.btnBackward.sizeHint().height())
 
+
 	def sendCommand(self, command):
 		self.mw.controlBarCommand(command)
+
 
 	def enablePlayButton(self, enable):
 		self.btnPlay.setEnabled(enable)
