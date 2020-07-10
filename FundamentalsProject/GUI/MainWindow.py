@@ -160,6 +160,8 @@ class Ui_MainWindow(object):
 
 		#Load annotation from file
 		elif(command == 1):
+			self.listOfAnnotations = list()
+			self.listOfBreaks = list()
 			success, projectName, videoPath = self.xmlSerializer.readXML(projectPath)
 			if success:
 				if projectName != "":
@@ -366,7 +368,7 @@ class Ui_MainWindow(object):
 		for item in self.listOfAnnotations:
 			if annotationID == str(item):
 				item.setFocus()
-				self.videoPlayer.goToPosition(item.getSecStart())
+				self.videoPlayer.goToPosition(item.getFrameStart())
 				self.setLastFocusAnnotation(item)
 
 	def removeAnnotation(self, annotationToRemove):
