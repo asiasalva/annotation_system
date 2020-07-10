@@ -62,7 +62,6 @@ class WindowPaint(QWidget):
 
 				self.lastPoint = currentPoint
 				self.update()
-				#print("drawing " + str(currentPoint))
 			else:
 				self.lastPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
 

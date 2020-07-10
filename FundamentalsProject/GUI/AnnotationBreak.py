@@ -322,8 +322,6 @@ class AnnotationBreak(QWidget):
 
 
 	def getRealPosition(self, fakePos):
-		print("getRealPosition")
-
 		#	realX:frameWidth = fakeX:parentWidth
 		#	realY:frameHeight = fakeY:parentHeight
 
@@ -333,8 +331,6 @@ class AnnotationBreak(QWidget):
 		return QPoint(realX, realY)
 
 	def getFakePosition(self, realPos):
-		print("getFakePosition")
-
 		#	realX:frameWidth = fakeX:parentWidth
 		#	realY:frameHeight = fakeY:parentHeight
 		
@@ -345,8 +341,6 @@ class AnnotationBreak(QWidget):
 
 
 	def getRealDimensions(self, fakeW, fakeH):
-		print("getRealDimensions")
-
 		#	realW:frameWidth = fakeW:parentWidth
 		#	realH:frameHeight = fakeH:parentHeight
 
@@ -356,8 +350,6 @@ class AnnotationBreak(QWidget):
 		return QSize(realW, realH)
 
 	def getFakeDimensions(self, realW, realH):
-		print("getFakeDimensions")
-
 		#	realW:frameWidth = fakeW:parentWidth
 		#	realH:frameHeight = fakeH:parentHeight
 		
