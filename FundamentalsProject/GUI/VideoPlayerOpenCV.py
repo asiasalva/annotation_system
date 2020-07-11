@@ -129,7 +129,7 @@ class VideoPlayerOpenCV(QWidget):
 		# Scan breakpoints annotations
 		for i in range(len(self.mw.listOfBreaks)):
 			tmp =  (self.mw.listOfBreaks[i]).getFrameRange()[0]
-			if videoPos < tmp :
+			if videoPos < tmp:
 				videoPos = tmp
 				breakpointFound = True
 				break

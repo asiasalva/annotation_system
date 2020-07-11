@@ -457,16 +457,21 @@ class Ui_MainWindow(object):
 	### SUPPORT FUNCTIONS
 		
 	def messageBox(self):
-		if self.projectPath == "":
-			projectName = "Untitled"
+
+		# If a video has been loaded, then there is something to save
+		if self.videoPlayer.getvideoPath() != "":
+			if self.projectPath == "":
+				projectName = "Untitled"
+			else:
+				projectName = os.path.basename(self.projectPath)
+			msg = QtWidgets.QMessageBox()
+			msg.setIcon(QtWidgets.QMessageBox.Warning)
+			msg.setText("Do You want to save changes to " + projectName + "?")
+			msg.setWindowTitle(projectName)
+			msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
+			return msg.exec_()
 		else:
-			projectName = os.path.basename(self.projectPath)
-		msg = QtWidgets.QMessageBox()
-		msg.setIcon(QtWidgets.QMessageBox.Warning)
-		msg.setText("Do You want to save changes to " + projectName + "?")
-		msg.setWindowTitle(projectName)
-		msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
-		return msg.exec_()
+			return QtWidgets.QMessageBox.Discard
 
 
 	def launchError(self):
