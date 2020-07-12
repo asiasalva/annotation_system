@@ -1,20 +1,22 @@
-from PyQt5 import QtCore, QtWidgets, QtGui
 import os
+
+from PyQt5 import QtCore, QtWidgets, QtGui
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
 from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing, XMLSerializer, AnnotationBreak
+
 
 class Ui_MainWindow(object):
 
 	### Main window ###
 
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 		# Set main window, 
 		# set central widget (i.e., main container),
 		# set vertical layout (i.e., main layout)
 		# N.B.: you need to put a layout (any kind of layout) in order to make content auto resizable
 		MainWindow.setObjectName("MainWindow")
-		#MainWindow.resize(1280, 720)
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -66,10 +68,6 @@ class Ui_MainWindow(object):
 		self.actionAdd_Video.setObjectName("actionAdd_Video")
 		self.actionSave_Project = QtWidgets.QAction(MainWindow)
 		self.actionSave_Project.setObjectName("actionSave_Project")
-		#--self.actionExport = QtWidgets.QAction(MainWindow)
-		#--self.actionExport.setObjectName("actionExport")
-		#--self.actionClose = QtWidgets.QAction(MainWindow)
-		#--self.actionClose.setObjectName("actionClose")
 		self.actionExit = QtWidgets.QAction(MainWindow)
 		self.actionExit.setObjectName("actionExit")
 		self.menuFile.addAction(self.actionNew_Project)
@@ -78,9 +76,7 @@ class Ui_MainWindow(object):
 		self.menuFile.addAction(self.actionAdd_Video)
 		self.menuFile.addSeparator()
 		self.menuFile.addAction(self.actionSave_Project)
-		#--self.menuFile.addAction(self.actionExport)
 		self.menuFile.addSeparator()
-		#--self.menuFile.addAction(self.actionClose)
 		self.menuFile.addAction(self.actionExit)
 		self.menubar.addAction(self.menuFile.menuAction())
 
@@ -139,24 +135,19 @@ class Ui_MainWindow(object):
 		self.actionAdd_Video.setText(_translate("MainWindow", "Add Video"))
 		self.actionSave_Project.setText(_translate("MainWindow", "Save Project"))
 		self.actionSave_Project.setShortcut(_translate("MainWindow", "Ctrl+S"))
-		#--self.actionExport.setText(_translate("MainWindow", "Export"))
-		#--self.actionClose.setText(_translate("MainWindow", "Close Project"))
 		self.actionExit.setText(_translate("MainWindow", "Exit"))
 		self.actionExit.setShortcut(_translate("MainWindow", "Ctrl+Q"))
 		self.actionNew_Project.triggered.connect(self.newProject)
 		self.actionOpen_Project.triggered.connect(self.openProject)
 		self.actionAdd_Video.triggered.connect(self.addVideo)
 		self.actionSave_Project.triggered.connect(self.saveProject)
-		#--self.actionExport.triggered.connect(self.exportVideo)
-		#--self.actionClose.triggered.connect(self.closeProject)
 		self.actionExit.triggered.connect(self.exitProgram)
 		self.actionNew_Project.setEnabled(True)
 		self.actionOpen_Project.setEnabled(True)
 		self.actionAdd_Video.setEnabled(True)
 		self.actionSave_Project.setEnabled(False)
-		#--self.actionExport.setEnabled(False)
-		#--self.actionClose.setEnabled(False)
 		self.actionExit.setEnabled(True)
+
 
 	def setupAnnotations(self, command, projectPath = "", nFrame = None):
 		#First setup:
@@ -165,11 +156,12 @@ class Ui_MainWindow(object):
 			self.listOfDrawing = list()
 			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
-			#--self.setDurationProperty()
 			self.projectPath = ""
-			#self.actionAdd_Video.setEnabled(True)
+
 		#Load annotation from file
 		elif(command == 1):
+			self.listOfAnnotations = list()
+			self.listOfBreaks = list()
 			success, projectName, videoPath = self.xmlSerializer.readXML(projectPath)
 			if success:
 				if projectName != "":
@@ -184,14 +176,17 @@ class Ui_MainWindow(object):
 			else:
 				self.launchError()
 
+		# Load annotations present in this specific frame
 		elif(command == 2):
-			# Load annotations present in this specific frame
 			self.annotationsContainer.showAnnotations(nFrame)
+
 
 	def setLastFocusAnnotation(self, lastFocusAnnotation):	
 		self.annotationsProperties.setPropertiesVisible(True)
 		self.lastFocusAnnotation = lastFocusAnnotation
 		self.windowPaint.setRubber(False)
+
+		# TEXTBOX
 		if(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
@@ -202,6 +197,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+		# ARROW
 		elif self.lastFocusAnnotation.isArrow:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
@@ -212,6 +208,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+		# LINE
 		elif self.lastFocusAnnotation.isArrow == False:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
@@ -222,6 +219,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+		# BREAKPOINT
 		else:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
@@ -232,6 +230,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):		
 		# DRAWING
@@ -275,11 +274,12 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		
-		
 		self.orderAnnotations()
+
 
 	def setDurationProperty(self):
 		self.annotationsProperties.setDuration(self.videoPlayer.getDuration())
+
 
 	### ACTIONS: VideoPlayerControlBar -> VideoPlayerOpenCV
 
@@ -316,7 +316,8 @@ class Ui_MainWindow(object):
 		elif(command == 7):
 			self.videoPlayer.nextBreakpoint()
 
-	### ACTIONS: AnnotationsList -> ???
+
+	### ACTIONS: AnnotationsList
 
 	def annotationsListCommand(self, command):
 		# 0 -> line
@@ -353,7 +354,9 @@ class Ui_MainWindow(object):
 			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
 			self.orderAnnotations()
 
+
 	### ACTIONS: AnnotationsTable
+
 	def showAnnotationSelected(self, annotationID):
 		# If user is drawing, stop WindowPaint from drawing
 		if self.windowPaint.getTrackingMouse():
@@ -373,6 +376,7 @@ class Ui_MainWindow(object):
 		self.listOfAnnotations.remove(annotationToRemove)
 		self.annotationsProperties.setPropertiesVisible(False)
 
+
 	### MENU FUNCTIONS
 
 	def newProject(self):
@@ -390,7 +394,7 @@ class Ui_MainWindow(object):
 	def addVideo(self):
 		# If a video is not already loaded
 		if self.videoPlayer.getvideoPath() == "":
-			videoPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Video", QtCore.QDir.homePath())#, "Video files")
+			videoPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Video", QtCore.QDir.homePath())
 			if videoPath != "":
 				if self.videoPlayer.setupVariables(videoPath):
 					self.setDurationProperty()
@@ -438,15 +442,6 @@ class Ui_MainWindow(object):
 		else:
 			return False
 
-	#--def exportVideo(self):
-	#--	print("exportVideo")
-	#--	# TENERE ???
-
-	#--def closeProject(self):
-	#--	print("closeProject")
-	#--	# TENERE ???
-	#--	self.newProject()
-
 	def exitProgram(self):
 		retval = self.messageBox()
 		if retval == QtWidgets.QMessageBox.Save:
@@ -457,18 +452,27 @@ class Ui_MainWindow(object):
 			# Close application
 			QtCore.QCoreApplication.instance().quit()
 		return retval
+
+
+	### SUPPORT FUNCTIONS
 		
 	def messageBox(self):
-		if self.projectPath == "":
-			projectName = "Untitled"
+
+		# If a video has been loaded, then there is something to save
+		if self.videoPlayer.getvideoPath() != "":
+			if self.projectPath == "":
+				projectName = "Untitled"
+			else:
+				projectName = os.path.basename(self.projectPath)
+			msg = QtWidgets.QMessageBox()
+			msg.setIcon(QtWidgets.QMessageBox.Warning)
+			msg.setText("Do You want to save changes to " + projectName + "?")
+			msg.setWindowTitle(projectName)
+			msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
+			return msg.exec_()
 		else:
-			projectName = os.path.basename(self.projectPath)
-		msg = QtWidgets.QMessageBox()
-		msg.setIcon(QtWidgets.QMessageBox.Warning)
-		msg.setText("Do You want to save changes to " + projectName + "?")
-		msg.setWindowTitle(projectName)
-		msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
-		return msg.exec_()
+			return QtWidgets.QMessageBox.Discard
+
 
 	def launchError(self):
 		msg = QtWidgets.QMessageBox()
@@ -481,23 +485,18 @@ class Ui_MainWindow(object):
 		self.setupAnnotations(0)
 		self.setupUi(self.mw)
 
+
 	def byFrameStart(self, elem):
 		return elem.getFrameRange()[0]
+
 
 	def orderAnnotations(self):
 		self.listOfAnnotations.sort(key=self.byFrameStart)
 		self.listOfBreaks.sort(key=self.byFrameStart)
 
 
-
-
-
 	def clearWindowPaint(self):
 		self.windowPaint.clearWindowPaint()
-
-
-
-
 
 
 	def setFrameDimensions(self, width, height):

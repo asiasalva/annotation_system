@@ -1,10 +1,12 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel, QPushButton, QFormLayout, QFrame
 
+
 class AnnotationsList(QWidget):
 
 	### "List view" for annotation types ###
 
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 		
 		### Widgets simulating a list view
@@ -54,8 +56,10 @@ class AnnotationsList(QWidget):
 		container.addWidget(QLabel("Types"))
 		container.addWidget(self.scroll)
 
+
 	def sendCommand(self, command):
 		self.mw.annotationsListCommand(command)
+
 
 	def changeDrawButtonText(self, drawing):
 		if drawing:

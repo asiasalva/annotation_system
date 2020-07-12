@@ -1,11 +1,7 @@
-'''
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QImage, QPainter, QPen, QBrush, QColor
-from PyQt5.QtCore import Qt, QPoint, QRect, QSize
-'''
+###!!! da togliere !!!
 
-# class for the drawing annotation
+
+# Class for the drawing annotation
 
 class AnnotationDrawing(object):
     
@@ -24,14 +20,3 @@ class AnnotationDrawing(object):
 			self.painterPen = pen
 			self.pointStart = pStart
 			self.pointEnd = pEnd
-	
-	#LINE
-	#painterPen		QPen	
-	#pointStart		QPoint
-	#pointEnd		QPoint
-
-	#RUBBER
-	#rubberSize		int
-	#point			QPoint
-
-

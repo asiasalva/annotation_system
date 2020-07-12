@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Mode(Enum):
 	NONE = 0,
 	MOVE = 1,

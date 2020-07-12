@@ -1,13 +1,10 @@
+import time, datetime, os
+
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QScrollArea, QLabel, QFormLayout, QFrame, QComboBox, QSpinBox, QPlainTextEdit, QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QIcon, QBrush, QPainter, QValidator
 from PyQt5.QtSvg import QSvgWidget
 
-import time
-import datetime
-import os 
-
-#Class annotation Properties needed to show properties on the GUI 
 
 class SpinBoxTime(QSpinBox):
 	def __init__(self, *args, **kwargs):
@@ -35,10 +32,12 @@ class SpinBoxTime(QSpinBox):
 		except ValueError:
 			return False
 
+
 class AnnotationsProperties(QWidget):
 
 	### "List view" for annotation properties ###
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 
 		### Widgets simulating a list view
@@ -87,6 +86,7 @@ class AnnotationsProperties(QWidget):
 		container.addWidget(QLabel("Properties"))
 		container.addWidget(self.scroll)
 
+
 	def setProperties(self, annotationClass, isArrow, colorString, value1, value2, secStart, secEnd):
 		
 		self.spinboxValue1.blockSignals(True)
@@ -114,7 +114,7 @@ class AnnotationsProperties(QWidget):
 			if(self.comboboxColor.itemData(0) is None):
 				self.removeRubber(self.comboboxColor, 0)
 		else:
-			# Common section to all the annotations
+			# Common section to all annotations
 			self.lblColor.setHidden(False)
 			self.lblValue1.setHidden(False)
 			self.lblValue2.setHidden(False)
@@ -189,14 +189,12 @@ class AnnotationsProperties(QWidget):
 		self.spinboxSecStart.blockSignals(False)
 		self.spinboxSecEnd.blockSignals(False)
 
+
 	def changeProperties(self):
 
-		# If RUBBER is not present in combobox (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
-		#if (self.comboboxColor.itemData(0) is not None) and (self.spinboxSecEnd.isHidden()):
 		# If btnClear is hidden (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
 		if (self.btnClear.isHidden() and self.spinboxSecEnd.isHidden()):
 			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
-
 		else:
 			selectedColor = self.comboboxColor.currentData()
 			selectedValue1 = self.spinboxValue1.value()
@@ -212,9 +210,10 @@ class AnnotationsProperties(QWidget):
 			else:
 				self.mw.setNewAnnotationProperties(selectedColor, selectedValue1, selectedValue2, secondStart, secondEnd)
 
-	def clearWindowPaint(self):
-		self.mw.clearWindowPaint()
 		
+	def setPropertiesVisible(self, visible):
+		self.setVisible(visible)
+
 	def setDuration(self, duration):
 		self.spinboxSecStart.blockSignals(True)
 		self.spinboxSecEnd.blockSignals(True)
@@ -225,10 +224,13 @@ class AnnotationsProperties(QWidget):
 		self.spinboxSecStart.blockSignals(False)
 		self.spinboxSecEnd.blockSignals(False)
 
+	def clearWindowPaint(self):
+		self.mw.clearWindowPaint()
+
+
 	def insertRubber(self, combobox, index):
 		dirname = os.path.dirname(__file__)
 		fileName = os.path.join(dirname, 'rubber.svg')
-		# combobox.insertItem(index, QIcon(QPixmap("C:\\Users\\Brugix\\source\\repos\\FundamentalsProject\\FundamentalsProject\\GUI\\rubber.svg").scaled(12,12)), "Rubber", None)
 		combobox.insertItem(index, QIcon(QPixmap(fileName).scaled(12,12)), "Rubber", None)
 
 	def removeRubber(self, combobox, index):
@@ -241,7 +243,6 @@ class AnnotationsProperties(QWidget):
 		painter.setPen(Qt.gray)
 		painter.setBrush(brushColor)
 		painter.drawRect(0, 0, 12, 12)
-
 		painter.end()
 
 		combobox.addItem(QIcon(pix), name, brushColor.color().name())
@@ -264,6 +265,3 @@ class AnnotationsProperties(QWidget):
 		self.insertColor(combobox, QBrush(Qt.gray), "Gray")						# 5		#a0a0a4
 		self.insertColor(combobox, QBrush(Qt.darkGray), "Dark gray")			# 4		#808080
 		self.insertColor(combobox, QBrush(Qt.lightGray), "Light gray")			# 6		#c0c0c0
-
-	def setPropertiesVisible(self, visible):
-		self.setVisible(visible)
