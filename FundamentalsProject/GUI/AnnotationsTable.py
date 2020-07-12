@@ -2,6 +2,7 @@ import time
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QLabel, QAbstractItemView
+from PyQt5.QtGui import QKeyEvent
 
 
 class AnnotationsTable(QWidget):
@@ -43,6 +44,10 @@ class AnnotationsTable(QWidget):
 
 	def getSelectedAnnotation(self):
 		self.mw.showAnnotationSelected((self.table.selectedItems())[2].data(Qt.UserRole))
+
+	def keyPressEvent(self, e: QKeyEvent):
+		if e.key() == Qt.Key_Delete:
+			self.mw.removeAnnotationFromTable((self.table.selectedItems())[2].data(Qt.UserRole))
 
 
 	def insertRows(self, listOfAnnotations):
