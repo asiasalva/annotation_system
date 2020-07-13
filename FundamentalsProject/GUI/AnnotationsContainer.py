@@ -38,7 +38,7 @@ class AnnotationsContainer(QWidget):
 			)
 			#append to the only brealpoints list needed to the function nextbreakpoint
 			self.mw.listOfBreaks.append(self.mw.listOfAnnotations[-1])
-		elif(annotationType == 5): #DRAWS 
+		elif(annotationType == 4): #DRAWS 
 			self.mw.listOfAnnotations.append(AnnotationDraws.AnnotationDraws(self, QPoint(10,10), QLabel(), False, self.mw, currentSecond)
 			)
 

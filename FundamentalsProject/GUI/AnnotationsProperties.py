@@ -101,7 +101,7 @@ class AnnotationsProperties(QWidget):
 			self.lblValue2.setHidden(True)
 			self.lblTime.setHidden(False)
 			self.lblFrom.setHidden(False)
-			self.lblTo.setHidden(False)
+			self.lblTo.setHidden(True)
 			self.spinboxValue1.setHidden(True)
 			self.spinboxValue2.setHidden(True)
 			self.comboboxColor.setHidden(True)
@@ -111,6 +111,25 @@ class AnnotationsProperties(QWidget):
 			self.btnClear.setHidden(True)
 			
 			# Breakpoint -> remove rubber from colors
+			if(self.comboboxColor.itemData(0) is None):
+				self.removeRubber(self.comboboxColor, 0)
+		elif annotationClass is QLabel:
+			# DRAWING
+			self.lblColor.setHidden(True)
+			self.lblValue1.setHidden(True)
+			self.lblValue2.setHidden(True)
+			self.lblTime.setHidden(False)
+			self.lblFrom.setHidden(False)
+			self.lblTo.setHidden(False)
+			self.spinboxValue1.setHidden(True)
+			self.spinboxValue2.setHidden(True)
+			self.comboboxColor.setHidden(True)
+			self.spinboxSecStart.setHidden(False)
+			self.spinboxSecEnd.setHidden(False)
+			self.spinboxSecStart.setValue(secStart)
+			self.spinboxSecEnd.setValue(secEnd)
+			self.btnClear.setHidden(True)
+			# Annotation -> remove rubber from colors
 			if(self.comboboxColor.itemData(0) is None):
 				self.removeRubber(self.comboboxColor, 0)
 		else:
@@ -195,6 +214,8 @@ class AnnotationsProperties(QWidget):
 		# If btnClear is hidden (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
 		if (self.btnClear.isHidden() and self.spinboxSecEnd.isHidden()):
 			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
+		elif (self.comboboxColor.isHidden() and not self.spinboxSecEnd.isHidden()):
+			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecEnd.value())
 		else:
 			selectedColor = self.comboboxColor.currentData()
 			selectedValue1 = self.spinboxValue1.value()

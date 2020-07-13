@@ -268,6 +268,7 @@ class AnnotationDraws(QWidget):
 		self.annotationSecondEnd = currentSecond
 		self.annotationPosition = 0
 		self.isArrow = None
+		self.listOfDrawings = list()
 
 		# These two lines of code (which change annotation's size and put it back 
 		#	are used to prevent that Qt automatically adjust the widget's size 
@@ -383,7 +384,7 @@ class AnnotationDraws(QWidget):
 
 	def drawAnnotations(self, listOfDrawings):
 		
-		### self.mw.listOfDrawing.append([dType, pen, pStart, pEnd, rSize, rPoint])
+		### self.mw.listOfDrawing.append([pen, pStart, pEnd])
 
 		## find dimensions for child widget
 		#self.childWidget = QImage(self.size(), QImage.Format_ARGB32)
@@ -398,18 +399,10 @@ class AnnotationDraws(QWidget):
 		painter = QPainter(img)
 		
 		for drawing in listOfDrawings:
+			painter.setPen(drawing[0])
+			painter.drawLine(drawing[1], drawing[2])
 
-			# drawingType = 0 -> LINE, 1 -> RUBBER
-			if drawing[0]:
-				r = QRect(QPoint(), drawing[4]*QSize())
-				r.moveCenter(drawing[5])
-				painter.save()
-				painter.setCompositionMode(QPainter.CompositionMode_Clear)
-				painter.eraseRect(r)
-				painter.restore()
-			else:
-				painter.setPen(drawing[1])
-				painter.drawLine(drawing[2], drawing[3])
+			self.listOfDrawings.append(drawing)
 
 		
 		pix = QPixmap.fromImage(img)

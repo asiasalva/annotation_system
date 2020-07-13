@@ -54,6 +54,9 @@ class XMLSerializer(object):
 				elif child.attrib["type"] == "QWidget":
 					self.mw.annotationsContainer.createAnnotation(3, frame_start)
 
+				elif child.attrib["type"] == "QLabel":
+					self.mw.annotationsContainer.createAnnotation(4, frame_start)
+
 				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
 				self.mw.listOfAnnotations[-1].setPosition(position)
@@ -183,6 +186,33 @@ class XMLSerializer(object):
 
 				transform = ET.SubElement(child, "transform")
 				transform.text = item.getSvgTransform()
+
+			elif item.annotationType == "QLabel":
+				brush_color = ET.SubElement(child, "brush_color")
+				brush_color.text = item.listOfDrawings[0][0].color().name()
+
+				brush_size = ET.SubElement(child, "brush_size")
+				brush_size.text = str(item.listOfDrawings[0][0].width())
+
+				list_drawings = ET.SubElement(child, "list_drawings")
+
+				for drawing in item.listOfDrawings:	#[pen, pStart, pEnd]
+					line = ET.SubElement(list_drawings, "line")					
+
+					position_start = ET.SubElement(line, "position_start")
+					x = ET.SubElement(position_start, "x")
+					x.text = str(drawing[1].x())
+					y = ET.SubElement(position_start, "y")
+					y.text = str(drawing[1].y())
+
+					position_end = ET.SubElement(line, "position_end")
+					x = ET.SubElement(position_end, "x")
+					x.text = str(drawing[2].x())
+					y = ET.SubElement(position_end, "y")
+					y.text = str(drawing[2].y())
+
+
+
 
 
 		tree = ET.ElementTree(root)

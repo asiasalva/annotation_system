@@ -39,6 +39,7 @@ class VideoPlayerOpenCV(QWidget):
 		self.stackedLayout.addWidget(self.videoFrame)
 		self.stackedLayout.addWidget(self.mw.windowPaint)
 		self.stackedLayout.addWidget(self.mw.annotationsContainer)
+		self.stackedLayout.addWidget(self.mw.windowBlackboard)
 		self.stackedLayout.setStackingMode(QStackedLayout.StackAll)
 
 		### Widget container

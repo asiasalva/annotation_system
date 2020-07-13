@@ -12,23 +12,18 @@ class WindowPaint(QWidget):
 	def setupUi(self, MainWindow):
 
 		self.mw = MainWindow
-		self.isDraw = None
-		self.listOfImages = list()
+		#self.isDraw = None
+		self.listOfDrawings = list()
 
 		# Image to draw on (like a transparent blackboard)
 		self.image = QImage(self.size(), QImage.Format_ARGB32)
 		self.image.fill(QtGui.qRgba(0,0,0,0));
-		self.listOfImages.append(self.image)
 
 		# Default pen
 		self.brushSize = 1
 		self.brushColor = Qt.red
 		self.lastPoint = QPoint()
 		self.painterPen = QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
-
-		# Default rubber
-		self.clear = False
-		self.rubberSize = 1
 
 		# Drawing checks
 		self.drawing = False
@@ -49,20 +44,10 @@ class WindowPaint(QWidget):
 
 				currentPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
 
-				if self.clear:
-					r = QRect(QPoint(), self.rubberSize*QSize())
-					r.moveCenter(currentPoint)
-					painter.save()
-					painter.setCompositionMode(QPainter.CompositionMode_Clear)
-					painter.eraseRect(r)
-					painter.restore()
-
-					# dType = 0 -> LINE, 1 -> RUBBER
-					self.createAnnotation(1, None, None, None, self.rubberSize, currentPoint)
-				else:
-					painter.drawLine(self.lastPoint, currentPoint)
-					# dType = 0 -> LINE, 1 -> RUBBER
-					self.createAnnotation(0, self.painterPen, self.lastPoint, currentPoint, None, None)
+				
+				painter.drawLine(self.lastPoint, currentPoint)
+				# dType = 0 -> LINE, 1 -> RUBBER
+				self.createAnnotation(self.painterPen, self.lastPoint, currentPoint)
 
 				self.lastPoint = currentPoint
 				self.update()
@@ -73,30 +58,15 @@ class WindowPaint(QWidget):
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.LeftButton:
 			self.drawing = False
-			if self.isDraw:
-				self.mw.copyDraw()
-				self.clearWindowPaint()
+			#if self.isDraw:
+			self.mw.copyDraw(self.listOfDrawings)
+			self.clearWindowPaint()
 
 				
 
 	def paintEvent(self, event):
 		canvasPainter  = QPainter(self)
 		canvasPainter.drawImage(self.rect(), self.image, self.image.rect() )
-
-
-	def setRubber(self, active):
-		self.clear = active
-		if self.clear:
-			pixmap = QtGui.QPixmap(QSize(1, 1)*self.rubberSize)
-			pixmap.fill(Qt.transparent)
-			painter = QtGui.QPainter(pixmap)
-			painter.setPen(QtGui.QPen(Qt.black, 2))
-			painter.drawRect(pixmap.rect())
-			painter.end()
-			cursor = QtGui.QCursor(pixmap)
-			QApplication.setOverrideCursor(cursor)
-		else:
-			QApplication.restoreOverrideCursor()
 
 
 	def setTrackingMouse(self, tracking):
@@ -111,61 +81,41 @@ class WindowPaint(QWidget):
 	def getPainterPen(self):
 		return self.painterPen
 
-	def setRubberSize(self, size):
-		self.rubberSize = size
-
-	def getRubberSize(self):
-		return self.rubberSize
-
 	
-	def createAnnotation(self, dType, pen, pStart, pEnd, rSize, rPoint):
-		if self.isDraw:
-			self.mw.listOfDraws.append([dType, pen, pStart, pEnd, rSize, rPoint])
-		else:
-			self.mw.listOfDrawing.append(
-				BlackBoard.BlackBoard(dType, pen, pStart, pEnd, rSize, rPoint)
-			)
+	def createAnnotation(self, pen, pStart, pEnd):
+		#if self.isDraw:
+		self.listOfDrawings.append([pen, pStart, pEnd])
+		#else:
+		#	self.mw.listOfDrawing.append(
+		#		BlackBoard.BlackBoard(dType, pen, pStart, pEnd, rSize, rPoint)
+		#	)
 
 	def clearWindowPaint(self):
-		print('listOfDraws size: ', len(self.mw.listOfDraws))
-		print('listOfDrawing size: ', len(self.mw.listOfDrawing))
-		print('isDraw: ', self.isDraw)
-		if self.isDraw:
-			print('sono nell if')
-			self.listOfImages[-1].fill(QtGui.qRgba(0,0,0,0))
-			self.mw.listOfDraws.clear()
-		else:
-			print('sono nell else')
-			self.image.fill(QtGui.qRgba(0,0,0,0))
+		#print('listOfDraws size: ', len(self.mw.listOfDraws))
+		#print('listOfDrawing size: ', len(self.mw.listOfDrawing))
+		#print('isDraw: ', self.isDraw)
+		#if self.isDraw:
+		#	print('sono nell if')
+		#	self.listOfImages[-1].fill(QtGui.qRgba(0,0,0,0))
+		#	self.mw.listOfDraws.clear()
+		#else:
+		#	print('sono nell else')
+		#	self.image.fill(QtGui.qRgba(0,0,0,0))
+
+		self.listOfDrawings.clear()
+		self.image.fill(QtGui.qRgba(0,0,0,0))
 		self.update()
 
-	###!!! da modificare !!!
-	def drawAnnotations(self, listOfDrawings):
-		
-		painter = QPainter(self.image)
-		
-		for drawing in listOfDrawings:
+	
 
-			# drawingType = 0 -> LINE, 1 -> RUBBER
-			if drawing.drawingType:
-				r = QRect(QPoint(), drawing.rubberSize*QSize())
-				r.moveCenter(drawing.rubberPoint)
-				painter.save()
-				painter.setCompositionMode(QPainter.CompositionMode_Clear)
-				painter.eraseRect(r)
-				painter.restore()
-			else:
-				painter.setPen(drawing.painterPen)
-				painter.drawLine(drawing.pointStart, drawing.pointEnd)
-
-	def isDrawing(self, command):
-		if command == 5:
-			self.isDraw = True
-			return True
-		else:
-			self.isDraw = False
-			return False
-
+	#def isDrawing(self, command):
+	#	if command == 5:
+	#		self.isDraw = True
+	#		return True
+	#	else:
+	#		self.isDraw = False
+	#		return False
+	
 
 
 

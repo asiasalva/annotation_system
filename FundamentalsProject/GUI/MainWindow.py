@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 import os
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDraws, BlackBoard, XMLSerializer, AnnotationBreak
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDraws, BlackBoard, XMLSerializer, AnnotationBreak, WindowBlackboard
 
 class Ui_MainWindow(object):
 
@@ -94,6 +94,9 @@ class Ui_MainWindow(object):
 		self.annotationsContainer = AnnotationsContainer.AnnotationsContainer(self)
 		self.annotationsContainer.setEnabled(False)
 		self.xmlSerializer = XMLSerializer.XMLSerializer(self)
+		self.windowBlackboard = WindowBlackboard.WindowBlackboard()
+		self.windowBlackboard.setupUi(self)
+		self.windowBlackboard.setEnabled(False)
 
 		### Custom widgets - "Video side"
 		# Add VideoPlayer widget
@@ -192,7 +195,7 @@ class Ui_MainWindow(object):
 	def setLastFocusAnnotation(self, lastFocusAnnotation):	
 		self.annotationsProperties.setPropertiesVisible(True)
 		self.lastFocusAnnotation = lastFocusAnnotation
-		self.windowPaint.setRubber(False)
+		self.windowBlackboard.setRubber(False)
 		if(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
@@ -226,7 +229,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
-		else:
+		elif(isinstance(self.lastFocusAnnotation, AnnotationBreak.AnnotationBreak)):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				None,
@@ -237,19 +240,33 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
+		elif(isinstance(self.lastFocusAnnotation, AnnotationDraws.AnnotationDraws)):
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__,
+				None,
+				False,
+				False,
+				0,
+				0,
+				self.lastFocusAnnotation.getSecStart(),
+				self.lastFocusAnnotation.getSecEnd()
+			)
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):		
 		# BLACKBOARD
 		if self.lastFocusAnnotation is None:
-			# RUBBER
-			if colorString is None:
-				self.windowPaint.setRubber(True)
-				self.windowPaint.setRubberSize(value2)
-			# DRAW
-			else:
+			if self.windowBlackboard.getTrackingMouse():
+				# RUBBER
+				if colorString is None:
+					self.windowBlackboard.setRubber(True)
+					self.windowBlackboard.setRubberSize(value2)
+				# DRAW
+				else:
+					self.windowBlackboard.setPainterPen(QtGui.QPen(QtGui.QColor(colorString), value1, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+					self.windowBlackboard.setRubber(False)
+					self.windowBlackboard.setRubberSize(value2)
+			elif self.windowPaint.getTrackingMouse():
 				self.windowPaint.setPainterPen(QtGui.QPen(QtGui.QColor(colorString), value1, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
-				self.windowPaint.setRubber(False)
-				self.windowPaint.setRubberSize(value2)
 		# TEXTBOX
 		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
 			self.lastFocusAnnotation.setTextboxFontColor(colorString)
@@ -279,6 +296,10 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		elif(isinstance(self.lastFocusAnnotation, AnnotationDraws.AnnotationDraws)):
+			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
+			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
 		
 		
 		self.orderAnnotations()
@@ -296,12 +317,14 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setEnabled(False)
 			self.annotationsContainer.setEnabled(False)
 			self.windowPaint.setEnabled(False)
+			self.windowBlackboard.setEnabled(False)
 		elif(command == 1):
 			self.videoPlayer.pause()
 			self.annotationsList.setEnabled(True)
 			self.annotationsProperties.setEnabled(True)
 			self.annotationsContainer.setEnabled(True)
 			self.windowPaint.setEnabled(True)
+			self.windowBlackboard.setEnabled(True)
 		elif(command == 2):
 			self.videoPlayer.stop()
 			self.videoPlayerControlBar.enableButtons(False)
@@ -310,6 +333,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setEnabled(False)
 			self.annotationsContainer.setEnabled(False)
 			self.windowPaint.setEnabled(False)
+			self.windowBlackboard.setEnabled(False)
 		elif(command == 3):
 			self.videoPlayer.backward()
 		elif(command == 4):
@@ -330,32 +354,55 @@ class Ui_MainWindow(object):
 		# 3 -> breakpoint
 		# 4 -> blackboard
 		# 5 -> draws
-		if(command == 4) or (command == 5):
+		self.annotationsProperties.setPropertiesVisible(True)
+		if(command == 4):
 			self.lastFocusAnnotation = None
-			#isDraw: flag used to know if we are in blackboard mode or in drawing mode
-			isDraw = self.windowPaint.isDrawing(command)			
 			self.annotationsProperties.setProperties(
 				None, 
 				False, 
-				isDraw,
+				False,
+				self.windowBlackboard.getPainterPen().color().name(),
+				self.windowBlackboard.getPainterPen().width(),
+				self.windowBlackboard.getRubberSize(),
+				0,0
+			)
+			if self.windowBlackboard.getTrackingMouse():
+				self.annotationsList.changeDrawButtonText(False)
+				self.windowBlackboard.setTrackingMouse(False)
+				self.videoPlayer.setLayoutWidget(2)
+				self.windowBlackboard.setRubber(False)
+			else:
+				self.annotationsList.changeDrawButtonText(True)
+				self.windowBlackboard.setTrackingMouse(True)
+				self.windowPaint.setTrackingMouse(False)
+				self.videoPlayer.setLayoutWidget(3)
+		elif command == 5:
+			self.lastFocusAnnotation = None
+			#isDraw: flag used to know if we are in blackboard mode or in drawing mode
+			#isDraw = self.windowPaint.isDrawing(command)			
+			self.annotationsProperties.setProperties(
+				None, 
+				False, 
+				False,
 				self.windowPaint.getPainterPen().color().name(),
 				self.windowPaint.getPainterPen().width(),
-				self.windowPaint.getRubberSize(),
+				0,
 				0,0
 			)
 			if self.windowPaint.getTrackingMouse():
 				self.annotationsList.changeDrawButtonText(False)
 				self.windowPaint.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(2)
-				self.windowPaint.isDraw = isDraw
-				self.windowPaint.setRubber(False)
+				#self.windowPaint.isDraw = isDraw
 			else:
 				self.annotationsList.changeDrawButtonText(True)
 				self.windowPaint.setTrackingMouse(True)
+				self.windowBlackboard.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(1)
 		else:
 			self.annotationsList.changeDrawButtonText(False)
 			self.windowPaint.setTrackingMouse(False)
+			self.windowBlackboard.setTrackingMouse(False)
 			self.videoPlayer.setLayoutWidget(2)
 
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
@@ -366,11 +413,12 @@ class Ui_MainWindow(object):
 	### ACTIONS: AnnotationsTable
 	def showAnnotationSelected(self, annotationID):
 		# If user is drawing, stop WindowPaint from drawing
-		if self.windowPaint.getTrackingMouse():
+		if self.windowPaint.getTrackingMouse() or self.windowBlackboard.getTrackingMouse():
 			self.annotationsList.changeDrawButtonText(False)
 			self.windowPaint.setTrackingMouse(False)
+			self.windowBlackboard.setTrackingMouse(False)
 			self.videoPlayer.setLayoutWidget(2)
-			self.windowPaint.setRubber(False)
+			self.windowBlackboard.setRubber(False)
 		# Find annotation selected and show it
 		for item in self.listOfAnnotations:
 			if annotationID == str(item):
@@ -503,7 +551,7 @@ class Ui_MainWindow(object):
 
 
 	def clearWindowPaint(self):
-		self.windowPaint.clearWindowPaint()
+		self.windowBlackboard.clearWindowPaint()
 
 
 
@@ -517,11 +565,12 @@ class Ui_MainWindow(object):
 	def getFrameDimensions(self):
 		return (self.frameWidth, self.frameHeight)
 
-	def copyDraw(self):
-		self.annotationsContainer.createAnnotation(5, self.videoPlayer.getCurrentSecond())
+	def copyDraw(self, listOfDrawings):
+		self.annotationsContainer.createAnnotation(4, self.videoPlayer.getCurrentSecond())
 		self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber() )
 		#self.listOfAnnotations[-1].drawAnnotations(self.listOfDrawing)
-		self.listOfAnnotations[-1].drawAnnotations(self.listOfDraws)
+		self.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
 		# del self.listOfDrawing[-1]
+		self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
 		self.orderAnnotations()
 
