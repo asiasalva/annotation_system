@@ -1,9 +1,9 @@
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtGui import QImage, QPainter, QPen, QBrush, QColor
+from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QCursor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 
-from GUI import AnnotationDrawing
+from GUI import BlackBoard
 from GUI import AnnotationDraws
 
 
@@ -13,25 +13,29 @@ class WindowPaint(QWidget):
 
 		self.mw = MainWindow
 		self.isDraw = None
+		self.listOfImages = list()
 
+		# Image to draw on (like a transparent blackboard)
 		self.image = QImage(self.size(), QImage.Format_ARGB32)
 		self.image.fill(QtGui.qRgba(0,0,0,0));
+		self.listOfImages.append(self.image)
 
-		self.drawing = False
+		# Default pen
 		self.brushSize = 1
 		self.brushColor = Qt.red
 		self.lastPoint = QPoint()
-
 		self.painterPen = QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
 
+		# Default rubber
 		self.clear = False
 		self.rubberSize = 1
 
+		# Drawing checks
+		self.drawing = False
 		self.trackMouse = False
 
 
 	def mousePressEvent(self, event):
-		print('isDraw:', self.isDraw)
 		if self.trackMouse and event.button() == Qt.LeftButton:
 			self.drawing = True
 			self.lastPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
@@ -60,25 +64,24 @@ class WindowPaint(QWidget):
 					# dType = 0 -> LINE, 1 -> RUBBER
 					self.createAnnotation(0, self.painterPen, self.lastPoint, currentPoint, None, None)
 
-
 				self.lastPoint = currentPoint
 				self.update()
-				#print("drawing " + str(currentPoint))
 			else:
 				self.lastPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
-
 
 
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.LeftButton:
 			self.drawing = False
+			if self.isDraw:
+				self.mw.copyDraw()
+				self.clearWindowPaint()
 
+				
 
 	def paintEvent(self, event):
 		canvasPainter  = QPainter(self)
 		canvasPainter.drawImage(self.rect(), self.image, self.image.rect() )
-		if (isDraw):
-			AnnotationDraws.drawInContainer(self.rect(), self.image, self.image.rect() )
 
 
 	def setRubber(self, active):
@@ -94,9 +97,6 @@ class WindowPaint(QWidget):
 			QApplication.setOverrideCursor(cursor)
 		else:
 			QApplication.restoreOverrideCursor()
-
-
-
 
 
 	def setTrackingMouse(self, tracking):
@@ -119,10 +119,27 @@ class WindowPaint(QWidget):
 
 	
 	def createAnnotation(self, dType, pen, pStart, pEnd, rSize, rPoint):
-		self.mw.listOfDrawing.append(
-			AnnotationDrawing.AnnotationDrawing(dType, pen, pStart, pEnd, rSize, rPoint)
-		)
+		if self.isDraw:
+			self.mw.listOfDraws.append([dType, pen, pStart, pEnd, rSize, rPoint])
+		else:
+			self.mw.listOfDrawing.append(
+				BlackBoard.BlackBoard(dType, pen, pStart, pEnd, rSize, rPoint)
+			)
 
+	def clearWindowPaint(self):
+		print('listOfDraws size: ', len(self.mw.listOfDraws))
+		print('listOfDrawing size: ', len(self.mw.listOfDrawing))
+		print('isDraw: ', self.isDraw)
+		if self.isDraw:
+			print('sono nell if')
+			self.listOfImages[-1].fill(QtGui.qRgba(0,0,0,0))
+			self.mw.listOfDraws.clear()
+		else:
+			print('sono nell else')
+			self.image.fill(QtGui.qRgba(0,0,0,0))
+		self.update()
+
+	###!!! da modificare !!!
 	def drawAnnotations(self, listOfDrawings):
 		
 		painter = QPainter(self.image)
@@ -140,10 +157,6 @@ class WindowPaint(QWidget):
 			else:
 				painter.setPen(drawing.painterPen)
 				painter.drawLine(drawing.pointStart, drawing.pointEnd)
-
-
-	def clearWindowPaint(self):
-		self.image.fill(QtGui.qRgba(0,0,0,0));
 
 	def isDrawing(self, command):
 		if command == 5:

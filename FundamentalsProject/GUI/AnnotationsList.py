@@ -34,10 +34,10 @@ class AnnotationsList(QWidget):
 		self.btnBreakpoint.setEnabled(True)
 		self.btnBreakpoint.clicked.connect(lambda: self.sendCommand(3))
 
-		# Drawing button
-		self.btnDrawing = QPushButton("Drawing: OFF")
-		self.btnDrawing.setEnabled(True)
-		self.btnDrawing.clicked.connect(lambda: self.sendCommand(4))
+		# BlackBoard button
+		self.btnBoard = QPushButton("BlackBoard: OFF")
+		self.btnBoard.setEnabled(True)
+		self.btnBoard.clicked.connect(lambda: self.sendCommand(4))
 
 		# Drawing button
 		self.btnDraw = QPushButton("Draws: OFF")
@@ -49,7 +49,7 @@ class AnnotationsList(QWidget):
 		self.formLayout.addRow(self.btnArrow)
 		self.formLayout.addRow(self.btnTextbox)
 		self.formLayout.addRow(self.btnBreakpoint)
-		self.formLayout.addRow(self.btnDrawing)
+		self.formLayout.addRow(self.btnBoard)
 		self.formLayout.addRow(self.btnDraw)
 
 		self.frame.setLayout(self.formLayout)
@@ -65,8 +65,8 @@ class AnnotationsList(QWidget):
 
 	def changeDrawButtonText(self, drawing):
 		if drawing:
-			self.btnDrawing.setText("Drawing: ON")
+			self.btnBoard.setText("BlackBoard: ON")
 			self.btnDraw.setText("Drawing: ON")
 		else:
-			self.btnDrawing.setText("Drawing: OFF")
+			self.btnBoard.setText("BlackBoard: OFF")
 			self.btnDraw.setText("Drawing: OFF")

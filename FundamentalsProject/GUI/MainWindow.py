@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 import os
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDrawing, XMLSerializer, AnnotationBreak
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDraws, BlackBoard, XMLSerializer, AnnotationBreak
 
 class Ui_MainWindow(object):
 
@@ -13,7 +13,7 @@ class Ui_MainWindow(object):
 		# set central widget (i.e., main container),
 		# set vertical layout (i.e., main layout)
 		# N.B.: you need to put a layout (any kind of layout) in order to make content auto resizable
-		MainWindow.setObjectName("MainWindow")
+		MainWindow.setObjectName("Video Annotation Tool")
 		#MainWindow.resize(1280, 720)
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
@@ -239,7 +239,7 @@ class Ui_MainWindow(object):
 			)
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):		
-		# DRAWING
+		# BLACKBOARD
 		if self.lastFocusAnnotation is None:
 			# RUBBER
 			if colorString is None:
@@ -328,13 +328,12 @@ class Ui_MainWindow(object):
 		# 1 -> arrow
 		# 2 -> textbox
 		# 3 -> breakpoint
-		# 4 -> drawing
+		# 4 -> blackboard
 		# 5 -> draws
 		if(command == 4) or (command == 5):
 			self.lastFocusAnnotation = None
-			print('command: ', command)
-			isDraw = self.windowPaint.isDrawing(command)
-			
+			#isDraw: flag used to know if we are in blackboard mode or in drawing mode
+			isDraw = self.windowPaint.isDrawing(command)			
 			self.annotationsProperties.setProperties(
 				None, 
 				False, 
@@ -517,3 +516,12 @@ class Ui_MainWindow(object):
 
 	def getFrameDimensions(self):
 		return (self.frameWidth, self.frameHeight)
+
+	def copyDraw(self):
+		self.annotationsContainer.createAnnotation(5, self.videoPlayer.getCurrentSecond())
+		self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber() )
+		#self.listOfAnnotations[-1].drawAnnotations(self.listOfDrawing)
+		self.listOfAnnotations[-1].drawAnnotations(self.listOfDraws)
+		# del self.listOfDrawing[-1]
+		self.orderAnnotations()
+
