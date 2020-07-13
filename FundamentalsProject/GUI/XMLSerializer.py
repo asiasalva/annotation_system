@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, Qt
+from PyQt5.QtGui import QPen, QColor
 
 class XMLSerializer(object):
 	def __init__(self, MainWindow):
@@ -56,6 +57,21 @@ class XMLSerializer(object):
 
 				elif child.attrib["type"] == "QLabel":
 					self.mw.annotationsContainer.createAnnotation(4, frame_start)
+					#[pen, pStart, pEnd]
+					brush_color = child[0].text
+					brush_size = int(child[1].text)
+
+					listOfDrawings = list()
+
+					for line in child[2]:
+						pos_start = QPoint(int(line[0][0].text), int(line[0][1].text))
+						pos_end = QPoint(int(line[1][0].text), int(line[1][1].text))
+
+						listOfDrawings.append([QPen(QColor(brush_color), brush_size, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin), pos_start, pos_end])
+
+					self.mw.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
+
+
 
 				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
@@ -63,7 +79,7 @@ class XMLSerializer(object):
 				self.mw.listOfAnnotations[-1].setDimensions(width, height)
 
 				success = True
-		except:
+		except Exception as e:
 			success = False
 			projectName = None
 			videoPath = None
