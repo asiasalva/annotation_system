@@ -163,6 +163,7 @@ class Ui_MainWindow(object):
 		if(command == 0):					
 			self.listOfAnnotations = list()
 			self.listOfDrawing = list()
+			self.listOfDraws = list()
 			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
 			#--self.setDurationProperty()
@@ -196,6 +197,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				False, 
+				False,
 				self.lastFocusAnnotation.getTextboxFontColor(), 
 				self.lastFocusAnnotation.getTextboxFontSize(),
 				self.lastFocusAnnotation.getTextboxBackgroundOpacity(),
@@ -206,6 +208,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				self.lastFocusAnnotation.isArrow, 
+				False,
 				self.lastFocusAnnotation.svgColor, 
 				int(float(self.lastFocusAnnotation.svgExtraAttribute)*100), 
 				int(self.lastFocusAnnotation.svgTransform),
@@ -216,6 +219,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				self.lastFocusAnnotation.isArrow, 
+				False,
 				self.lastFocusAnnotation.svgColor, 
 				int(self.lastFocusAnnotation.svgExtraAttribute), 
 				int(self.lastFocusAnnotation.svgTransform),
@@ -227,6 +231,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.childWidget.__class__, 
 				None,
 				False, 
+				False,
 				0, 
 				0,
 				self.lastFocusAnnotation.getSecStart(),
@@ -324,11 +329,16 @@ class Ui_MainWindow(object):
 		# 2 -> textbox
 		# 3 -> breakpoint
 		# 4 -> drawing
-		if(command == 4):
+		# 5 -> draws
+		if(command == 4) or (command == 5):
 			self.lastFocusAnnotation = None
+			print('command: ', command)
+			isDraw = self.windowPaint.isDrawing(command)
+			
 			self.annotationsProperties.setProperties(
 				None, 
 				False, 
+				isDraw,
 				self.windowPaint.getPainterPen().color().name(),
 				self.windowPaint.getPainterPen().width(),
 				self.windowPaint.getRubberSize(),
@@ -338,6 +348,7 @@ class Ui_MainWindow(object):
 				self.annotationsList.changeDrawButtonText(False)
 				self.windowPaint.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(2)
+				self.windowPaint.isDraw = isDraw
 				self.windowPaint.setRubber(False)
 			else:
 				self.annotationsList.changeDrawButtonText(True)

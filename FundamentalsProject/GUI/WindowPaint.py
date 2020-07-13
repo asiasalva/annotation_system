@@ -4,15 +4,15 @@ from PyQt5.QtGui import QImage, QPainter, QPen, QBrush, QColor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 
 from GUI import AnnotationDrawing
+from GUI import AnnotationDraws
 
 
 class WindowPaint(QWidget):
+
 	def setupUi(self, MainWindow):
 
 		self.mw = MainWindow
-
-
-
+		self.isDraw = None
 
 		self.image = QImage(self.size(), QImage.Format_ARGB32)
 		self.image.fill(QtGui.qRgba(0,0,0,0));
@@ -30,78 +30,8 @@ class WindowPaint(QWidget):
 		self.trackMouse = False
 
 
-
-		
-
-
-		''' Per provare la GOMMA, togli il commento da questo pezzo
-		painter = QPainter(self.image)
-		painter.setPen(QPen(self.brushColor, self.brushSize, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-		painter.drawLine(0,0,50,100)
-
-		self.changeColour()
-		'''
-
-		#mainMenu = self.menuBar()
-		#fileMenu = mainMenu.addMenu("File")
-		#brushSize = mainMenu.addMenu("Brush Size")
-		#brushColor = mainMenu.addMenu("Brush Color")
-
-		#saveAction = QAction(QIcon("icons/save.png"), "Save",self)
-		#saveAction.setShortcut("Ctrl+S")
-		#fileMenu.addAction(saveAction)
-		#saveAction.triggered.connect(self.save)
-
-		#clearAction = QAction(QIcon("icons/clear.png"), "Clear", self)
-		#clearAction.setShortcut("Ctrl+C")
-		#fileMenu.addAction(clearAction)
-		#clearAction.triggered.connect(self.clear)
-
-		#threepxAction = QAction( QIcon("icons/threepx.png"), "3px", self)
-		#brushSize.addAction(threepxAction)
-		#threepxAction.triggered.connect(self.threePixel)
-
-		#fivepxAction = QAction(QIcon("icons/fivepx.png"), "5px", self)
-		#brushSize.addAction(fivepxAction)
-		#fivepxAction.triggered.connect(self.fivePixel)
-
-		#sevenpxAction = QAction(QIcon("icons/sevenpx.png"),"7px", self)
-		#brushSize.addAction(sevenpxAction)
-		#sevenpxAction.triggered.connect(self.sevenPixel)
-
-		#ninepxAction = QAction(QIcon("icons/ninepx.png"), "9px", self)
-		#brushSize.addAction(ninepxAction)
-		#ninepxAction.triggered.connect(self.ninePixel)
-
-		#blackAction = QAction(QIcon("icons/black.png"), "Black", self)
-		#blackAction.setShortcut("Ctrl+B")
-		#brushColor.addAction(blackAction)
-		#blackAction.triggered.connect(self.blackColor)
-
-
-		#whitekAction = QAction(QIcon("icons/white.png"), "White", self)
-		#whitekAction.setShortcut("Ctrl+W")
-		#brushColor.addAction(whitekAction)
-		#whitekAction.triggered.connect(self.whiteColor)
-
-
-		#redAction = QAction(QIcon("icons/red.png"), "Red", self)
-		#redAction.setShortcut("Ctrl+R")
-		#brushColor.addAction(redAction)
-		#redAction.triggered.connect(self.redColor)
-
-		#greenAction = QAction(QIcon("icons/green.png"), "Green", self)
-		#greenAction.setShortcut("Ctrl+G")
-		#brushColor.addAction(greenAction)
-		#greenAction.triggered.connect(self.greenColor)
-
-		#yellowAction = QAction(QIcon("icons/yellow.png"), "Yellow", self)
-		#yellowAction.setShortcut("Ctrl+Y")
-		#brushColor.addAction(yellowAction)
-		#yellowAction.triggered.connect(self.yellowColor)
-
-
 	def mousePressEvent(self, event):
+		print('isDraw:', self.isDraw)
 		if self.trackMouse and event.button() == Qt.LeftButton:
 			self.drawing = True
 			self.lastPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
@@ -147,6 +77,8 @@ class WindowPaint(QWidget):
 	def paintEvent(self, event):
 		canvasPainter  = QPainter(self)
 		canvasPainter.drawImage(self.rect(), self.image, self.image.rect() )
+		if (isDraw):
+			AnnotationDraws.drawInContainer(self.rect(), self.image, self.image.rect() )
 
 
 	def setRubber(self, active):
@@ -213,7 +145,13 @@ class WindowPaint(QWidget):
 	def clearWindowPaint(self):
 		self.image.fill(QtGui.qRgba(0,0,0,0));
 
-
+	def isDrawing(self, command):
+		if command == 5:
+			self.isDraw = True
+			return True
+		else:
+			self.isDraw = False
+			return False
 
 
 
