@@ -306,13 +306,19 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.setEnabled(False)
 			self.windowPaint.setEnabled(False)
 		elif(command == 3):
+			# 10 seconds backward
 			self.videoPlayer.backward()
+			# 10 frames backward
+			#self.videoPlayer.backwardFrames()
 		elif(command == 4):
 			self.videoPlayer.decreaseSpeed()
 		elif(command == 5):
 			self.videoPlayer.increaseSpeed()
 		elif(command == 6):
+			# 10 seconds forward
 			self.videoPlayer.forward()
+			# 10 frames forward
+			#self.videoPlayer.forwardFrames()
 		elif(command == 7):
 			self.videoPlayer.nextBreakpoint()
 
@@ -370,11 +376,20 @@ class Ui_MainWindow(object):
 				item.setFocus()
 				self.videoPlayer.goToPosition(item.getSecStart())
 				self.setLastFocusAnnotation(item)
+				break
 
 	def removeAnnotation(self, annotationToRemove):
 		self.annotationsTable.removeRow(annotationToRemove)
 		self.listOfAnnotations.remove(annotationToRemove)
 		self.annotationsProperties.setPropertiesVisible(False)
+
+	def removeAnnotationFromTable(self, annotationID):
+		# Find annotation selected and remove it
+		for item in self.listOfAnnotations:
+			if annotationID == str(item):
+				item.deleteLater()
+				self.removeAnnotation(item)
+				break
 
 
 	### MENU FUNCTIONS

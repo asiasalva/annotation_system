@@ -1,7 +1,7 @@
 import cv2
 import time, ffmpeg
 
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout, QMessageBox
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
@@ -102,6 +102,19 @@ class VideoPlayerOpenCV(QWidget):
 		if(not self.timer.isActive()):
 			self.nextFrameSlot()
 
+	def backwardFrames(self):
+		# Get videoCapture position (in frames)
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES)
+		# Move 10 frames backward (if pos < 10 frames set pos to frame 0)
+		if(videoPos < 10):
+			videoPos = 0
+		else:
+			videoPos -= 10
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_FRAMES, videoPos)
+		if(not self.timer.isActive()):
+			self.nextFrameSlot()
+
 	def decreaseSpeed(self):
 		if(self.speed < 4.0):
 			self.speed *= 2.0
@@ -120,6 +133,17 @@ class VideoPlayerOpenCV(QWidget):
 			videoPos += 10000
 		# Set videoCapture position
 		self.videoCapture.set(cv2.CAP_PROP_POS_MSEC, videoPos)
+		if(not self.timer.isActive()):
+			self.nextFrameSlot()
+
+	def forwardFrames(self):
+		# Get videoCapture position (in frames)
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES)
+		# Move 10 frames forward (if pos+10f > video nFrames do nothing)
+		if(videoPos < (self.videoCapture_nFrame - 10)):
+			videoPos += 10
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_FRAMES, videoPos)
 		if(not self.timer.isActive()):
 			self.nextFrameSlot()
 
@@ -213,8 +237,15 @@ class VideoPlayerOpenCV(QWidget):
 			self.mw.setFrameDimensions(self.videoCapture_frameWidth, self.videoCapture_frameHeight)
 
 			success = True
-		except:
+		except Exception as e:
 			success = False
+			#msg = QMessageBox()
+			#msg.setIcon(QMessageBox.Critical)
+			#msg.setText(str(e.__class__))
+			#msg.setDetailedText(str(e))
+			#msg.setWindowTitle("VideoPlayerOpenCV ERROR")
+			#msg.setStandardButtons(QMessageBox.Ok)
+			#msg.exec_()
 
 		return success
 
@@ -228,17 +259,27 @@ class VideoPlayerOpenCV(QWidget):
 		meta_dict = ffmpeg.probe(path_video_file)
 		rotateCode = None
 
-		if 'rotate' in meta_dict['streams'][0]['tags']:
+		try:
+			if 'rotate' in meta_dict['streams'][0]['tags']:
 		
-			# From the dictionary, meta_dict['streams'][0]['tags']['rotate'] is the key
-			#	we are looking for
+				# From the dictionary, meta_dict['streams'][0]['tags']['rotate'] is the key
+				#	we are looking for
 			
-			if int(meta_dict['streams'][0]['tags']['rotate']) == 90:
-				rotateCode = cv2.ROTATE_90_CLOCKWISE
-			elif int(meta_dict['streams'][0]['tags']['rotate']) == 180:
-				rotateCode = cv2.ROTATE_180
-			elif int(meta_dict['streams'][0]['tags']['rotate']) == 270:
-				rotateCode = cv2.ROTATE_90_COUNTERCLOCKWISE
+				if int(meta_dict['streams'][0]['tags']['rotate']) == 90:
+					rotateCode = cv2.ROTATE_90_CLOCKWISE
+				elif int(meta_dict['streams'][0]['tags']['rotate']) == 180:
+					rotateCode = cv2.ROTATE_180
+				elif int(meta_dict['streams'][0]['tags']['rotate']) == 270:
+					rotateCode = cv2.ROTATE_90_COUNTERCLOCKWISE
+		except Exception as e:
+			rotateCode = None
+			#msg = QMessageBox()
+			#msg.setIcon(QMessageBox.Critical)
+			#msg.setText(str(e.__class__))
+			#msg.setDetailedText(str(e))
+			#msg.setWindowTitle("VideoPlayerOpenCV ERROR")
+			#msg.setStandardButtons(QMessageBox.Ok)
+			#msg.exec_()
 
 		return rotateCode
 

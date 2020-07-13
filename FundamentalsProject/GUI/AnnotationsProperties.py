@@ -27,7 +27,7 @@ class SpinBoxTime(QSpinBox):
 
 	def parseString(self, text):
 		try:
-			time.strptime(str(text), '%H:%M:%S')
+			datetime.datetime.strptime(str(text), '%H:%M:%S')
 			return True
 		except ValueError:
 			return False
@@ -180,7 +180,7 @@ class AnnotationsProperties(QWidget):
 						self.lblColor.setText("Line color:")
 						self.lblValue1.setText("Line width:")
 						self.lblValue2.setText("Line rotation:")
-						self.spinboxValue1.setRange(1, 25)
+						self.spinboxValue1.setRange(1, 100)
 						self.spinboxValue2.setRange(0, 360)
 						self.comboboxColor.setCurrentIndex(self.comboboxColor.findData(colorString))
 		
@@ -231,7 +231,10 @@ class AnnotationsProperties(QWidget):
 	def insertRubber(self, combobox, index):
 		dirname = os.path.dirname(__file__)
 		fileName = os.path.join(dirname, 'rubber.svg')
-		combobox.insertItem(index, QIcon(QPixmap(fileName).scaled(12,12)), "Rubber", None)
+		if os.path.exists(fileName):
+			combobox.insertItem(index, QIcon(QPixmap(fileName).scaled(12,12)), "Rubber", None)
+		else:
+			combobox.insertItem(index, "Rubber", None)
 
 	def removeRubber(self, combobox, index):
 		combobox.removeItem(index)
