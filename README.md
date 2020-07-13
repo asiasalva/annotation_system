@@ -1,14 +1,14 @@
 # Video Annotation System
 
 This repository is aimed to contain the project for the course "Fundamentals of Image and Video Processing" held in University of Trento for the Computer Science Master Degree. 
-The developer team is composed of two students: Federico Brugiolo and Asia Salvaterra.
-
+The developer team is composed of two students, Federico Brugiolo and Asia Salvaterra.
 
 # Environment
 
 The project was created using Visual Studio and Python.
 
 ## Project Libraries
+The following libraries are needed in order to make the project work:
 
 - PyQt5 (https://pypi.org/project/PyQt5/)
 - OpenCV (https://pypi.org/project/opencv-python/)
@@ -17,7 +17,7 @@ The project was created using Visual Studio and Python.
 
 # Usage
 
-The GUI we created is a video editor that can take in input a video in order to start a new project or an existing project composed by a video and an annotation XML file. 
+The GUI we created is a video editor that can take in input a video in order to start a new project or an existing project composed by a video and an annotations XML file. 
 
 ## Using the GUI
 
@@ -29,8 +29,8 @@ In the video side there is the box in which the video will be played and then al
 - Stop: stop the video;
 - Go ahead: jump ahead by 10 seconds;
 - Go back: go back for 10 seconds;
-- Move forward of one frame
-- Move backword for one frame
+- Slow down
+- Speed up
 - Go to next breakpoint: move between different breakpoints
 
 
@@ -41,3 +41,10 @@ In the video side there is the box in which the video will be played and then al
 - Arrow: same as the line but it is an arrow.
 - BreakPoint: when a breakoint is encountered, the video pauses. Also, the user can add breakpoints to play the video and instantly go to that position.
 - Drawing: user can use the video player as a sort of blackboard on which he can draw something, changing brush color and size, eliminate drawings with the rubber and so on.
+
+## Extra
+Some structures were used in order to create some functionalities and understand how pyqt5 library work:
+- TContainer used to insert annotations, move and resize them: https://github.com/korabelnikov/moveable-and-resize-qt-widget-on-python
+- For the creation of the drawings on screen: https://stackoverflow.com/questions/62023019/how-to-draw-line-with-brush-on-image-with-pyqt5
+- For the rubber: https://stackoverflow.com/questions/53515295/erasing-pen-on-a-canvas
+- To make the color picker for the interface: http://www.blackbeltcoder.com/Articles/controls/creating-a-color-picker-with-an-owner-draw-combobox
