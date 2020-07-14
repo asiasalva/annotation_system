@@ -82,9 +82,8 @@ class XMLSerializer(object):
 
 				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
-				if child.attrib["type"] != "QLabel":
-					self.mw.listOfAnnotations[-1].setPosition(position)
-					self.mw.listOfAnnotations[-1].setDimensions(width, height)
+				self.mw.listOfAnnotations[-1].setPosition(position)
+				self.mw.listOfAnnotations[-1].setDimensions(width, height)
 
 				success = True
 		except Exception as e:
