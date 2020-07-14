@@ -309,7 +309,7 @@ class Ui_MainWindow(object):
 			self.videoPlayerControlBar.enableButtons(True)
 			self.annotationsList.setEnabled(False)
 			self.annotationsProperties.setEnabled(False)
-			self.annotationsContainer.setEnabled(False)
+			self.annotationsContainer.setEnabled(True)
 			self.windowPaint.setEnabled(False)
 			self.windowBlackboard.setEnabled(False)
 		elif(command == 1):
@@ -374,6 +374,7 @@ class Ui_MainWindow(object):
 				self.windowBlackboard.setRubber(False)
 			else:
 				self.annotationsList.changeBlackBoardButtonText(True)
+				self.annotationsList.changeDrawButtonText(True)
 				self.windowBlackboard.setTrackingMouse(True)
 				self.windowPaint.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(3)
@@ -396,6 +397,7 @@ class Ui_MainWindow(object):
 				self.videoPlayer.setLayoutWidget(2)
 			else:
 				self.annotationsList.changeDrawButtonText(True)
+				self.annotationsList.changeBlackBoardButtonText(True)
 				self.windowPaint.setTrackingMouse(True)
 				self.windowBlackboard.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(1)
