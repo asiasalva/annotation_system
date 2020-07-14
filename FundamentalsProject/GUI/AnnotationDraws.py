@@ -381,18 +381,62 @@ class AnnotationDraws(QWidget):
 
 
 
+	def getDrawingContainerDimensionsAndPoint(self, listOfDrawings):
+		# Find proper container dimensions and start point
+		x_min = 2*self.parentWidth
+		y_min = 2*self.parentHeight
+		x_max = -1
+		y_max = -1
+
+		for item in listOfDrawings:		#[pen, pStart, pEnd]
+			pStart = item[1]
+			pEnd = item[2]
+
+			x_min = min(x_min, pStart.x(), pEnd.x())
+			y_min = min(y_min, pStart.y(), pEnd.y())
+			x_max = max(x_max, pStart.x(), pEnd.x())
+			y_max = max(y_max, pStart.y(), pEnd.y())
+
+		print(QPoint(x_min, y_min))
+		print(QPoint(x_max, y_max))
+
+		width = x_max - x_min + 10
+		height = y_max - y_min + 10
+
+		return QPoint(x_min, y_min), width, height, QPoint(x_max, y_max)
+
+
+
+
 
 	def drawAnnotations(self, listOfDrawings):
-		
-		### self.mw.listOfDrawing.append([pen, pStart, pEnd])
 
-		## find dimensions for child widget
-		#self.childWidget = QImage(self.size(), QImage.Format_ARGB32)
-		#self.childWidget(QtGui.qRgba(0,0,0,0));
-		self.childWidget.setStyleSheet("border: 5px solid black;")
+		p, w, h, pMax = self.getDrawingContainerDimensionsAndPoint(listOfDrawings)
+
+		fakeX = round((self.parentWidth * p.x()) / self.childWidget.width())
+		fakeY = round((self.parentHeight * p.y()) / self.childWidget.height())
+		fakeW = round((self.parentWidth * w) / self.childWidget.width())
+		fakeH = round((self.parentHeight * h) / self.childWidget.height())
+
+		#conversione punto disegno in punto annotazione (parent)
+
+
+		#self.setPosition(QPoint(fakeX, fakeY))
+		#self.setDimensions(fakeW, fakeH)
+		self.annotationWidth = fakeW
+		self.annotationheight = fakeH
+		self.resize(fakeW, fakeH)
+		self.annotationPosition = QPoint(fakeX, fakeY)
+		self.move(fakeX, fakeY)
+
+
+		self.childWidget.setStyleSheet("border: 1px solid black;")
 		self.childWidget.setScaledContents(True)
 		x = self.childWidget.size()
-		img = QImage(x, QImage.Format_ARGB32)
+		self.childWidget.resize(fakeW, fakeH)
+		z = self.childWidget.size()
+		y = self.size()
+		img = QImage(self.childWidget.size(), QImage.Format_ARGB32)
 		img.fill(QtGui.qRgba(0,0,0,0))
 		
 
@@ -400,11 +444,103 @@ class AnnotationDraws(QWidget):
 		
 		for drawing in listOfDrawings:
 			painter.setPen(drawing[0])
-			painter.drawLine(drawing[1], drawing[2])
+
+			'''
+			pStart = QPoint(
+				round((self.parentWidth * drawing[1].x()) / self.childWidget.width()),
+				round((self.parentHeight * drawing[1].y()) / self.childWidget.height())
+			)
+			pEnd = QPoint(
+				round((self.parentWidth * drawing[2].x()) / self.childWidget.width()),
+				round((self.parentHeight * drawing[2].y()) / self.childWidget.height())
+			)
+			'''
+			'''
+			pStart = QPoint(
+				round((self.childWidget.width() * drawing[1].x()) / self.parentWidth),
+				round((self.childWidget.height() * drawing[1].y()) / self.parentHeight)
+			)
+			pEnd = QPoint(
+				round((self.childWidget.width() * drawing[2].x()) / self.parentWidth),
+				round((self.childWidget.height() * drawing[2].y()) / self.parentHeight)
+			)
+			'''
+			'''
+			pStart = QPoint(
+				round((self.childWidget.width() * drawing[1].x()) / self.width()),
+				round((self.childWidget.height() * drawing[1].y()) / self.height())
+			)
+			pEnd = QPoint(
+				round((self.childWidget.width() * drawing[2].x()) / self.width()),
+				round((self.childWidget.height() * drawing[2].y()) / self.height())
+			)
+			'''
+			'''
+			pStart = QPoint(
+				round((self.width() * drawing[1].x()) / x.width()),
+				round((self.height() * drawing[1].y()) / x.height())
+			)
+			pEnd = QPoint(
+				round((self.width() * drawing[2].x()) / x.width()),
+				round((self.height() * drawing[2].y()) / x.height())
+			)
+			'''
+			'''
+			pStart = QPoint(
+				round((self.width() * drawing[1].x()) / x.width()),
+				round((self.height() * drawing[1].y()) / x.height())
+			)
+			pEnd = QPoint(
+				round((self.width() * drawing[2].x()) / x.width()),
+				round((self.height() * drawing[2].y()) / x.height())
+			)
+			'''
+			'''
+			pStart = QPoint(
+				round((self.width() * (drawing[1].x()-p.x())) / (x.width()-p.x())),
+				round((self.height() * (drawing[1].y()-p.y())) / (x.height()-p.y()))
+			)
+			pEnd = QPoint(
+				round((self.width() * (drawing[2].x()-p.x())) / (x.width()-p.x())),
+				round((self.height() * (drawing[2].y()-p.y())) / (x.height()-p.y()))
+			)
+			'''
+			'''
+			pStart = QPoint(
+				drawing[1].x()-p.x(),
+				drawing[1].y()-p.y()
+			)
+			pEnd = QPoint(
+				drawing[2].x()-p.x(),
+				drawing[2].y()-p.y()
+			)
+			'''
+			'''
+			pStart = QPoint(
+				abs(round((self.width() * drawing[1].x()) / x.width()) -self.width()),
+				abs(round((self.height() * drawing[1].y()) / x.height()) -self.height())
+			)
+			pEnd = QPoint(
+				abs(round((self.width() * drawing[2].x()) / x.width()) -self.width()),
+				abs(round((self.height() * drawing[2].y()) / x.height()) -self.height())
+			)
+			'''
+			pStart = QPoint(
+				round((x.width()-p.x()) * (drawing[1].x()-p.x()) / (self.width()+10)),
+				round((x.height()-p.y()) * (drawing[1].y()-p.y()) / (self.height()+10))
+			)
+			pEnd = QPoint(
+				round((x.width()-p.x()) * (drawing[2].x()-p.x()) / (self.width()+10)),
+				round((x.height()-p.y()) * (drawing[2].y()-p.y()) / (self.height()+10))
+			)
+			print(pStart)
+			print(pEnd)
+			#painter.drawLine(drawing[1], drawing[2])
+			painter.drawLine(pStart, pEnd)
 
 			self.listOfDrawings.append(drawing)
 
-		
+		#img.save(r"C:\Users\Brugix\Desktop\1.png")
 		pix = QPixmap.fromImage(img)
 		self.childWidget.setPixmap(pix)
 		painter.end()
