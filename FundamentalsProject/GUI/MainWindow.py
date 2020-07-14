@@ -381,6 +381,7 @@ class Ui_MainWindow(object):
 	def removeAnnotation(self, annotationToRemove):
 		self.annotationsTable.removeRow(annotationToRemove)
 		self.listOfAnnotations.remove(annotationToRemove)
+		self.listOfBreaks.remove(annotationToRemove)
 		self.annotationsProperties.setPropertiesVisible(False)
 
 	def removeAnnotationFromTable(self, annotationID):
