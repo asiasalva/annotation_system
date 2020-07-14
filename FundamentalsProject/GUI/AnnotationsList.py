@@ -65,8 +65,12 @@ class AnnotationsList(QWidget):
 
 	def changeDrawButtonText(self, drawing):
 		if drawing:
-			self.btnBoard.setText("BlackBoard: ON")
 			self.btnDraw.setText("Drawing: ON")
 		else:
-			self.btnBoard.setText("BlackBoard: OFF")
 			self.btnDraw.setText("Drawing: OFF")
+	
+	def changeBlackBoardButtonText(self, blackboard):
+		if blackboard:
+			self.btnBoard.setText("BlackBoard: ON")
+		else:
+			self.btnBoard.setText("BlackBoard: OFF")

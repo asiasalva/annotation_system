@@ -61,22 +61,30 @@ class XMLSerializer(object):
 					brush_color = child[0].text
 					brush_size = int(child[1].text)
 
+
+					needed_parent_dimensions = child[2]
+					self.mw.listOfAnnotations[-1].setNeededParentDimensions(int(needed_parent_dimensions[0].text), int(needed_parent_dimensions[1].text))
+
+
 					listOfDrawings = list()
 
-					for line in child[2]:
+					for line in child[3]:
 						pos_start = QPoint(int(line[0][0].text), int(line[0][1].text))
 						pos_end = QPoint(int(line[1][0].text), int(line[1][1].text))
 
 						listOfDrawings.append([QPen(QColor(brush_color), brush_size, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin), pos_start, pos_end])
 
+					self.mw.listOfAnnotations[-1].drawingFromXML = True
 					self.mw.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
+					self.mw.listOfAnnotations[-1].drawingFromXML = False
 
 
 
 				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
-				self.mw.listOfAnnotations[-1].setPosition(position)
-				self.mw.listOfAnnotations[-1].setDimensions(width, height)
+				if child.attrib["type"] != "QLabel":
+					self.mw.listOfAnnotations[-1].setPosition(position)
+					self.mw.listOfAnnotations[-1].setDimensions(width, height)
 
 				success = True
 		except Exception as e:
@@ -86,53 +94,6 @@ class XMLSerializer(object):
 
 		return success, projectName, videoPath
 
-	'''
-	XML STRUCTURE
-
-	<project name="name_project" da
-	te="date_modified">
-		<video>
-			<path>path</path>
-			<width>n°</width>
-			<height>n°</height>
-		</video>
-		<list_annotations>
-			<annotation>
-				<frame_start>n°</frame_start>
-				<frame_end>n°</frame_end>
-				<second_start>n°</second_start>
-				<second_end>n°</second_end>
-				<position>
-					<x>n°</x>
-					<y>n°</y>
-				</position>
-				<dimensions>
-					<width>n°</width>
-					<height>n°</height>
-				</dimensions>
-
-				<child type="annotation_type">
-					IF TYPE=QPLAINTEXTEDIT
-					<text>textbox_text</text>
-					<background_opacity>n°</background_opacity>
-					<font_color>#000000</font_color>
-					<font_size>n°</font_size>
-
-					IF TYPE=QSVGWIDGET
-					<is_arrow>bool</is_arrow>
-					<color>#000000</color>
-					<extra>n°</extra>
-					<transform>n°</transform>
-
-					IF TYPE=BREAKPOINT
-					EMPTY
-				</child>
-
-			</annotation>
-		</list_annotations>
-	</project>
-
-	'''
 
 	def writeXML(self, projectPath, projectName, videoPath, videoWidth, videoHeight, listOfAnnotations):
 		root = ET.Element("project")
@@ -210,6 +171,12 @@ class XMLSerializer(object):
 				brush_size = ET.SubElement(child, "brush_size")
 				brush_size.text = str(item.listOfDrawings[0][0].width())
 
+				needed_parent_dimensions = ET.SubElement(child, "needed_parent_dimensions")
+				width = ET.SubElement(needed_parent_dimensions, "width")
+				width.text = str(item.getNeededParentDimensions().width())
+				height = ET.SubElement(needed_parent_dimensions, "height")
+				height.text = str(item.getNeededParentDimensions().height())
+
 				list_drawings = ET.SubElement(child, "list_drawings")
 
 				for drawing in item.listOfDrawings:	#[pen, pStart, pEnd]
@@ -239,5 +206,51 @@ class XMLSerializer(object):
 		#reparsed = minidom.parseString(s)
 		#print(reparsed.toprettyxml(indent="  "))
 
+		
+	'''
+	XML STRUCTURE
 
-	
+	<project name="name_project" da
+	te="date_modified">
+		<video>
+			<path>path</path>
+			<width>n°</width>
+			<height>n°</height>
+		</video>
+		<list_annotations>
+			<annotation>
+				<frame_start>n°</frame_start>
+				<frame_end>n°</frame_end>
+				<second_start>n°</second_start>
+				<second_end>n°</second_end>
+				<position>
+					<x>n°</x>
+					<y>n°</y>
+				</position>
+				<dimensions>
+					<width>n°</width>
+					<height>n°</height>
+				</dimensions>
+
+				<child type="annotation_type">
+					IF TYPE=QPLAINTEXTEDIT
+					<text>textbox_text</text>
+					<background_opacity>n°</background_opacity>
+					<font_color>#000000</font_color>
+					<font_size>n°</font_size>
+
+					IF TYPE=QSVGWIDGET
+					<is_arrow>bool</is_arrow>
+					<color>#000000</color>
+					<extra>n°</extra>
+					<transform>n°</transform>
+
+					IF TYPE=BREAKPOINT
+					EMPTY
+				</child>
+
+			</annotation>
+		</list_annotations>
+	</project>
+
+	'''

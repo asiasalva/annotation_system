@@ -1,16 +1,14 @@
 import cv2
-import os, time, ffmpeg
+import time, ffmpeg
 
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout
-from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
-from PyQt5.QtCore import Qt, QUrl, QTimer
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel, QStackedLayout, QMessageBox
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
 class VideoPlayerOpenCV(QWidget):
-	
-	### Video player ###
 
 	def setupUi(self, MainWindow):
+
 		self.mw = MainWindow
 		self.videoPath = ""
 
@@ -39,7 +37,6 @@ class VideoPlayerOpenCV(QWidget):
 		self.stackedLayout.addWidget(self.videoFrame)
 		self.stackedLayout.addWidget(self.mw.windowPaint)
 		self.stackedLayout.addWidget(self.mw.annotationsContainer)
-		self.stackedLayout.addWidget(self.mw.windowBlackboard)
 		self.stackedLayout.setStackingMode(QStackedLayout.StackAll)
 
 		### Widget container
@@ -50,6 +47,10 @@ class VideoPlayerOpenCV(QWidget):
 	def setLayoutWidget(self, index):
 		self.stackedLayout.setCurrentIndex(index)
 
+
+	### Functions of VideoPlayer
+
+	# Load next frame
 	def nextFrameSlot(self):
 		ret, frame = self.videoCapture.read()
 		if(ret == True):
@@ -60,15 +61,19 @@ class VideoPlayerOpenCV(QWidget):
 			if self.rotateCode is not None:
 				frame = self.correctVideoRotation(frame, self.rotateCode)
 
+			# Show frame in videoFrame
 			img = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
 			pix = QPixmap.fromImage(img)
 			self.videoFrame.setPixmap(pix)
+
+			# Change slider position
 			self.positionChanged(self.videoCapture.get(cv2.CAP_PROP_POS_MSEC) / 1000)
+
+			# Show annotations
 			self.mw.setupAnnotations(2, "", self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES))
 		else:
 			self.pause()
 
-	### Functions of VideoPlayer
 
 	def play(self):
 		if(not self.timer.isActive()):
@@ -97,6 +102,19 @@ class VideoPlayerOpenCV(QWidget):
 		if(not self.timer.isActive()):
 			self.nextFrameSlot()
 
+	def backwardFrames(self):
+		# Get videoCapture position (in frames)
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES)
+		# Move 10 frames backward (if pos < 10 frames set pos to frame 0)
+		if(videoPos < 10):
+			videoPos = 0
+		else:
+			videoPos -= 10
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_FRAMES, videoPos)
+		if(not self.timer.isActive()):
+			self.nextFrameSlot()
+
 	def decreaseSpeed(self):
 		if(self.speed < 4.0):
 			self.speed *= 2.0
@@ -118,13 +136,24 @@ class VideoPlayerOpenCV(QWidget):
 		if(not self.timer.isActive()):
 			self.nextFrameSlot()
 
+	def forwardFrames(self):
+		# Get videoCapture position (in frames)
+		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES)
+		# Move 10 frames forward (if pos+10f > video nFrames do nothing)
+		if(videoPos < (self.videoCapture_nFrame - 10)):
+			videoPos += 10
+		# Set videoCapture position
+		self.videoCapture.set(cv2.CAP_PROP_POS_FRAMES, videoPos)
+		if(not self.timer.isActive()):
+			self.nextFrameSlot()
+
 	def nextBreakpoint(self):
 		videoPos = self.videoCapture.get(cv2.CAP_PROP_POS_FRAMES)
 		breakpointFound = False
 		# Scan breakpoints annotations
 		for i in range(len(self.mw.listOfBreaks)):
 			tmp =  (self.mw.listOfBreaks[i]).getFrameRange()[0]
-			if videoPos < tmp :
+			if videoPos < tmp:
 				videoPos = tmp
 				breakpointFound = True
 				break
@@ -138,6 +167,7 @@ class VideoPlayerOpenCV(QWidget):
 			self.videoCapture.set(cv2.CAP_PROP_POS_FRAMES, videoPos-1)
 			self.pause()
 			self.nextFrameSlot()
+
 
 	def getDuration(self):
 		return self.duration
@@ -169,12 +199,12 @@ class VideoPlayerOpenCV(QWidget):
 
 	def setupVariables(self, videoPath):
 
+		# True at the end if all went well
 		success = False
 
 		try:
-			### Video path, directory, and name
+			### Video path
 			self.videoPath =  videoPath
-			#self.onBreakpoint = False
 
 			### OpenCV video capture
 			# Select file to capture
@@ -203,35 +233,55 @@ class VideoPlayerOpenCV(QWidget):
 			### Check if video requires rotation
 			self.rotateCode = self.checkVideoRotation(self.videoPath)
 
+			### Save video dimensions (for annotation resizing)
 			self.mw.setFrameDimensions(self.videoCapture_frameWidth, self.videoCapture_frameHeight)
 
 			success = True
-		except:
+		except Exception as e:
 			success = False
+			#msg = QMessageBox()
+			#msg.setIcon(QMessageBox.Critical)
+			#msg.setText(str(e.__class__))
+			#msg.setDetailedText(str(e))
+			#msg.setWindowTitle("VideoPlayerOpenCV ERROR")
+			#msg.setStandardButtons(QMessageBox.Ok)
+			#msg.exec_()
 
 		return success
 
+
 	def getvideoPath(self):
 		return self.videoPath
+
 
 	def checkVideoRotation(self, path_video_file):
 		# This returns meta-data of the video file in form of a dictionary
 		meta_dict = ffmpeg.probe(path_video_file)
 		rotateCode = None
 
-		if 'rotate' in meta_dict['streams'][0]['tags']:
+		try:
+			if 'rotate' in meta_dict['streams'][0]['tags']:
 		
-			# From the dictionary, meta_dict['streams'][0]['tags']['rotate'] is the key
-			#	we are looking for
+				# From the dictionary, meta_dict['streams'][0]['tags']['rotate'] is the key
+				#	we are looking for
 			
-			if int(meta_dict['streams'][0]['tags']['rotate']) == 90:
-				rotateCode = cv2.ROTATE_90_CLOCKWISE
-			elif int(meta_dict['streams'][0]['tags']['rotate']) == 180:
-				rotateCode = cv2.ROTATE_180
-			elif int(meta_dict['streams'][0]['tags']['rotate']) == 270:
-				rotateCode = cv2.ROTATE_90_COUNTERCLOCKWISE
+				if int(meta_dict['streams'][0]['tags']['rotate']) == 90:
+					rotateCode = cv2.ROTATE_90_CLOCKWISE
+				elif int(meta_dict['streams'][0]['tags']['rotate']) == 180:
+					rotateCode = cv2.ROTATE_180
+				elif int(meta_dict['streams'][0]['tags']['rotate']) == 270:
+					rotateCode = cv2.ROTATE_90_COUNTERCLOCKWISE
+		except Exception as e:
+			rotateCode = None
+			#msg = QMessageBox()
+			#msg.setIcon(QMessageBox.Critical)
+			#msg.setText(str(e.__class__))
+			#msg.setDetailedText(str(e))
+			#msg.setWindowTitle("VideoPlayerOpenCV ERROR")
+			#msg.setStandardButtons(QMessageBox.Ok)
+			#msg.exec_()
 
 		return rotateCode
 
 	def correctVideoRotation(self, frame, rotateCode):  
-		return cv2.rotate(frame, rotateCode) 
+		return cv2.rotate(frame, rotateCode)

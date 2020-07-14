@@ -92,15 +92,11 @@ class WindowPaint(QWidget):
 		#	)
 
 	def clearWindowPaint(self):
-		#print('listOfDraws size: ', len(self.mw.listOfDraws))
-		#print('listOfDrawing size: ', len(self.mw.listOfDrawing))
-		#print('isDraw: ', self.isDraw)
+		# pezzo utile
 		#if self.isDraw:
-		#	print('sono nell if')
 		#	self.listOfImages[-1].fill(QtGui.qRgba(0,0,0,0))
 		#	self.mw.listOfDraws.clear()
 		#else:
-		#	print('sono nell else')
 		#	self.image.fill(QtGui.qRgba(0,0,0,0))
 
 		self.listOfDrawings.clear()
@@ -109,6 +105,7 @@ class WindowPaint(QWidget):
 
 	
 
+	# utile
 	#def isDrawing(self, command):
 	#	if command == 5:
 	#		self.isDraw = True
@@ -116,60 +113,3 @@ class WindowPaint(QWidget):
 	#	else:
 	#		self.isDraw = False
 	#		return False
-	
-
-
-
-	#LINE
-	#painterPen		QPen	
-	#pointStart		QPoint
-	#pointEnd		QPoint
-
-	#RUBBER
-	#rubberSize		int
-	#point			QPoint
-
-
-
-
-	#def save(self):
-	#	filePath, _ = QFileDialog.getSaveFileName(self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*) ")
-
-	#	if filePath == "":
-	#		return
-	#	self.image.save(filePath)
-
-
-
-	#def clear(self):
-	#	self.image.fill(Qt.white)
-	#	self.update()
-
-
-	#def threePixel(self):
-	#	self.brushSize = 3
-
-	#def fivePixel(self):
-	#	self.brushSize = 5
-
-	#def sevenPixel(self):
-	#	self.brushSize = 7
-
-	#def ninePixel(self):
-	#	self.brushSize = 9
-
-
-	#def blackColor(self):
-	#	self.brushColor = Qt.black
-
-	#def whiteColor(self):
-	#	self.brushColor = Qt.white
-
-	#def redColor(self):
-	#	self.brushColor = Qt.red
-
-	#def greenColor(self):
-	#	self.brushColor = Qt.green
-
-	#def yellowColor(self):
-	#	self.brushColor = Qt.yellow

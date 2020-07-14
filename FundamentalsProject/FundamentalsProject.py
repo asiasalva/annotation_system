@@ -14,7 +14,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
 	app = QtWidgets.QApplication(sys.argv)
-	#mainWindow = QtWidgets.QMainWindow()
 	ui = MainWindow.Ui_MainWindow()
 	mainWindow = MyMainWindow(ui)
 	ui.setupUi(mainWindow)

@@ -1,12 +1,12 @@
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray, Qt, QSize
-from PyQt5.QtGui import *
+from PyQt5.QtCore import QPoint, pyqtSignal, QRect, QByteArray, Qt, QSize, QEvent
+from PyQt5.QtGui import QColor, QCursor, QFont, QPalette, QFocusEvent, QPaintEvent, QPainter, QMouseEvent, QKeyEvent
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPlainTextEdit
 from PyQt5.QtSvg import QSvgWidget
 
 from GUI import Mode
 
-#class annotation for the textbox, arrow and line 
+
+# Class annotation for the textbox, arrow and line 
 
 class Annotation(QWidget):
 
@@ -24,30 +24,23 @@ class Annotation(QWidget):
 
 		self.mw = MainWindow
 
-
 		self.frameWidth, self.frameHeight = self.mw.getFrameDimensions()
 		self.parentWidth = parent.width()
 		self.parentHeight = parent.height()
-
 		self.setMinimumSize(10,10)
 
-
-
-
-
 		self.childWidget = None
-		self.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+		self.setAttribute(Qt.WA_DeleteOnClose, True)
 		self.setVisible(True)
 		self.setAutoFillBackground(False)
 		self.setMouseTracking(True)
-		self.setFocusPolicy(QtCore.Qt.ClickFocus)
+		self.setFocusPolicy(Qt.ClickFocus)
 		self.setFocus()
-		#self.move(p)
 		self.vLayout = QVBoxLayout(self)
 		self.setChildWidget(cWidget, isArrow, currentSecond)
 		self.setPosition(p)
 		self.move(self.getFakePosition(p))
-		#set the focus and the event handler
+		# Set the focus and the event handler
 		self.m_infocus = True
 		self.m_isEditing = True
 		self.installEventFilter(parent)
@@ -55,7 +48,7 @@ class Annotation(QWidget):
 	def setChildWidget(self, cWidget, isArrow, currentSecond):
 		if cWidget:
 			self.childWidget = cWidget
-			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+			self.childWidget.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 			self.childWidget.setParent(self)
 			self.childWidget.releaseMouse()
 			self.vLayout.addWidget(cWidget)
@@ -68,7 +61,7 @@ class Annotation(QWidget):
 	
 			self.mw.setLastFocusAnnotation(self)
 
-	def focusInEvent(self, a0: QtGui.QFocusEvent):
+	def focusInEvent(self, a0: QFocusEvent):
 		self.m_infocus = True
 		p = self.parentWidget()
 		p.installEventFilter(self)
@@ -77,15 +70,15 @@ class Annotation(QWidget):
 		if self.childWidget is not None:
 			self.mw.setLastFocusAnnotation(self)
 
-	def focusOutEvent(self, a0: QtGui.QFocusEvent):
+	def focusOutEvent(self, a0: QFocusEvent):
 		if not self.m_isEditing:
 			return
 		self.mode = Mode.Mode.NONE
 		self.outFocus.emit(False)
 		self.m_infocus = False
 
-	def paintEvent(self, e: QtGui.QPaintEvent):
-		painter = QtGui.QPainter(self)
+	def paintEvent(self, e: QPaintEvent):
+		painter = QPainter(self)
 		color = (r, g, b, a) = (255, 0, 0, 0)
 		painter.fillRect(e.rect(), QColor(r, g, b, a))
 		if self.m_infocus:
@@ -94,34 +87,34 @@ class Annotation(QWidget):
 			painter.setPen(QColor(r, g, b))
 			painter.drawRect(rect)
 
-	def mousePressEvent(self, e: QtGui.QMouseEvent):
+	def mousePressEvent(self, e: QMouseEvent):
 		self.position = QPoint(e.globalX() - self.geometry().x(), e.globalY() - self.geometry().y())
 		if not self.m_isEditing:
 			return
 		if not self.m_infocus:
 			return
-		if not e.buttons() and QtCore.Qt.LeftButton:
+		if not e.buttons() and Qt.LeftButton:
 			self.setCursorShape(e.pos())
 			return
 		# Raises this widget to the top of the parent widget’s stack.
 		self.raise_()
 
-	def keyPressEvent(self, e: QtGui.QKeyEvent):
+	def keyPressEvent(self, e: QKeyEvent):
 		if not self.m_isEditing: return
 		# Remove annotation
-		if e.key() == QtCore.Qt.Key_Delete:
+		if e.key() == Qt.Key_Delete:
 			self.deleteLater()
 			self.mw.removeAnnotation(self)
 		# Moving container with arrows
-		if QApplication.keyboardModifiers() == QtCore.Qt.ControlModifier:
+		if QApplication.keyboardModifiers() == Qt.ControlModifier:
 			newPos = QPoint(self.x(), self.y())
-			if e.key() == QtCore.Qt.Key_Up:
+			if e.key() == Qt.Key_Up:
 				newPos.setY(newPos.y() - 1)
-			if e.key() == QtCore.Qt.Key_Down:
+			if e.key() == Qt.Key_Down:
 				newPos.setY(newPos.y() + 1)
-			if e.key() == QtCore.Qt.Key_Left:
+			if e.key() == Qt.Key_Left:
 				newPos.setX(newPos.x() - 1)
-			if e.key() == QtCore.Qt.Key_Right:
+			if e.key() == Qt.Key_Right:
 				newPos.setX(newPos.x() + 1)
 
 			if newPos.x() < 0:return
@@ -130,14 +123,14 @@ class Annotation(QWidget):
 			if newPos.y() > self.parentWidget().height() - self.height(): return
 			self.move(newPos)
 
-		if QApplication.keyboardModifiers() == QtCore.Qt.ShiftModifier:
-			if e.key() == QtCore.Qt.Key_Up:
+		if QApplication.keyboardModifiers() == Qt.ShiftModifier:
+			if e.key() == Qt.Key_Up:
 				self.resize(self.width(), self.height() - 1)
-			if e.key() == QtCore.Qt.Key_Down:
+			if e.key() == Qt.Key_Down:
 				self.resize(self.width(), self.height() + 1)
-			if e.key() == QtCore.Qt.Key_Left:
+			if e.key() == Qt.Key_Left:
 				self.resize(self.width() - 1, self.height())
-			if e.key() == QtCore.Qt.Key_Right:
+			if e.key() == Qt.Key_Right:
 				self.resize(self.width() + 1, self.height())
 		self.newGeometry.emit(self.geometry())
 
@@ -160,63 +153,63 @@ class Annotation(QWidget):
 			(e_pos.x() < self.x()
 				+ diff)): # Left
 				self.mode = Mode.Mode.RESIZEBL
-				self.setCursor(QCursor(QtCore.Qt.SizeBDiagCursor))
+				self.setCursor(QCursor(Qt.SizeBDiagCursor))
 				# Right - Bottom
 			if ((e_pos.y() > self.y() + self.height() - diff) and # Bottom
 			(e_pos.x() > self.x() + self.width() - diff)): # Right
 				self.mode = Mode.Mode.RESIZEBR
-				self.setCursor(QCursor(QtCore.Qt.SizeFDiagCursor))
+				self.setCursor(QCursor(Qt.SizeFDiagCursor))
 			# Left - Top
 			if ((e_pos.y() < self.y() + diff) and # Top
 			(e_pos.x() < self.x() + diff)): # Left
 				self.mode = Mode.Mode.RESIZETL
-				self.setCursor(QCursor(QtCore.Qt.SizeFDiagCursor))
+				self.setCursor(QCursor(Qt.SizeFDiagCursor))
 			# Right - Top
 			if ((e_pos.y() < self.y() + diff) and # Top
 			(e_pos.x() > self.x() + self.width() - diff)): # Right
 				self.mode = Mode.Mode.RESIZETR
-				self.setCursor(QCursor(QtCore.Qt.SizeBDiagCursor))
+				self.setCursor(QCursor(Qt.SizeBDiagCursor))
 		# check cursor horizontal position
 		elif ((e_pos.x() < self.x() + diff) or # Left
 			(e_pos.x() > self.x() + self.width() - diff)): # Right
 			if e_pos.x() < self.x() + diff: # Left
-				self.setCursor(QCursor(QtCore.Qt.SizeHorCursor))
+				self.setCursor(QCursor(Qt.SizeHorCursor))
 				self.mode = Mode.Mode.RESIZEL
 			else: # Right
-				self.setCursor(QCursor(QtCore.Qt.SizeHorCursor))
+				self.setCursor(QCursor(Qt.SizeHorCursor))
 				self.mode = Mode.Mode.RESIZER
 		# check cursor vertical position
 		elif ((e_pos.y() > self.y() + self.height() - diff) or # Bottom
 			(e_pos.y() < self.y() + diff)): # Top
 			if e_pos.y() < self.y() + diff: # Top
-				self.setCursor(QCursor(QtCore.Qt.SizeVerCursor))
+				self.setCursor(QCursor(Qt.SizeVerCursor))
 				self.mode = Mode.Mode.RESIZET
 			else: # Bottom
-				self.setCursor(QCursor(QtCore.Qt.SizeVerCursor))
+				self.setCursor(QCursor(Qt.SizeVerCursor))
 				self.mode = Mode.Mode.RESIZEB
 		else:
-			self.setCursor(QCursor(QtCore.Qt. ArrowCursor))
+			self.setCursor(QCursor(Qt. ArrowCursor))
 			self.mode = Mode.Mode.MOVE
 
-	def mouseReleaseEvent(self, e: QtGui.QMouseEvent):
+	def mouseReleaseEvent(self, e: QMouseEvent):
 		QWidget.mouseReleaseEvent(self, e)
 		# Save new annotation's position
 		self.setPosition(self.getRealPosition(self.pos()))
 		dim = self.getRealDimensions(self.width(), self.height())
 		self.setDimensions(dim.width(), dim.height())
 
-	def mouseMoveEvent(self, e: QtGui.QMouseEvent):
+	def mouseMoveEvent(self, e: QMouseEvent):
 		QWidget.mouseMoveEvent(self, e)
 		if not self.m_isEditing:
 			return
 		if not self.m_infocus:
 			return
-		if not e.buttons() and QtCore.Qt.LeftButton:
+		if not e.buttons() and Qt.LeftButton:
 			p = QPoint(e.x() + self.geometry().x(), e.y() + self.geometry().y())
 			self.setCursorShape(p)
 			return
 
-		if (self.mode == Mode.Mode.MOVE or self.mode == Mode.Mode.NONE) and e.buttons() and QtCore.Qt.LeftButton:
+		if (self.mode == Mode.Mode.MOVE or self.mode == Mode.Mode.NONE) and e.buttons() and Qt.LeftButton:
 			toMove = e.globalPos() - self.position
 			if toMove.x() < 0:return
 			if toMove.y() < 0:return
@@ -226,7 +219,7 @@ class Annotation(QWidget):
 			self.newGeometry.emit(self.geometry())
 			self.parentWidget().repaint()
 			return
-		if (self.mode != Mode.Mode.MOVE) and e.buttons() and QtCore.Qt.LeftButton:
+		if (self.mode != Mode.Mode.MOVE) and e.buttons() and Qt.LeftButton:
 			if self.mode == Mode.Mode.RESIZETL: # Left - Top
 				newwidth = e.globalX() - self.position.x() - self.geometry().x()
 				newheight = e.globalY() - self.position.y() - self.geometry().y()
@@ -273,7 +266,7 @@ class Annotation(QWidget):
 		self.annotationFrameEnd = 0
 		self.annotationSecondStart = currentSecond
 		self.annotationSecondEnd = currentSecond
-		self.annotationPosition = 0#self.pos()
+		self.annotationPosition = 0
 
 		# These two lines of code (which change annotation's size and put it back 
 		#	are used to prevent that Qt automatically adjust the widget's size 
@@ -346,23 +339,23 @@ class Annotation(QWidget):
 
 	def setTextboxPalette(self):
 		textboxPalette = self.childWidget.palette()
-		self.childWidget.setFont(QtGui.QFont(self.childWidget.font().rawName(), self.textboxFontSize))
-		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Text, QColor(self.textboxFontColor))
-		textboxPalette.setColor(QtGui.QPalette.Active, QtGui.QPalette.Base, QColor(255, 255, 255, (int(self.textboxBackgroundOpacity*2.55))))
+		self.childWidget.setFont(QFont(self.childWidget.font().rawName(), self.textboxFontSize))
+		textboxPalette.setColor(QPalette.Active, QPalette.Text, QColor(self.textboxFontColor))
+		textboxPalette.setColor(QPalette.Active, QPalette.Base, QColor(255, 255, 255, (int(self.textboxBackgroundOpacity*2.55))))
 		self.childWidget.setPalette(textboxPalette)
 		self.setTextboxText(self.getTextboxText())
 
 	def mouseDoubleClickEvent(self, event):
 		if(isinstance(self.childWidget, QPlainTextEdit)):
-			self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, False)
+			self.childWidget.setAttribute(Qt.WA_TransparentForMouseEvents, False)
 			self.childWidget.installEventFilter(self)
 			self.childWidget.textChanged.connect(self.updateTextboxText)
 
 	def eventFilter(self, obj, event):
-		if event.type() == QtCore.QEvent.FocusOut:
+		if event.type() == QEvent.FocusOut:
 			if(isinstance(self.childWidget, QPlainTextEdit)):
-				if obj is self.childWidget and event.type() == QtCore.QEvent.FocusOut:
-					self.childWidget.setAttribute(QtCore.Qt.WA_TransparentForMouseEvents, True)
+				if obj is self.childWidget and event.type() == QEvent.FocusOut:
+					self.childWidget.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
 		return super().eventFilter(obj, event)
 
@@ -474,10 +467,8 @@ class Annotation(QWidget):
 	#endregion
 
 
-
-
-
-
+	### RESIZE FUNCTIONS
+	#region
 
 	def setParentDimensions(self, width, height):
 		self.parentWidth = width
@@ -489,8 +480,6 @@ class Annotation(QWidget):
 
 
 	def getRealPosition(self, fakePos):
-		print("getRealPosition")
-
 		#	realX:frameWidth = fakeX:parentWidth
 		#	realY:frameHeight = fakeY:parentHeight
 
@@ -499,10 +488,7 @@ class Annotation(QWidget):
 
 		return QPoint(realX, realY)
 
-
 	def getFakePosition(self, realPos):
-		print("getFakePosition")
-
 		#	realX:frameWidth = fakeX:parentWidth
 		#	realY:frameHeight = fakeY:parentHeight
 		
@@ -512,27 +498,22 @@ class Annotation(QWidget):
 		return QPoint(fakeX, fakeY)
 
 
-
-
 	def getRealDimensions(self, fakeW, fakeH):
-		print("getRealDimensions")
-
-		#	realX:frameWidth = fakeX:parentWidth
-		#	realY:frameHeight = fakeY:parentHeight
+		#	realW:frameWidth = fakeW:parentWidth
+		#	realH:frameHeight = fakeH:parentHeight
 
 		realW = round((self.frameWidth * fakeW) / self.parentWidth)
 		realH = round((self.frameHeight * fakeH) / self.parentHeight)
 
 		return QSize(realW, realH)
 
-
 	def getFakeDimensions(self, realW, realH):
-		print("getFakeDimensions")
-
-		#	realX:frameWidth = fakeX:parentWidth
-		#	realY:frameHeight = fakeY:parentHeight
+		#	realW:frameWidth = fakeW:parentWidth
+		#	realH:frameHeight = fakeH:parentHeight
 		
 		fakeW = round((self.parentWidth * realW) / self.frameWidth)
 		fakeH = round((self.parentHeight * realH) / self.frameHeight)
 
 		return QSize(fakeW, fakeH)
+
+	#endregion
