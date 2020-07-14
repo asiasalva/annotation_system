@@ -87,7 +87,7 @@ class AnnotationsProperties(QWidget):
 		container.addWidget(self.scroll)
 
 
-	def setProperties(self, annotationClass, isArrow, isDraw, colorString, value1, value2, secStart, secEnd):
+	def setProperties(self, annotationClass, isArrow, colorString, value1, value2, secStart, secEnd):
 		
 		self.spinboxValue1.blockSignals(True)
 		self.spinboxValue2.blockSignals(True)

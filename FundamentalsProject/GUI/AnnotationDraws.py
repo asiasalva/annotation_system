@@ -402,8 +402,8 @@ class AnnotationDraws(QWidget):
 
 	def getDrawingContainerDimensionsAndPoint(self, listOfDrawings):
 		# Find proper container dimensions and start point
-		x_min = sys.maxsize#1000000000#2*self.parentWidth
-		y_min = sys.maxsize#1000000000#2*self.parentHeight
+		x_min = sys.maxsize
+		y_min = sys.maxsize
 		x_max = -1
 		y_max = -1
 
@@ -418,23 +418,15 @@ class AnnotationDraws(QWidget):
 			x_max = max(x_max, pStart.x()+halfBrushSize, pEnd.x()+halfBrushSize)
 			y_max = max(y_max, pStart.y()+halfBrushSize, pEnd.y()+halfBrushSize)
 
-		print(QPoint(x_min, y_min))
-		print(QPoint(x_max, y_max))
-
 		width = x_max - x_min + 10
 		height = y_max - y_min + 10
 
 		return QPoint(x_min, y_min), width, height
 
 
-
 	def drawAnnotations(self, listOfDrawings):
-
-
 		if self.neededParentDimensions is None:
 			self.setNeededParentDimensions(self.parentWidth, self.parentHeight)
-
-
 
 		p, w, h = self.getDrawingContainerDimensionsAndPoint(listOfDrawings)
 
@@ -449,22 +441,17 @@ class AnnotationDraws(QWidget):
 		self.annotationPosition = p
 		self.move(p)
 
-
-		self.childWidget.setStyleSheet("border: 1px solid black;")
+		#self.childWidget.setStyleSheet("border: 1px solid black;")
 		self.childWidget.setScaledContents(True)
-		x = self.childWidget.size()
 		self.childWidget.resize(w,h)
-		z = self.childWidget.size()
-		y = self.size()
 		img = QImage(self.childWidget.size(), QImage.Format_ARGB32)
 		img.fill(QtGui.qRgba(0,0,0,0))
 		
 
 		painter = QPainter(img)
+		painter.setPen(listOfDrawings[0][0])
 		
 		for drawing in listOfDrawings:
-			painter.setPen(drawing[0])
-	
 			pStart = QPoint(
 				(drawing[1].x()-p.x()+5),
 				(drawing[1].y()-p.y()+5)
@@ -481,9 +468,11 @@ class AnnotationDraws(QWidget):
 		
 		pix = QPixmap.fromImage(img)
 		self.childWidget.setPixmap(pix)
+
 		self.setPosition(self.getRealPosition(QPoint(fakeX-10, fakeY-10)))
 		d = self.getRealDimensions(fakeW, fakeH)
 		self.setDimensions(d.width(), d.height())
+
 		painter.end()
 
 

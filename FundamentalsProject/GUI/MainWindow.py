@@ -154,7 +154,7 @@ class Ui_MainWindow(object):
 		#First setup:
 		if(command == 0):					
 			self.listOfAnnotations = list()
-			self.listOfDrawing = list()
+			#self.listOfDrawing = list()
 			self.listOfDraws = list()
 			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
@@ -189,7 +189,6 @@ class Ui_MainWindow(object):
 		if(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
-				False, 
 				False,
 				self.lastFocusAnnotation.getTextboxFontColor(), 
 				self.lastFocusAnnotation.getTextboxFontSize(),
@@ -201,8 +200,7 @@ class Ui_MainWindow(object):
 		elif self.lastFocusAnnotation.isArrow:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
-				self.lastFocusAnnotation.isArrow, 
-				False,
+				self.lastFocusAnnotation.isArrow,
 				self.lastFocusAnnotation.svgColor, 
 				int(float(self.lastFocusAnnotation.svgExtraAttribute)*100), 
 				int(self.lastFocusAnnotation.svgTransform),
@@ -213,8 +211,7 @@ class Ui_MainWindow(object):
 		elif self.lastFocusAnnotation.isArrow == False:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
-				self.lastFocusAnnotation.isArrow, 
-				False,
+				self.lastFocusAnnotation.isArrow,
 				self.lastFocusAnnotation.svgColor, 
 				int(self.lastFocusAnnotation.svgExtraAttribute), 
 				int(self.lastFocusAnnotation.svgTransform),
@@ -226,7 +223,6 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				None,
-				False, 
 				False,
 				0, 
 				0,
@@ -238,7 +234,6 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__,
 				None,
-				False,
 				False,
 				0,
 				0,
@@ -356,11 +351,9 @@ class Ui_MainWindow(object):
 		# 5 -> draws
 		self.annotationsProperties.setPropertiesVisible(True)
 		if(command == 4):
-			print('blackboard')
 			self.lastFocusAnnotation = None
 			self.annotationsProperties.setProperties(
 				None, 
-				False, 
 				False,
 				self.windowBlackboard.getPainterPen().color().name(),
 				self.windowBlackboard.getPainterPen().width(),
@@ -374,17 +367,14 @@ class Ui_MainWindow(object):
 				self.windowBlackboard.setRubber(False)
 			else:
 				self.annotationsList.changeBlackBoardButtonText(True)
-				self.annotationsList.changeDrawButtonText(True)
+				self.annotationsList.changeDrawButtonText(False)
 				self.windowBlackboard.setTrackingMouse(True)
 				self.windowPaint.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(3)
 		elif command == 5:
-			self.lastFocusAnnotation = None
-			#isDraw: flag used to know if we are in blackboard mode or in drawing mode
-			#isDraw = self.windowPaint.isDrawing(command)			
+			self.lastFocusAnnotation = None		
 			self.annotationsProperties.setProperties(
 				None, 
-				False, 
 				False,
 				self.windowPaint.getPainterPen().color().name(),
 				self.windowPaint.getPainterPen().width(),
@@ -397,7 +387,7 @@ class Ui_MainWindow(object):
 				self.videoPlayer.setLayoutWidget(2)
 			else:
 				self.annotationsList.changeDrawButtonText(True)
-				self.annotationsList.changeBlackBoardButtonText(True)
+				self.annotationsList.changeBlackBoardButtonText(False)
 				self.windowPaint.setTrackingMouse(True)
 				self.windowBlackboard.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(1)
@@ -434,7 +424,8 @@ class Ui_MainWindow(object):
 	def removeAnnotation(self, annotationToRemove):
 		self.annotationsTable.removeRow(annotationToRemove)
 		self.listOfAnnotations.remove(annotationToRemove)
-		self.listOfBreaks.remove(annotationToRemove)
+		if annotationToRemove.annotationType == "QWidget":
+			self.listOfBreaks.remove(annotationToRemove)
 		self.annotationsProperties.setPropertiesVisible(False)
 
 	def removeAnnotationFromTable(self, annotationID):
@@ -566,9 +557,7 @@ class Ui_MainWindow(object):
 	def copyDraw(self, listOfDrawings):
 		self.annotationsContainer.createAnnotation(4, self.videoPlayer.getCurrentSecond())
 		self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber() )
-		#self.listOfAnnotations[-1].drawAnnotations(self.listOfDrawing)
 		self.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
-		# del self.listOfDrawing[-1]
 		self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
 		self.orderAnnotations()
 

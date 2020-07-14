@@ -11,7 +11,6 @@ class WindowPaint(QWidget):
 	def setupUi(self, MainWindow):
 
 		self.mw = MainWindow
-		#self.isDraw = None
 		self.listOfDrawings = list()
 
 		# Image to draw on (like a transparent blackboard)
@@ -45,12 +44,11 @@ class WindowPaint(QWidget):
 
 				
 				painter.drawLine(self.lastPoint, currentPoint)
-				# dType = 0 -> LINE, 1 -> RUBBER
-				self.createAnnotation(self.painterPen, self.lastPoint, currentPoint)
+
+				self.listOfDrawings.append([self.painterPen, self.lastPoint, currentPoint])
 
 				self.lastPoint = currentPoint
 				self.update()
-				print("drawing " + str(currentPoint))
 			else:
 				self.lastPoint = QPoint(event.x() * (self.image.width() / self.width()), event.y() * (self.image.height() / self.height()))
 
@@ -58,7 +56,6 @@ class WindowPaint(QWidget):
 	def mouseReleaseEvent(self, event):
 		if event.button() == Qt.LeftButton:
 			self.drawing = False
-			#if self.isDraw:
 			self.mw.copyDraw(self.listOfDrawings)
 			self.clearWindowPaint()
 
@@ -81,34 +78,8 @@ class WindowPaint(QWidget):
 	def getPainterPen(self):
 		return self.painterPen
 
-	
-	def createAnnotation(self, pen, pStart, pEnd):
-		#if self.isDraw:
-		self.listOfDrawings.append([pen, pStart, pEnd])
-		#else:
-		#	self.mw.listOfDrawing.append(
-		#		BlackBoard.BlackBoard(dType, pen, pStart, pEnd, rSize, rPoint)
-		#	)
 
 	def clearWindowPaint(self):
-		# pezzo utile
-		#if self.isDraw:
-		#	self.listOfImages[-1].fill(QtGui.qRgba(0,0,0,0))
-		#	self.mw.listOfDraws.clear()
-		#else:
-		#	self.image.fill(QtGui.qRgba(0,0,0,0))
-
 		self.listOfDrawings.clear()
 		self.image.fill(QtGui.qRgba(0,0,0,0))
 		self.update()
-
-	
-
-	# utile
-	#def isDrawing(self, command):
-	#	if command == 5:
-	#		self.isDraw = True
-	#		return True
-	#	else:
-	#		self.isDraw = False
-	#		return False
