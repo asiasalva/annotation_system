@@ -102,6 +102,8 @@ class AnnotationsTable(QWidget):
 			return "Textbox"
 		elif annotation.annotationType == "QWidget":
 			return "Breakpoint"
+		elif annotation.annotationType == "QLabel":
+			return "Drawing"
 		elif annotation.isArrow:
 			return "Arrow"
 		else:

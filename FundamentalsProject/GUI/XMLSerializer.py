@@ -1,37 +1,30 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-from PyQt5.QtCore import QPoint
-
+from PyQt5.QtCore import QPoint, Qt
+from PyQt5.QtGui import QPen, QColor
 
 class XMLSerializer(object):
-
 	def __init__(self, MainWindow):
 		super().__init__()
+
 		self.mw = MainWindow
 
-
 	def readXML(self, projectPath):
-		# True at the end if all went well
+
 		success = False
 
 		try:
-			# Start reading XML
 			tree = ET.parse(projectPath)
 			root = tree.getroot()
 
 			projectName = root.attrib["name"]
-
-			# Read video attributes
 			video = root[0]
 			videoPath = video[0].text
 			videoWidth = int(float(video[1].text))
 			videoHeight = int(float(video[2].text))
-
-			# Save video dimensions (for annotation resizing)
 			self.mw.setFrameDimensions(videoWidth, videoHeight)
 
-			# Read annotations list
 			for item in root[1]:
 				frame_start = int(float(item[0].text))
 				frame_end = int(float(item[1].text))
@@ -62,28 +55,51 @@ class XMLSerializer(object):
 				elif child.attrib["type"] == "QWidget":
 					self.mw.annotationsContainer.createAnnotation(3, frame_start)
 
+				elif child.attrib["type"] == "QLabel":
+					self.mw.annotationsContainer.createAnnotation(4, frame_start)
+					#[pen, pStart, pEnd]
+					brush_color = child[0].text
+					brush_size = int(child[1].text)
+
+
+					needed_parent_dimensions = child[2]
+					self.mw.listOfAnnotations[-1].setNeededParentDimensions(int(needed_parent_dimensions[0].text), int(needed_parent_dimensions[1].text))
+
+
+					listOfDrawings = list()
+
+					for line in child[3]:
+						pos_start = QPoint(int(line[0][0].text), int(line[0][1].text))
+						pos_end = QPoint(int(line[1][0].text), int(line[1][1].text))
+
+						listOfDrawings.append([QPen(QColor(brush_color), brush_size, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin), pos_start, pos_end])
+
+					self.mw.listOfAnnotations[-1].drawingFromXML = True
+					self.mw.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
+					self.mw.listOfAnnotations[-1].drawingFromXML = False
+
+
+
 				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
-				self.mw.listOfAnnotations[-1].setPosition(position)
-				self.mw.listOfAnnotations[-1].setDimensions(width, height)
+				if child.attrib["type"] != "QLabel":
+					self.mw.listOfAnnotations[-1].setPosition(position)
+					self.mw.listOfAnnotations[-1].setDimensions(width, height)
 
 				success = True
-		except:
-			# Execption thrown
+		except Exception as e:
 			success = False
 			projectName = None
 			videoPath = None
 
 		return success, projectName, videoPath
 
-	
+
 	def writeXML(self, projectPath, projectName, videoPath, videoWidth, videoHeight, listOfAnnotations):
-		# Start XML tree creation
 		root = ET.Element("project")
 		root.attrib["name"] = projectName
 		root.attrib["date"] = str((datetime.now()).strftime("%d/%m/%Y %H:%M:%S"))
 
-		# Write video attributes
 		video = ET.SubElement(root, "video")
 		video_path = ET.SubElement(video, "video_path")
 		video_path.text = videoPath
@@ -92,7 +108,6 @@ class XMLSerializer(object):
 		video_height = ET.SubElement(video, "height")
 		video_height.text = str(videoHeight)
 
-		# Write annotations list
 		list_annotations = ET.SubElement(root, "list_annotations")
 
 		for item in listOfAnnotations:
@@ -149,6 +164,39 @@ class XMLSerializer(object):
 				transform = ET.SubElement(child, "transform")
 				transform.text = item.getSvgTransform()
 
+			elif item.annotationType == "QLabel":
+				brush_color = ET.SubElement(child, "brush_color")
+				brush_color.text = item.listOfDrawings[0][0].color().name()
+
+				brush_size = ET.SubElement(child, "brush_size")
+				brush_size.text = str(item.listOfDrawings[0][0].width())
+
+				needed_parent_dimensions = ET.SubElement(child, "needed_parent_dimensions")
+				width = ET.SubElement(needed_parent_dimensions, "width")
+				width.text = str(item.getNeededParentDimensions().width())
+				height = ET.SubElement(needed_parent_dimensions, "height")
+				height.text = str(item.getNeededParentDimensions().height())
+
+				list_drawings = ET.SubElement(child, "list_drawings")
+
+				for drawing in item.listOfDrawings:	#[pen, pStart, pEnd]
+					line = ET.SubElement(list_drawings, "line")					
+
+					position_start = ET.SubElement(line, "position_start")
+					x = ET.SubElement(position_start, "x")
+					x.text = str(drawing[1].x())
+					y = ET.SubElement(position_start, "y")
+					y.text = str(drawing[1].y())
+
+					position_end = ET.SubElement(line, "position_end")
+					x = ET.SubElement(position_end, "x")
+					x.text = str(drawing[2].x())
+					y = ET.SubElement(position_end, "y")
+					y.text = str(drawing[2].y())
+
+
+
+
 
 		tree = ET.ElementTree(root)
 		tree.write(projectPath)
@@ -158,10 +206,9 @@ class XMLSerializer(object):
 		#reparsed = minidom.parseString(s)
 		#print(reparsed.toprettyxml(indent="  "))
 
-
+		
 	'''
 	XML STRUCTURE
-
 	<project name="name_project" da
 	te="date_modified">
 		<video>
@@ -183,24 +230,20 @@ class XMLSerializer(object):
 					<width>n°</width>
 					<height>n°</height>
 				</dimensions>
-
 				<child type="annotation_type">
 					IF TYPE=QPLAINTEXTEDIT
 					<text>textbox_text</text>
 					<background_opacity>n°</background_opacity>
 					<font_color>#000000</font_color>
 					<font_size>n°</font_size>
-
 					IF TYPE=QSVGWIDGET
 					<is_arrow>bool</is_arrow>
 					<color>#000000</color>
 					<extra>n°</extra>
 					<transform>n°</transform>
-
 					IF TYPE=BREAKPOINT
 					EMPTY
 				</child>
-
 			</annotation>
 		</list_annotations>
 	</project>

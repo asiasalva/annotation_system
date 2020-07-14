@@ -38,6 +38,10 @@ class AnnotationsContainer(QWidget):
 			)
 			# Append to the only breakpoints list needed to the function nextbreakpoint
 			self.mw.listOfBreaks.append(self.mw.listOfAnnotations[-1])
+		elif(annotationType == 4): #DRAWS 
+			self.mw.listOfAnnotations.append(AnnotationDraws.AnnotationDraws(self, QPoint(10,10), QLabel(), False, self.mw, currentSecond)
+			)
+
 
 
 	def showAnnotations(self, nFrame):
