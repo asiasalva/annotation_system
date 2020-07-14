@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QCursor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 
-from GUI import AnnotationDrawing
 
 
 class WindowPaint(QWidget):
@@ -58,7 +57,7 @@ class WindowPaint(QWidget):
 				else:
 					painter.drawLine(self.lastPoint, currentPoint)
 					# dType = 0 -> LINE, 1 -> RUBBER
-					self.createAnnotation(0, self.painterPen, self.lastPoint, currentPoint, None, None)
+					# self.createAnnotation(0, self.painterPen, self.lastPoint, currentPoint, None, None)
 
 				self.lastPoint = currentPoint
 				self.update()
@@ -108,12 +107,6 @@ class WindowPaint(QWidget):
 
 	def getRubberSize(self):
 		return self.rubberSize
-
-	
-	def createAnnotation(self, dType, pen, pStart, pEnd, rSize, rPoint):
-		self.mw.listOfDrawing.append(
-			AnnotationDrawing.AnnotationDrawing(dType, pen, pStart, pEnd, rSize, rPoint)
-		)
 
 
 	def clearWindowPaint(self):
