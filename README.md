@@ -42,7 +42,8 @@ In the video side there is the box in which the video will be played and then al
 - Line: creates a line on the screen, resizable and colorable by user's preferences.
 - Arrow: same as the line but it is an arrow.
 - BreakPoint: when a breakoint is encountered, the video pauses. Also, the user can add breakpoints to play the video and instantly go to that position.
-- Drawing: user can use the video player as a sort of blackboard on which he can draw something, changing brush color and size, eliminate drawings with the rubber and so on.
+- BlackBoard: user can use the video player as a sort of blackboard on which he can draw something, changing brush color and size, eliminate drawings with the rubber and so on.
+- Drawings: user can create drawing in specified positions of the screen that will have the same behaviour as textbox, arrow and line annotations.
 
 ## Extra
 Some structures were used in order to create some functionalities and understand how pyqt5 library work:
