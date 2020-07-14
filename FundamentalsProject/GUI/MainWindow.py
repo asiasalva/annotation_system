@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 import os
 from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDraws, BlackBoard, XMLSerializer, AnnotationBreak, WindowBlackboard
+from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDraws, XMLSerializer, AnnotationBreak, WindowBlackboard
 
 class Ui_MainWindow(object):
 

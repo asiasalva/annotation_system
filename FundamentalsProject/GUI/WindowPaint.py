@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QCursor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 
-from GUI import BlackBoard
 from GUI import AnnotationDraws
 
 
