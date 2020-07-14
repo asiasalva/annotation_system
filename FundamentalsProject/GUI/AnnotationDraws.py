@@ -388,14 +388,16 @@ class AnnotationDraws(QWidget):
 		x_max = -1
 		y_max = -1
 
+		halfBrushSize = round(listOfDrawings[0][0].width() / 2)
+
 		for item in listOfDrawings:		#[pen, pStart, pEnd]
 			pStart = item[1]
 			pEnd = item[2]
 
-			x_min = min(x_min, pStart.x(), pEnd.x())
-			y_min = min(y_min, pStart.y(), pEnd.y())
-			x_max = max(x_max, pStart.x(), pEnd.x())
-			y_max = max(y_max, pStart.y(), pEnd.y())
+			x_min = min(x_min, pStart.x()-halfBrushSize, pEnd.x()-halfBrushSize)
+			y_min = min(y_min, pStart.y()-halfBrushSize, pEnd.y()-halfBrushSize)
+			x_max = max(x_max, pStart.x()+halfBrushSize, pEnd.x()+halfBrushSize)
+			y_max = max(y_max, pStart.y()+halfBrushSize, pEnd.y()+halfBrushSize)
 
 		print(QPoint(x_min, y_min))
 		print(QPoint(x_max, y_max))
@@ -403,7 +405,7 @@ class AnnotationDraws(QWidget):
 		width = x_max - x_min + 10
 		height = y_max - y_min + 10
 
-		return QPoint(x_min, y_min), width, height, QPoint(x_max, y_max)
+		return QPoint(x_min, y_min), width, height
 
 
 
@@ -411,29 +413,32 @@ class AnnotationDraws(QWidget):
 
 	def drawAnnotations(self, listOfDrawings):
 
-		p, w, h, pMax = self.getDrawingContainerDimensionsAndPoint(listOfDrawings)
+		p, w, h = self.getDrawingContainerDimensionsAndPoint(listOfDrawings)
 
 		fakeX = round((self.parentWidth * p.x()) / self.childWidget.width())
 		fakeY = round((self.parentHeight * p.y()) / self.childWidget.height())
 		fakeW = round((self.parentWidth * w) / self.childWidget.width())
 		fakeH = round((self.parentHeight * h) / self.childWidget.height())
 
+		#p.setX(round((self.childWidget.width() * fakeX) / self.parentWidth))
+		#p.setY(round((self.childWidget.height() * fakeY) / self.parentHeight))
+
 		#conversione punto disegno in punto annotazione (parent)
 
 
 		#self.setPosition(QPoint(fakeX, fakeY))
 		#self.setDimensions(fakeW, fakeH)
-		self.annotationWidth = fakeW
-		self.annotationheight = fakeH
-		self.resize(fakeW, fakeH)
-		self.annotationPosition = QPoint(fakeX, fakeY)
-		self.move(fakeX, fakeY)
+		self.annotationWidth = w#fakeW
+		self.annotationheight = h#fakeH
+		self.resize(w,h)#self.resize(fakeW, fakeH)
+		self.annotationPosition = p#QPoint(fakeX, fakeY)
+		self.move(p)#fakeX, fakeY)
 
 
 		self.childWidget.setStyleSheet("border: 1px solid black;")
 		self.childWidget.setScaledContents(True)
 		x = self.childWidget.size()
-		self.childWidget.resize(fakeW, fakeH)
+		self.childWidget.resize(w,h)#fakeW, fakeH)
 		z = self.childWidget.size()
 		y = self.size()
 		img = QImage(self.childWidget.size(), QImage.Format_ARGB32)
@@ -505,16 +510,16 @@ class AnnotationDraws(QWidget):
 				round((self.height() * (drawing[2].y()-p.y())) / (x.height()-p.y()))
 			)
 			'''
-			'''
+			
 			pStart = QPoint(
-				drawing[1].x()-p.x(),
-				drawing[1].y()-p.y()
+				(drawing[1].x()-p.x()+5),#*(x.width()/self.width()),
+				(drawing[1].y()-p.y()+5)#*(x.height()/self.height())
 			)
 			pEnd = QPoint(
-				drawing[2].x()-p.x(),
-				drawing[2].y()-p.y()
+				(drawing[2].x()-p.x()+5),#*(x.width()/self.width()),
+				(drawing[2].y()-p.y()+5)#*(x.height()/self.height())
 			)
-			'''
+			
 			'''
 			pStart = QPoint(
 				abs(round((self.width() * drawing[1].x()) / x.width()) -self.width()),
@@ -525,6 +530,17 @@ class AnnotationDraws(QWidget):
 				abs(round((self.height() * drawing[2].y()) / x.height()) -self.height())
 			)
 			'''
+			'''
+			pStart = QPoint(
+				round((self.width()+10) * (drawing[1].x()-p.x()) / (x.width()-p.x())),
+				round((self.height()+10) * (drawing[1].y()-p.y()) / (x.height()-p.y()))
+			)
+			pEnd = QPoint(
+				round((self.width()+10) * (drawing[2].x()-p.x()) / (x.width()-p.x())),
+				round((self.height()+10) * (drawing[2].y()-p.y()) / (x.height()-p.y()))
+			)
+			'''
+			'''
 			pStart = QPoint(
 				round((x.width()-p.x()) * (drawing[1].x()-p.x()) / (self.width()+10)),
 				round((x.height()-p.y()) * (drawing[1].y()-p.y()) / (self.height()+10))
@@ -533,6 +549,8 @@ class AnnotationDraws(QWidget):
 				round((x.width()-p.x()) * (drawing[2].x()-p.x()) / (self.width()+10)),
 				round((x.height()-p.y()) * (drawing[2].y()-p.y()) / (self.height()+10))
 			)
+			'''
+
 			print(pStart)
 			print(pEnd)
 			#painter.drawLine(drawing[1], drawing[2])
@@ -543,4 +561,8 @@ class AnnotationDraws(QWidget):
 		#img.save(r"C:\Users\Brugix\Desktop\1.png")
 		pix = QPixmap.fromImage(img)
 		self.childWidget.setPixmap(pix)
+		self.setPosition(QPoint(fakeX, fakeY))
+		self.setDimensions(fakeW, fakeH)
+		#self.resize(fakeW, fakeH)
+		#self.childWidget.resize(fakeW, fakeH)
 		painter.end()
