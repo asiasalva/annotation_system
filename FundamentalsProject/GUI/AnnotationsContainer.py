@@ -1,12 +1,12 @@
-from PyQt5.QtWidgets import QWidget, QPlainTextEdit
+from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QLabel
 from PyQt5.QtCore import QPoint
 from PyQt5.QtSvg import QSvgWidget
-from PyQt5.QtGui import QResizeEvent
+from PyQt5.QtGui import QResizeEvent, QImage
 
 from GUI import Annotation
 from GUI import AnnotationBreak
+from GUI import AnnotationDraws
 from GUI import VideoPlayerOpenCV
-
 
 #Creates the lists of annotations needed
 
@@ -32,17 +32,15 @@ class AnnotationsContainer(QWidget):
 				Annotation.Annotation(self, QPoint(10,10), QPlainTextEdit(), False, self.mw, currentSecond)
 			)
 		elif(annotationType == 3):	# BREAKPOINT
-			# Append to the annotations list 
+			# append to the annotations list 
 			self.mw.listOfAnnotations.append(
 				AnnotationBreak.AnnotationBreak(self, QPoint(50,50), QWidget(), self.mw, currentSecond)
 			)
-			# Append to the only breakpoints list needed to the function nextbreakpoint
+			#append to the only brealpoints list needed to the function nextbreakpoint
 			self.mw.listOfBreaks.append(self.mw.listOfAnnotations[-1])
 		elif(annotationType == 4): #DRAWS 
 			self.mw.listOfAnnotations.append(AnnotationDraws.AnnotationDraws(self, QPoint(10,10), QLabel(), False, self.mw, currentSecond)
 			)
-
-
 
 	def showAnnotations(self, nFrame):
 		for annotation in self.mw.listOfAnnotations:
@@ -54,7 +52,6 @@ class AnnotationsContainer(QWidget):
 					self.mw.controlBarCommand(1)
 			else:
 				annotation.setHidden(True)
-
 
 	def resizeEvent(self, event: QResizeEvent):
 		if self.annotationListReady:

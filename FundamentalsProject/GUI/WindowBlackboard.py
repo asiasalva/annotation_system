@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QCursor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 
+#from GUI import AnnotationDrawing
 
 
 class WindowBlackboard(QWidget):
@@ -53,10 +54,11 @@ class WindowBlackboard(QWidget):
 					painter.restore()
 
 					# dType = 0 -> LINE, 1 -> RUBBER
-					# self.createAnnotation(1, None, None, None, self.rubberSize, currentPoint)
+					#self.createAnnotation(1, None, None, None, self.rubberSize, currentPoint)
 				else:
 					painter.drawLine(self.lastPoint, currentPoint)
-			
+					# dType = 0 -> LINE, 1 -> RUBBER
+					#self.createAnnotation(0, self.painterPen, self.lastPoint, currentPoint, None, None)
 
 				self.lastPoint = currentPoint
 				self.update()
@@ -107,7 +109,34 @@ class WindowBlackboard(QWidget):
 	def getRubberSize(self):
 		return self.rubberSize
 
+	
+	#def createAnnotation(self, dType, pen, pStart, pEnd, rSize, rPoint):
+	#	self.mw.listOfDrawing.append(
+	#		AnnotationDrawing.AnnotationDrawing(dType, pen, pStart, pEnd, rSize, rPoint)
+	#	)
+
 
 	def clearWindowPaint(self):
 		self.image.fill(QtGui.qRgba(0,0,0,0));
 		self.update()
+
+
+
+	####!!! da modificare !!!
+	#def drawAnnotations(self, listOfDrawings):
+	#	
+	#	painter = QPainter(self.image)
+	#	
+	#	for drawing in listOfDrawings:
+	#
+	#		# drawingType = 0 -> LINE, 1 -> RUBBER
+	#		if drawing.drawingType:
+	#			r = QRect(QPoint(), drawing.rubberSize*QSize())
+	#			r.moveCenter(drawing.rubberPoint)
+	#			painter.save()
+	#			painter.setCompositionMode(QPainter.CompositionMode_Clear)
+	#			painter.eraseRect(r)
+	#			painter.restore()
+	#		else:
+	#			painter.setPen(drawing.painterPen)
+	#			painter.drawLine(drawing.pointStart, drawing.pointEnd)

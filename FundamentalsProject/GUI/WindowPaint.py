@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QPen, QCursor
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 
-from GUI import BlackBoard
 from GUI import AnnotationDraws
 
 
@@ -84,9 +83,32 @@ class WindowPaint(QWidget):
 
 	
 	def createAnnotation(self, pen, pStart, pEnd):
+		#if self.isDraw:
 		self.listOfDrawings.append([pen, pStart, pEnd])
+		#else:
+		#	self.mw.listOfDrawing.append(
+		#		BlackBoard.BlackBoard(dType, pen, pStart, pEnd, rSize, rPoint)
+		#	)
 
 	def clearWindowPaint(self):
+		# pezzo utile
+		#if self.isDraw:
+		#	self.listOfImages[-1].fill(QtGui.qRgba(0,0,0,0))
+		#	self.mw.listOfDraws.clear()
+		#else:
+		#	self.image.fill(QtGui.qRgba(0,0,0,0))
+
 		self.listOfDrawings.clear()
 		self.image.fill(QtGui.qRgba(0,0,0,0))
 		self.update()
+
+	
+
+	# utile
+	#def isDrawing(self, command):
+	#	if command == 5:
+	#		self.isDraw = True
+	#		return True
+	#	else:
+	#		self.isDraw = False
+	#		return False

@@ -101,7 +101,7 @@ class AnnotationsProperties(QWidget):
 			self.lblValue2.setHidden(True)
 			self.lblTime.setHidden(False)
 			self.lblFrom.setHidden(False)
-			self.lblTo.setHidden(False)
+			self.lblTo.setHidden(True)
 			self.spinboxValue1.setHidden(True)
 			self.spinboxValue2.setHidden(True)
 			self.comboboxColor.setHidden(True)

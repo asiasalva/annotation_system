@@ -82,9 +82,8 @@ class XMLSerializer(object):
 
 				self.mw.listOfAnnotations[-1].setFrameRange(frame_start, frame_end)
 				self.mw.listOfAnnotations[-1].setSecRange(second_start, second_end)
-				if child.attrib["type"] != "QLabel":
-					self.mw.listOfAnnotations[-1].setPosition(position)
-					self.mw.listOfAnnotations[-1].setDimensions(width, height)
+				self.mw.listOfAnnotations[-1].setPosition(position)
+				self.mw.listOfAnnotations[-1].setDimensions(width, height)
 
 				success = True
 		except Exception as e:
@@ -209,6 +208,7 @@ class XMLSerializer(object):
 		
 	'''
 	XML STRUCTURE
+
 	<project name="name_project" da
 	te="date_modified">
 		<video>
@@ -230,21 +230,26 @@ class XMLSerializer(object):
 					<width>n°</width>
 					<height>n°</height>
 				</dimensions>
+
 				<child type="annotation_type">
 					IF TYPE=QPLAINTEXTEDIT
 					<text>textbox_text</text>
 					<background_opacity>n°</background_opacity>
 					<font_color>#000000</font_color>
 					<font_size>n°</font_size>
+
 					IF TYPE=QSVGWIDGET
 					<is_arrow>bool</is_arrow>
 					<color>#000000</color>
 					<extra>n°</extra>
 					<transform>n°</transform>
+
 					IF TYPE=BREAKPOINT
 					EMPTY
 				</child>
+
 			</annotation>
 		</list_annotations>
 	</project>
+
 	'''

@@ -23,6 +23,7 @@ class AnnotationDraws(QWidget):
 	outFocus = pyqtSignal(bool)
 	newGeometry = pyqtSignal(QRect)
 
+	# isArrow is used to distinguish which SVG image the user wants to add (LINE or ARROW). If cWidget is a QSvgWidget, then isArrow parameter is passed in setupSvgVariables function.
 	def __init__(self, parent, p, cWidget, isArrow, MainWindow, currentSecond): 
 		super().__init__(parent=parent)
 
