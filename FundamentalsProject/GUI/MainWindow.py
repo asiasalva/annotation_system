@@ -1,8 +1,8 @@
 import os
 
 from PyQt5 import QtCore, QtWidgets, QtGui
-from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, XMLSerializer, AnnotationBreak
+
+from GUI import Annotation, AnnotationBreak, AnnotationDraws, AnnotationsContainer, AnnotationsList, AnnotationsProperties, AnnotationsTable, VideoPlayerControlBar, VideoPlayerOpenCV, WindowBlackboard, WindowPaint, XMLSerializer
 
 
 class Ui_MainWindow(object):
@@ -17,6 +17,7 @@ class Ui_MainWindow(object):
 		# set vertical layout (i.e., main layout)
 		# N.B.: you need to put a layout (any kind of layout) in order to make content auto resizable
 		MainWindow.setObjectName("MainWindow")
+		#MainWindow.resize(1280, 720)
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
@@ -90,6 +91,9 @@ class Ui_MainWindow(object):
 		self.annotationsContainer = AnnotationsContainer.AnnotationsContainer(self)
 		self.annotationsContainer.setEnabled(False)
 		self.xmlSerializer = XMLSerializer.XMLSerializer(self)
+		self.windowBlackboard = WindowBlackboard.WindowBlackboard()
+		self.windowBlackboard.setupUi(self)
+		self.windowBlackboard.setEnabled(False)
 
 		### Custom widgets - "Video side"
 		# Add VideoPlayer widget
@@ -148,20 +152,17 @@ class Ui_MainWindow(object):
 		self.actionSave_Project.setEnabled(False)
 		self.actionExit.setEnabled(True)
 
-
 	def setupAnnotations(self, command, projectPath = "", nFrame = None):
 		#First setup:
 		if(command == 0):					
 			self.listOfAnnotations = list()
-			self.listOfDrawing = list()
 			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
 			self.projectPath = ""
-
+			self.setMainWindowTitle("Untitled")
+	
 		#Load annotation from file
 		elif(command == 1):
-			self.listOfAnnotations = list()
-			self.listOfBreaks = list()
 			success, projectName, videoPath = self.xmlSerializer.readXML(projectPath)
 			if success:
 				if projectName != "":
@@ -169,6 +170,7 @@ class Ui_MainWindow(object):
 						self.setDurationProperty()
 						self.actionAdd_Video.setEnabled(False)
 						self.videoPlayerControlBar.enablePlayButton(True)
+						self.setMainWindowTitle(os.path.splitext(projectName)[0])
 					else:
 						self.launchError()
 				self.annotationsTable.insertRows(self.listOfAnnotations)
@@ -176,15 +178,14 @@ class Ui_MainWindow(object):
 			else:
 				self.launchError()
 
-		# Load annotations present in this specific frame
 		elif(command == 2):
+			# Load annotations present in this specific frame
 			self.annotationsContainer.showAnnotations(nFrame)
-
 
 	def setLastFocusAnnotation(self, lastFocusAnnotation):	
 		self.annotationsProperties.setPropertiesVisible(True)
 		self.lastFocusAnnotation = lastFocusAnnotation
-		self.windowPaint.setRubber(False)
+		self.windowBlackboard.setRubber(False)
 
 		# TEXTBOX
 		if(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
@@ -220,7 +221,7 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecEnd()
 			)
 		# BREAKPOINT
-		else:
+		elif(isinstance(self.lastFocusAnnotation, AnnotationBreak.AnnotationBreak)):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				None,
@@ -230,20 +231,33 @@ class Ui_MainWindow(object):
 				self.lastFocusAnnotation.getSecStart(),
 				self.lastFocusAnnotation.getSecEnd()
 			)
-
+		# DRAWINGS
+		elif(isinstance(self.lastFocusAnnotation, AnnotationDraws.AnnotationDraws)):
+			self.annotationsProperties.setProperties(
+				self.lastFocusAnnotation.childWidget.__class__,
+				None,
+				False,
+				0,
+				0,
+				self.lastFocusAnnotation.getSecStart(),
+				self.lastFocusAnnotation.getSecEnd()
+			)
 
 	def setNewAnnotationProperties(self, colorString, value1, value2, secStart, secEnd):		
-		# DRAWING
+		# BLACKBOARD
 		if self.lastFocusAnnotation is None:
-			# RUBBER
-			if colorString is None:
-				self.windowPaint.setRubber(True)
-				self.windowPaint.setRubberSize(value2)
-			# DRAW
-			else:
+			if self.windowBlackboard.getTrackingMouse():
+				# RUBBER
+				if colorString is None:
+					self.windowBlackboard.setRubber(True)
+					self.windowBlackboard.setRubberSize(value2)
+				# DRAW
+				else:
+					self.windowBlackboard.setPainterPen(QtGui.QPen(QtGui.QColor(colorString), value1, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+					self.windowBlackboard.setRubber(False)
+					self.windowBlackboard.setRubberSize(value2)
+			elif self.windowPaint.getTrackingMouse():
 				self.windowPaint.setPainterPen(QtGui.QPen(QtGui.QColor(colorString), value1, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
-				self.windowPaint.setRubber(False)
-				self.windowPaint.setRubberSize(value2)
 		# TEXTBOX
 		elif(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
 			self.lastFocusAnnotation.setTextboxFontColor(colorString)
@@ -273,13 +287,17 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		#DRAWINGS
+		elif(isinstance(self.lastFocusAnnotation, AnnotationDraws.AnnotationDraws)):
+			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
+			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
+			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		
 		
 		self.orderAnnotations()
 
-
 	def setDurationProperty(self):
 		self.annotationsProperties.setDuration(self.videoPlayer.getDuration())
-
 
 	### ACTIONS: VideoPlayerControlBar -> VideoPlayerOpenCV
 
@@ -289,14 +307,18 @@ class Ui_MainWindow(object):
 			self.videoPlayerControlBar.enableButtons(True)
 			self.annotationsList.setEnabled(False)
 			self.annotationsProperties.setEnabled(False)
-			self.annotationsContainer.setEnabled(False)
+			self.annotationsContainer.setEnabled(True)
 			self.windowPaint.setEnabled(False)
+			self.windowBlackboard.setEnabled(False)
+			self.annotationsContainer.setAnnotationsEnabled(False)
 		elif(command == 1):
 			self.videoPlayer.pause()
 			self.annotationsList.setEnabled(True)
 			self.annotationsProperties.setEnabled(True)
 			self.annotationsContainer.setEnabled(True)
 			self.windowPaint.setEnabled(True)
+			self.windowBlackboard.setEnabled(True)
+			self.annotationsContainer.setAnnotationsEnabled(True)
 		elif(command == 2):
 			self.videoPlayer.stop()
 			self.videoPlayerControlBar.enableButtons(False)
@@ -305,6 +327,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setEnabled(False)
 			self.annotationsContainer.setEnabled(False)
 			self.windowPaint.setEnabled(False)
+			self.windowBlackboard.setEnabled(False)
 		elif(command == 3):
 			# 10 seconds backward
 			self.videoPlayer.backward()
@@ -322,7 +345,6 @@ class Ui_MainWindow(object):
 		elif(command == 7):
 			self.videoPlayer.nextBreakpoint()
 
-
 	### ACTIONS: AnnotationsList
 
 	def annotationsListCommand(self, command):
@@ -330,29 +352,55 @@ class Ui_MainWindow(object):
 		# 1 -> arrow
 		# 2 -> textbox
 		# 3 -> breakpoint
-		# 4 -> drawing
+		# 4 -> blackboard
+		# 5 -> draws
+		self.annotationsProperties.setPropertiesVisible(True)
 		if(command == 4):
 			self.lastFocusAnnotation = None
 			self.annotationsProperties.setProperties(
 				None, 
-				False, 
+				False,
+				self.windowBlackboard.getPainterPen().color().name(),
+				self.windowBlackboard.getPainterPen().width(),
+				self.windowBlackboard.getRubberSize(),
+				0,0
+			)
+			if self.windowBlackboard.getTrackingMouse():
+				self.annotationsList.changeBlackBoardButtonText(False)
+				self.windowBlackboard.setTrackingMouse(False)
+				self.videoPlayer.setLayoutWidget(2)
+				self.windowBlackboard.setRubber(False)
+			else:
+				self.annotationsList.changeBlackBoardButtonText(True)
+				self.annotationsList.changeDrawButtonText(False)
+				self.windowBlackboard.setTrackingMouse(True)
+				self.windowPaint.setTrackingMouse(False)
+				self.videoPlayer.setLayoutWidget(3)
+		elif command == 5:
+			self.lastFocusAnnotation = None		
+			self.annotationsProperties.setProperties(
+				None, 
+				False,
 				self.windowPaint.getPainterPen().color().name(),
 				self.windowPaint.getPainterPen().width(),
-				self.windowPaint.getRubberSize(),
+				0,
 				0,0
 			)
 			if self.windowPaint.getTrackingMouse():
 				self.annotationsList.changeDrawButtonText(False)
 				self.windowPaint.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(2)
-				self.windowPaint.setRubber(False)
 			else:
 				self.annotationsList.changeDrawButtonText(True)
+				self.annotationsList.changeBlackBoardButtonText(False)
 				self.windowPaint.setTrackingMouse(True)
+				self.windowBlackboard.setTrackingMouse(False)
 				self.videoPlayer.setLayoutWidget(1)
 		else:
+			self.annotationsList.changeBlackBoardButtonText(False)
 			self.annotationsList.changeDrawButtonText(False)
 			self.windowPaint.setTrackingMouse(False)
+			self.windowBlackboard.setTrackingMouse(False)
 			self.videoPlayer.setLayoutWidget(2)
 
 			self.annotationsContainer.createAnnotation(command, self.videoPlayer.getCurrentSecond())
@@ -360,16 +408,17 @@ class Ui_MainWindow(object):
 			self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
 			self.orderAnnotations()
 
-
 	### ACTIONS: AnnotationsTable
+
 
 	def showAnnotationSelected(self, annotationID):
 		# If user is drawing, stop WindowPaint from drawing
-		if self.windowPaint.getTrackingMouse():
-			self.annotationsList.changeDrawButtonText(False)
+		if self.windowPaint.getTrackingMouse() or self.windowBlackboard.getTrackingMouse():
+			self.annotationsList.changeBlackBoardButtonText(False)
 			self.windowPaint.setTrackingMouse(False)
+			self.windowBlackboard.setTrackingMouse(False)
 			self.videoPlayer.setLayoutWidget(2)
-			self.windowPaint.setRubber(False)
+			self.windowBlackboard.setRubber(False)
 		# Find annotation selected and show it
 		for item in self.listOfAnnotations:
 			if annotationID == str(item):
@@ -381,7 +430,8 @@ class Ui_MainWindow(object):
 	def removeAnnotation(self, annotationToRemove):
 		self.annotationsTable.removeRow(annotationToRemove)
 		self.listOfAnnotations.remove(annotationToRemove)
-		self.listOfBreaks.remove(annotationToRemove)
+		if annotationToRemove.annotationType == "QWidget":
+			self.listOfBreaks.remove(annotationToRemove)
 		self.annotationsProperties.setPropertiesVisible(False)
 
 	def removeAnnotationFromTable(self, annotationID):
@@ -392,7 +442,6 @@ class Ui_MainWindow(object):
 				self.removeAnnotation(item)
 				break
 
-
 	### MENU FUNCTIONS
 
 	def newProject(self):
@@ -402,15 +451,17 @@ class Ui_MainWindow(object):
 			if self.saveProject():
 				self.setupAnnotations(0)
 				self.setupUi(self.mw)
+				self.setMainWindowTitle("Untitled")
 		elif retval == QtWidgets.QMessageBox.Discard:
 			# Close current project and create new one
 			self.setupAnnotations(0)
 			self.setupUi(self.mw)
+			self.setMainWindowTitle("Untitled")
 
 	def addVideo(self):
 		# If a video is not already loaded
 		if self.videoPlayer.getvideoPath() == "":
-			videoPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Video", QtCore.QDir.homePath())
+			videoPath, _ = QtWidgets.QFileDialog.getOpenFileName(QtWidgets.QWidget(), "Open Video", QtCore.QDir.homePath())#, "Video files")
 			if videoPath != "":
 				if self.videoPlayer.setupVariables(videoPath):
 					self.setDurationProperty()
@@ -454,6 +505,7 @@ class Ui_MainWindow(object):
 				self.frameHeight,
 				self.listOfAnnotations
 			)
+			self.setMainWindowTitle(os.path.splitext(os.path.basename(self.projectPath))[0])
 			return True
 		else:
 			return False
@@ -468,27 +520,20 @@ class Ui_MainWindow(object):
 			# Close application
 			QtCore.QCoreApplication.instance().quit()
 		return retval
+	
+	### SUPPORT FUNCTIONS 
 
-
-	### SUPPORT FUNCTIONS
-		
 	def messageBox(self):
-
-		# If a video has been loaded, then there is something to save
-		if self.videoPlayer.getvideoPath() != "":
-			if self.projectPath == "":
-				projectName = "Untitled"
-			else:
-				projectName = os.path.basename(self.projectPath)
-			msg = QtWidgets.QMessageBox()
-			msg.setIcon(QtWidgets.QMessageBox.Warning)
-			msg.setText("Do You want to save changes to " + projectName + "?")
-			msg.setWindowTitle(projectName)
-			msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
-			return msg.exec_()
+		if self.projectPath == "":
+			projectName = "Untitled"
 		else:
-			return QtWidgets.QMessageBox.Discard
-
+			projectName = os.path.basename(self.projectPath)
+		msg = QtWidgets.QMessageBox()
+		msg.setIcon(QtWidgets.QMessageBox.Warning)
+		msg.setText("Do You want to save changes to " + projectName + "?")
+		msg.setWindowTitle(projectName)
+		msg.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
+		return msg.exec_()
 
 	def launchError(self):
 		msg = QtWidgets.QMessageBox()
@@ -501,19 +546,15 @@ class Ui_MainWindow(object):
 		self.setupAnnotations(0)
 		self.setupUi(self.mw)
 
-
 	def byFrameStart(self, elem):
 		return elem.getFrameRange()[0]
-
 
 	def orderAnnotations(self):
 		self.listOfAnnotations.sort(key=self.byFrameStart)
 		self.listOfBreaks.sort(key=self.byFrameStart)
 
-
-	def clearWindowPaint(self):
-		self.windowPaint.clearWindowPaint()
-
+	def clearWindowBlackboard(self):
+		self.windowBlackboard.clearWindowBlackboard()
 
 	def setFrameDimensions(self, width, height):
 		self.frameWidth = width
@@ -521,3 +562,14 @@ class Ui_MainWindow(object):
 
 	def getFrameDimensions(self):
 		return (self.frameWidth, self.frameHeight)
+
+	def copyDraw(self, listOfDrawings):
+		self.annotationsContainer.createAnnotation(4, self.videoPlayer.getCurrentSecond())
+		self.listOfAnnotations[-1].setFrameRange(self.videoPlayer.getCurrentFrameNumber(), self.videoPlayer.getCurrentFrameNumber() )
+		self.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
+		self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
+		self.orderAnnotations()
+
+
+	def setMainWindowTitle(self, title):
+		self.mw.setWindowTitle(QtCore.QCoreApplication.translate("MainWindow", title))

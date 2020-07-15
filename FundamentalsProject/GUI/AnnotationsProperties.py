@@ -64,7 +64,7 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue2.valueChanged.connect(self.changeProperties)
 		self.spinboxSecStart.valueChanged.connect(self.changeProperties)
 		self.spinboxSecEnd.valueChanged.connect(self.changeProperties)
-		self.btnClear.clicked.connect(self.clearWindowPaint)
+		self.btnClear.clicked.connect(self.clearWindowBlackboard)
 
 		self.formLayout.addRow(self.lblColor, self.comboboxColor)
 		self.formLayout.addRow(self.lblValue1, self.spinboxValue1)
@@ -101,7 +101,7 @@ class AnnotationsProperties(QWidget):
 			self.lblValue2.setHidden(True)
 			self.lblTime.setHidden(False)
 			self.lblFrom.setHidden(False)
-			self.lblTo.setHidden(False)
+			self.lblTo.setHidden(True)
 			self.spinboxValue1.setHidden(True)
 			self.spinboxValue2.setHidden(True)
 			self.comboboxColor.setHidden(True)
@@ -111,6 +111,25 @@ class AnnotationsProperties(QWidget):
 			self.btnClear.setHidden(True)
 			
 			# Breakpoint -> remove rubber from colors
+			if(self.comboboxColor.itemData(0) is None):
+				self.removeRubber(self.comboboxColor, 0)
+		elif annotationClass is QLabel:
+			# DRAWING
+			self.lblColor.setHidden(True)
+			self.lblValue1.setHidden(True)
+			self.lblValue2.setHidden(True)
+			self.lblTime.setHidden(False)
+			self.lblFrom.setHidden(False)
+			self.lblTo.setHidden(False)
+			self.spinboxValue1.setHidden(True)
+			self.spinboxValue2.setHidden(True)
+			self.comboboxColor.setHidden(True)
+			self.spinboxSecStart.setHidden(False)
+			self.spinboxSecEnd.setHidden(False)
+			self.spinboxSecStart.setValue(secStart)
+			self.spinboxSecEnd.setValue(secEnd)
+			self.btnClear.setHidden(True)
+			# Annotation -> remove rubber from colors
 			if(self.comboboxColor.itemData(0) is None):
 				self.removeRubber(self.comboboxColor, 0)
 		else:
@@ -133,7 +152,7 @@ class AnnotationsProperties(QWidget):
 			self.btnClear.setHidden(True)
 
 			if annotationClass is None:
-				# DRAWING
+				# DRAWING AND BLACKBOARD
 				self.lblColor.setText("Brush color:")
 				self.lblValue1.setText("Brush size:")
 				self.lblValue2.setText("Rubber size:")
@@ -195,6 +214,8 @@ class AnnotationsProperties(QWidget):
 		# If btnClear is hidden (so I'm not drawing) and spinboxSecEnd is hidden (so I'm changing breakpoint's properties)
 		if (self.btnClear.isHidden() and self.spinboxSecEnd.isHidden()):
 			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecStart.value())
+		elif (self.comboboxColor.isHidden() and not self.spinboxSecEnd.isHidden()):
+			self.mw.setNewAnnotationProperties(None, 0, 0, self.spinboxSecStart.value(), self.spinboxSecEnd.value())
 		else:
 			selectedColor = self.comboboxColor.currentData()
 			selectedValue1 = self.spinboxValue1.value()
@@ -224,8 +245,8 @@ class AnnotationsProperties(QWidget):
 		self.spinboxSecStart.blockSignals(False)
 		self.spinboxSecEnd.blockSignals(False)
 
-	def clearWindowPaint(self):
-		self.mw.clearWindowPaint()
+	def clearWindowBlackboard(self):
+		self.mw.clearWindowBlackboard()
 
 
 	def insertRubber(self, combobox, index):

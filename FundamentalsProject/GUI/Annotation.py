@@ -23,6 +23,7 @@ class Annotation(QWidget):
 		super().__init__(parent=parent)
 
 		self.mw = MainWindow
+		self.canBeSelected = True
 
 		self.frameWidth, self.frameHeight = self.mw.getFrameDimensions()
 		self.parentWidth = parent.width()
@@ -200,6 +201,8 @@ class Annotation(QWidget):
 
 	def mouseMoveEvent(self, e: QMouseEvent):
 		QWidget.mouseMoveEvent(self, e)
+		if not self.canBeSelected:
+			return
 		if not self.m_isEditing:
 			return
 		if not self.m_infocus:
@@ -346,6 +349,8 @@ class Annotation(QWidget):
 		self.setTextboxText(self.getTextboxText())
 
 	def mouseDoubleClickEvent(self, event):
+		if not self.canBeSelected:
+			return
 		if(isinstance(self.childWidget, QPlainTextEdit)):
 			self.childWidget.setAttribute(Qt.WA_TransparentForMouseEvents, False)
 			self.childWidget.installEventFilter(self)

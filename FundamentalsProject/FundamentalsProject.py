@@ -15,6 +15,7 @@ class MyMainWindow(QMainWindow):
 		if ui.exitProgram() == QMessageBox.Cancel:
 			event.ignore()
 
+
 if __name__ == "__main__":
 	app = QApplication(sys.argv)
 	ui = MainWindow.Ui_MainWindow()

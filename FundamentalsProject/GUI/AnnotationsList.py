@@ -6,7 +6,6 @@ class AnnotationsList(QWidget):
 	### "List view" for annotation types ###
 
 	def setupUi(self, MainWindow):
-
 		self.mw = MainWindow
 		
 		### Widgets simulating a list view
@@ -36,17 +35,23 @@ class AnnotationsList(QWidget):
 		self.btnBreakpoint.setEnabled(True)
 		self.btnBreakpoint.clicked.connect(lambda: self.sendCommand(3))
 
+		# BlackBoard button
+		self.btnBoard = QPushButton("BlackBoard: OFF")
+		self.btnBoard.setEnabled(True)
+		self.btnBoard.clicked.connect(lambda: self.sendCommand(4))
+
 		# Drawing button
-		self.btnDrawing = QPushButton("Drawing: OFF")
-		self.btnDrawing.setEnabled(True)
-		self.btnDrawing.clicked.connect(lambda: self.sendCommand(4))
+		self.btnDraw = QPushButton("Draws: OFF")
+		self.btnDraw.setEnabled(True)
+		self.btnDraw.clicked.connect(lambda: self.sendCommand(5))
 
 		### Widget container
 		self.formLayout.addRow(self.btnLine)
 		self.formLayout.addRow(self.btnArrow)
 		self.formLayout.addRow(self.btnTextbox)
 		self.formLayout.addRow(self.btnBreakpoint)
-		self.formLayout.addRow(self.btnDrawing)
+		self.formLayout.addRow(self.btnBoard)
+		self.formLayout.addRow(self.btnDraw)
 
 		self.frame.setLayout(self.formLayout)
 		self.scroll.setWidget(self.frame)
@@ -56,13 +61,17 @@ class AnnotationsList(QWidget):
 		container.addWidget(QLabel("Types"))
 		container.addWidget(self.scroll)
 
-
 	def sendCommand(self, command):
 		self.mw.annotationsListCommand(command)
 
-
 	def changeDrawButtonText(self, drawing):
 		if drawing:
-			self.btnDrawing.setText("Drawing: ON")
+			self.btnDraw.setText("Drawing: ON")
 		else:
-			self.btnDrawing.setText("Drawing: OFF")
+			self.btnDraw.setText("Drawing: OFF")
+	
+	def changeBlackBoardButtonText(self, blackboard):
+		if blackboard:
+			self.btnBoard.setText("BlackBoard: ON")
+		else:
+			self.btnBoard.setText("BlackBoard: OFF")

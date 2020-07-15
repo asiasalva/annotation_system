@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel,
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
+
 class VideoPlayerOpenCV(QWidget):
 
 	def setupUi(self, MainWindow):
@@ -37,6 +38,7 @@ class VideoPlayerOpenCV(QWidget):
 		self.stackedLayout.addWidget(self.videoFrame)
 		self.stackedLayout.addWidget(self.mw.windowPaint)
 		self.stackedLayout.addWidget(self.mw.annotationsContainer)
+		self.stackedLayout.addWidget(self.mw.windowBlackboard)
 		self.stackedLayout.setStackingMode(QStackedLayout.StackAll)
 
 		### Widget container
