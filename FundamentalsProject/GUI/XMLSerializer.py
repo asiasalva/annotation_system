@@ -91,7 +91,7 @@ class XMLSerializer(object):
 				self.mw.listOfAnnotations[-1].setPosition(position)
 				self.mw.listOfAnnotations[-1].setDimensions(width, height)
 
-				success = True
+			success = True
 		except Exception as e:
 			success = False
 			projectName = None

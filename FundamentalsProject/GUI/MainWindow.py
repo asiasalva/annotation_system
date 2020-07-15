@@ -159,6 +159,7 @@ class Ui_MainWindow(object):
 			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
 			self.projectPath = ""
+			self.setMainWindowTitle("Untitled")
 	
 		#Load annotation from file
 		elif(command == 1):
@@ -169,6 +170,7 @@ class Ui_MainWindow(object):
 						self.setDurationProperty()
 						self.actionAdd_Video.setEnabled(False)
 						self.videoPlayerControlBar.enablePlayButton(True)
+						self.setMainWindowTitle(os.path.splitext(projectName)[0])
 					else:
 						self.launchError()
 				self.annotationsTable.insertRows(self.listOfAnnotations)
@@ -449,10 +451,12 @@ class Ui_MainWindow(object):
 			if self.saveProject():
 				self.setupAnnotations(0)
 				self.setupUi(self.mw)
+				self.setMainWindowTitle("Untitled")
 		elif retval == QtWidgets.QMessageBox.Discard:
 			# Close current project and create new one
 			self.setupAnnotations(0)
 			self.setupUi(self.mw)
+			self.setMainWindowTitle("Untitled")
 
 	def addVideo(self):
 		# If a video is not already loaded
@@ -501,6 +505,7 @@ class Ui_MainWindow(object):
 				self.frameHeight,
 				self.listOfAnnotations
 			)
+			self.setMainWindowTitle(os.path.splitext(os.path.basename(self.projectPath))[0])
 			return True
 		else:
 			return False
@@ -564,3 +569,7 @@ class Ui_MainWindow(object):
 		self.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
 		self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
 		self.orderAnnotations()
+
+
+	def setMainWindowTitle(self, title):
+		self.mw.setWindowTitle(QtCore.QCoreApplication.translate("MainWindow", title))
