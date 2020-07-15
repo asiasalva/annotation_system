@@ -11,20 +11,26 @@ class XMLSerializer(object):
 		self.mw = MainWindow
 
 	def readXML(self, projectPath):
-
+		# True at the end if all went well
 		success = False
 
 		try:
+			# Start reading XML
 			tree = ET.parse(projectPath)
 			root = tree.getroot()
 
 			projectName = root.attrib["name"]
+
+			# Read video attributes
 			video = root[0]
 			videoPath = video[0].text
 			videoWidth = int(float(video[1].text))
 			videoHeight = int(float(video[2].text))
+
+			# Save video dimensions (for annotation resizing)
 			self.mw.setFrameDimensions(videoWidth, videoHeight)
 
+			# Read annotations list
 			for item in root[1]:
 				frame_start = int(float(item[0].text))
 				frame_end = int(float(item[1].text))
@@ -95,10 +101,12 @@ class XMLSerializer(object):
 
 
 	def writeXML(self, projectPath, projectName, videoPath, videoWidth, videoHeight, listOfAnnotations):
+		# Start XML tree creation
 		root = ET.Element("project")
 		root.attrib["name"] = projectName
 		root.attrib["date"] = str((datetime.now()).strftime("%d/%m/%Y %H:%M:%S"))
 
+		# Write video attributes
 		video = ET.SubElement(root, "video")
 		video_path = ET.SubElement(video, "video_path")
 		video_path.text = videoPath
@@ -107,6 +115,7 @@ class XMLSerializer(object):
 		video_height = ET.SubElement(video, "height")
 		video_height.text = str(videoHeight)
 
+		# Write annotations list
 		list_annotations = ET.SubElement(root, "list_annotations")
 
 		for item in listOfAnnotations:
@@ -205,7 +214,7 @@ class XMLSerializer(object):
 		#reparsed = minidom.parseString(s)
 		#print(reparsed.toprettyxml(indent="  "))
 
-		
+
 	'''
 	XML STRUCTURE
 

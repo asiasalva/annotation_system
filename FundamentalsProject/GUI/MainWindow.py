@@ -1,7 +1,9 @@
-from PyQt5 import QtCore, QtWidgets, QtGui
 import os
-from GUI import VideoPlayerOpenCV, VideoPlayerControlBar, AnnotationsTable, AnnotationsProperties, AnnotationsList
-from GUI import Annotation, WindowPaint, AnnotationsContainer, AnnotationDraws, XMLSerializer, AnnotationBreak, WindowBlackboard
+
+from PyQt5 import QtCore, QtWidgets, QtGui
+
+from GUI import Annotation, AnnotationBreak, AnnotationDraws, AnnotationsContainer, AnnotationsList, AnnotationsProperties, AnnotationsTable, VideoPlayerControlBar, VideoPlayerOpenCV, WindowBlackboard, WindowPaint, XMLSerializer
+
 
 class Ui_MainWindow(object):
 
@@ -154,8 +156,6 @@ class Ui_MainWindow(object):
 		#First setup:
 		if(command == 0):					
 			self.listOfAnnotations = list()
-			#self.listOfDrawing = list()
-			self.listOfDraws = list()
 			self.listOfBreaks = list()
 			self.lastFocusAnnotation = None
 			self.projectPath = ""
@@ -189,7 +189,7 @@ class Ui_MainWindow(object):
 		if(isinstance(self.lastFocusAnnotation.childWidget, QtWidgets.QPlainTextEdit)):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
-				False,
+				False, 
 				self.lastFocusAnnotation.getTextboxFontColor(), 
 				self.lastFocusAnnotation.getTextboxFontSize(),
 				self.lastFocusAnnotation.getTextboxBackgroundOpacity(),
@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
 		elif self.lastFocusAnnotation.isArrow:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
-				self.lastFocusAnnotation.isArrow,
+				self.lastFocusAnnotation.isArrow, 
 				self.lastFocusAnnotation.svgColor, 
 				int(float(self.lastFocusAnnotation.svgExtraAttribute)*100), 
 				int(self.lastFocusAnnotation.svgTransform),
@@ -211,7 +211,7 @@ class Ui_MainWindow(object):
 		elif self.lastFocusAnnotation.isArrow == False:
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
-				self.lastFocusAnnotation.isArrow,
+				self.lastFocusAnnotation.isArrow, 
 				self.lastFocusAnnotation.svgColor, 
 				int(self.lastFocusAnnotation.svgExtraAttribute), 
 				int(self.lastFocusAnnotation.svgTransform),
@@ -223,7 +223,7 @@ class Ui_MainWindow(object):
 			self.annotationsProperties.setProperties(
 				self.lastFocusAnnotation.childWidget.__class__, 
 				None,
-				False,
+				False, 
 				0, 
 				0,
 				self.lastFocusAnnotation.getSecStart(),
@@ -285,6 +285,7 @@ class Ui_MainWindow(object):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
 			self.annotationsTable.updateRow(self.lastFocusAnnotation)
+		#DRAWINGS
 		elif(isinstance(self.lastFocusAnnotation, AnnotationDraws.AnnotationDraws)):
 			self.lastFocusAnnotation.setSecRange(secStart, secEnd)
 			self.lastFocusAnnotation.setFrameRange(self.videoPlayer.getNumberFrameBySecond(secStart), self.videoPlayer.getNumberFrameBySecond(secEnd))
@@ -422,6 +423,7 @@ class Ui_MainWindow(object):
 				item.setFocus()
 				self.videoPlayer.goToPosition(item.getSecStart())
 				self.setLastFocusAnnotation(item)
+				break
 
 	def removeAnnotation(self, annotationToRemove):
 		self.annotationsTable.removeRow(annotationToRemove)
@@ -546,8 +548,8 @@ class Ui_MainWindow(object):
 		self.listOfAnnotations.sort(key=self.byFrameStart)
 		self.listOfBreaks.sort(key=self.byFrameStart)
 
-	def clearWindowPaint(self):
-		self.windowBlackboard.clearWindowPaint()
+	def clearWindowBlackboard(self):
+		self.windowBlackboard.clearWindowBlackboard()
 
 	def setFrameDimensions(self, width, height):
 		self.frameWidth = width
@@ -562,4 +564,3 @@ class Ui_MainWindow(object):
 		self.listOfAnnotations[-1].drawAnnotations(listOfDrawings)
 		self.annotationsTable.insertRow(self.listOfAnnotations[-1])	# [-1] get the last element of the list
 		self.orderAnnotations()
-

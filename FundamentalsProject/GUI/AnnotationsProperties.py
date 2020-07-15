@@ -64,7 +64,7 @@ class AnnotationsProperties(QWidget):
 		self.spinboxValue2.valueChanged.connect(self.changeProperties)
 		self.spinboxSecStart.valueChanged.connect(self.changeProperties)
 		self.spinboxSecEnd.valueChanged.connect(self.changeProperties)
-		self.btnClear.clicked.connect(self.clearWindowPaint)
+		self.btnClear.clicked.connect(self.clearWindowBlackboard)
 
 		self.formLayout.addRow(self.lblColor, self.comboboxColor)
 		self.formLayout.addRow(self.lblValue1, self.spinboxValue1)
@@ -245,8 +245,8 @@ class AnnotationsProperties(QWidget):
 		self.spinboxSecStart.blockSignals(False)
 		self.spinboxSecEnd.blockSignals(False)
 
-	def clearWindowPaint(self):
-		self.mw.clearWindowPaint()
+	def clearWindowBlackboard(self):
+		self.mw.clearWindowBlackboard()
 
 
 	def insertRubber(self, combobox, index):

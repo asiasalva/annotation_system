@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel, QPushButton, QFormLayout, QFrame
 
+
 class AnnotationsList(QWidget):
 
 	### "List view" for annotation types ###

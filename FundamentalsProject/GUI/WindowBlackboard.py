@@ -103,6 +103,6 @@ class WindowBlackboard(QWidget):
 		return self.rubberSize
 
 
-	def clearWindowPaint(self):
+	def clearWindowBlackboard(self):
 		self.image.fill(QtGui.qRgba(0,0,0,0));
 		self.update()

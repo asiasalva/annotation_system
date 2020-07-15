@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget , QSlider, QLabel,
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QImage
 
+
 class VideoPlayerOpenCV(QWidget):
 
 	def setupUi(self, MainWindow):
