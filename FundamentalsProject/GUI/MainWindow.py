@@ -307,6 +307,7 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.setEnabled(True)
 			self.windowPaint.setEnabled(False)
 			self.windowBlackboard.setEnabled(False)
+			self.annotationsContainer.setAnnotationsEnabled(False)
 		elif(command == 1):
 			self.videoPlayer.pause()
 			self.annotationsList.setEnabled(True)
@@ -314,6 +315,7 @@ class Ui_MainWindow(object):
 			self.annotationsContainer.setEnabled(True)
 			self.windowPaint.setEnabled(True)
 			self.windowBlackboard.setEnabled(True)
+			self.annotationsContainer.setAnnotationsEnabled(True)
 		elif(command == 2):
 			self.videoPlayer.stop()
 			self.videoPlayerControlBar.enableButtons(False)

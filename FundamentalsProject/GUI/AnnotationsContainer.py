@@ -59,3 +59,7 @@ class AnnotationsContainer(QWidget):
 				annotation.setParentDimensions(self.width(), self.height())
 
 		super().resizeEvent(event)
+
+	def setAnnotationsEnabled(self, enable):
+		for annotation in self.mw.listOfAnnotations:
+			annotation.canBeSelected = enable
